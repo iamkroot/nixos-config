@@ -1,0 +1,23 @@
+[vars]
+nix_chroot_bin = "nix-user-chroot ~/.nix ~/.nix-profile/bin"
+nix_bin = '{{vars.nix_chroot_bin}}/nix --extra-experimental-features "nix-command flakes"'
+
+[tasks.fmt]
+description = "Run nixfmt via nix-user-chroot"
+run = "{{vars.nix_chroot_bin}}/nix-shell -p nixfmt-tree --run \"treefmt ${@:-.}\""
+
+[tasks.renc]
+description = "Run vaultix renc"
+run = "{{vars.nix_bin}} run $'.?submodules=1#vaultix.app.x86_64-linux.renc'"
+
+[tasks.commit-secrets]
+dir = "secrets"
+run = ["git add .", "git commit -m {{usage.message | quote}}"]
+usage = '''arg <message> default="Update secrets"'''
+
+[tasks.deploy-vm]
+vars._.file = "secrets/mise_vars.txt"
+description = "Deploy configuration to a machine using nixos-anywhere"
+# TODO: 1. ssh-keygen a keypair to /tmp, 2. decrypt zfs passphrase via age, 3. Provide password via env.SSHPASS
+interactive = true
+run = '''{{vars.nix_bin}} run github:nix-community/nixos-anywhere -- --flake '.?submodules=1#{{vars.sandbox1_name}}' --extra-files /tmp/{{vars.sandbox1_name}}/keys --disk-encryption-keys /tmp/zfs-secret.key ~/zfs-pass.txt nixos-vm'''
