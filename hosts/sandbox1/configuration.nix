@@ -11,6 +11,7 @@ in
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
+    ../../modules/networking.nix
   ];
   nix.settings.experimental-features = [
     "nix-command"
@@ -23,7 +24,6 @@ in
   boot.zfs.devNodes = "/dev";
   networking.hostId = "${hostPII.netId}";
   networking.hostName = "${hostPII.name}";
-  networking.networkmanager.enable = true;
 
   time.timeZone = "America/Los_Angeles";
 
