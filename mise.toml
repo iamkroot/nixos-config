@@ -6,9 +6,15 @@ nix_bin = '{{vars.nix_chroot_bin}}/nix --extra-experimental-features "nix-comman
 description = "Run nixfmt via nix-user-chroot"
 run = "{{vars.nix_chroot_bin}}/nix-shell -p nixfmt-tree --run \"treefmt ${@:-.}\""
 
-[tasks.renc]
+[tasks."secret:renc"]
+alias = "renc"
 description = "Run vaultix renc"
 run = "{{vars.nix_bin}} run $'.?submodules=1#vaultix.app.x86_64-linux.renc'"
+
+[tasks."secret:edit"]
+alias = "sedit"
+description = "Run vaultix renc"
+run = "{{vars.nix_bin}} run $'.?submodules=1#vaultix.app.x86_64-linux.edit'"
 
 [tasks.commit-secrets]
 dir = "secrets"

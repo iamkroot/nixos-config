@@ -39,13 +39,13 @@
             disko.nixosModules.disko
             vaultix.nixosModules.default
 
-            ./hosts/sandbox1/hardware-configuration.nix
             ./hosts/sandbox1/configuration.nix
 
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit pii; };
               home-manager.users."${pii.primaryUser}" = import ./home/user1.nix;
             }
           ];
@@ -53,9 +53,16 @@
         "${pii.hosts.homelab1.name}" = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit inputs pii; };
           modules = [
+            disko.nixosModules.disko
             vaultix.nixosModules.default
-            ./hosts/homelab1/hardware-configuration.nix
             ./hosts/homelab1/configuration.nix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit pii; };
+              home-manager.users."${pii.primaryUser}" = import ./home/user1.nix;
+            }
           ];
         };
       };
