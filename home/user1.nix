@@ -13,10 +13,11 @@ in
 {
   imports = [
     ../modules/zsh.nix
+    ../modules/cli-tools.nix
   ];
 
   xdg.configFile."mise/config.toml".source = link "${dotfiles}/.config/mise/config.toml";
-  home.activation.cloneDotfiles = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.cloneDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     # If the dotfiles repo doesn't exist on this machine, clone it
     if [ ! -d "${dotfiles}" ]; then
       export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh"

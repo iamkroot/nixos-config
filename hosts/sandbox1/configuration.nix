@@ -56,12 +56,15 @@ in
     };
     beforeUserborn = [ "user-pwd" ];
   };
+
+  programs.zsh.enable = true;
   users.users."${pii.primaryUser}" = {
     isNormalUser = true;
     extraGroups = [
       "networkmanager"
       "wheel"
     ];
+    shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
       "${pii.userPubkey}"
     ];
@@ -72,10 +75,10 @@ in
     openssh.authorizedKeys.keys = [
       "${pii.userPubkey}"
     ];
+    shell = pkgs.zsh;
     hashedPasswordFile = config.vaultix.secrets."user-pwd".path;
   };
-  users.mutableUsers = false;
-
+  # users.mutableUsers = false;
   services.userborn.enable = true;
 
   nixpkgs.config.allowUnfree = true;
@@ -85,6 +88,13 @@ in
     helix
     wget
     wl-clipboard
+    bat
+    eza
+    ripgrep
+    dust
+    fd
+    aria2
+    zsh
   ];
 
   services.openssh = {

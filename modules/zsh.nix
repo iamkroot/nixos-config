@@ -31,7 +31,7 @@
 
     # Use mkMerge to combine your top and bottom scripts safely
     initContent = lib.mkMerge [
-      
+
       # This replaces initExtraFirst (Forces it to the VERY TOP of .zshrc)
       (lib.mkBefore ''
         # Enable Powerlevel10k instant prompt.
