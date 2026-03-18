@@ -50,7 +50,6 @@ in
       };
       "github-ssh-key" = {
         file = "${hostPII.secrets.github-ssh-key}";
-        path = "/home/${pii.primaryUser}/.ssh/github_ed25519";
         owner = "${pii.primaryUser}";
         mode = "0400";
       };
