@@ -50,6 +50,9 @@ in
         owner = "${pii.primaryUser}";
         mode = "0400";
       };
+      "ssh-key" = {
+        file = "${hostPII.secrets.ssh-key}";
+      };
     };
     beforeUserborn = [ "user-pwd" ];
   };

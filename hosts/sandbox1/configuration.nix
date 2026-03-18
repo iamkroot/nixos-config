@@ -27,12 +27,12 @@ in
 
   time.timeZone = "America/Los_Angeles";
 
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
-  xdg.portal.enable = true;
-  services.qemuGuest.enable = true;
-  services.spice-vdagentd.enable = true;
+  # services.displayManager.sddm.enable = true;
+  # services.desktopManager.plasma6.enable = true;
+  # services.displayManager.sddm.wayland.enable = true;
+  # xdg.portal.enable = true;
+  # services.qemuGuest.enable = true;
+  # services.spice-vdagentd.enable = true;
 
   services.pipewire = {
     enable = true;
@@ -44,6 +44,9 @@ in
     secrets = {
       "user-pwd" = {
         file = "${hostPII.secrets.user-pwd}";
+      };
+      "ssh-key" = {
+        file = "${hostPII.secrets.ssh-key}";
       };
       "github-ssh-key" = {
         file = "${hostPII.secrets.github-ssh-key}";
