@@ -5,6 +5,9 @@
   ...
 }:
 {
+  imports = [
+    ../modules/zsh.nix
+  ];
   programs.git = {
     enable = true;
     userName = "${pii.nick}";
