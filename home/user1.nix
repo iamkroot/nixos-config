@@ -14,13 +14,14 @@ in
   imports = [
     ../modules/zsh.nix
     ../modules/cli-tools.nix
+    ../modules/aliases.nix
   ];
 
   xdg.configFile."mise/config.toml".source = link "${dotfiles}/.config/mise/config.toml";
   home.activation.cloneDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     # If the dotfiles repo doesn't exist on this machine, clone it
     if [ ! -d "${dotfiles}" ]; then
-      export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh"
+      export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh -o StrictHostKeyChecking=accept-new"
       $DRY_RUN_CMD ${pkgs.git}/bin/git clone "${pii.dotfilesRepo}" "${dotfiles}"
     fi
   '';
@@ -39,6 +40,9 @@ in
   };
   programs.ssh = {
     enable = true;
+    extraOptionOverrides = {
+      StrictHostKeyChecking = "accept-new";
+    };
     matchBlocks."github.com" = {
       hostname = "github.com";
       user = "git";

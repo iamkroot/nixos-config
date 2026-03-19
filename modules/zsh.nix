@@ -46,7 +46,11 @@
           source "$HOME/.dotfiles/.zshrc-nix-extra"
         fi
 
-        [[ ! -f "$HOME/.dotfiles/.p10k.zsh" ]] || source "$HOME/.dotfiles/.p10k.zsh"
+        if [ -f "$HOME/.dotfiles/.p10k.zsh" ]; then
+          source "$HOME/.dotfiles/.p10k.zsh"
+        elif [ -f "$HOME/.p10k.zsh" ]; then
+          source "$HOME/.p10k.zsh"
+        fi
       '')
     ];
   };

@@ -21,8 +21,11 @@ in
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+
+  # zfs
   boot.supportedFilesystems = [ "zfs" ];
   boot.zfs.devNodes = "/dev";
+  services.zfs.trim.enable = true;
   networking.hostId = "${hostPII.netId}";
   networking.hostName = "${hostPII.name}";
 
@@ -57,8 +60,10 @@ in
     beforeUserborn = [ "user-pwd" ];
   };
 
+  programs.zsh.enable = true;
   users.users."${pii.primaryUser}" = {
     isNormalUser = true;
+    shell = pkgs.zsh;
     extraGroups = [
       "networkmanager"
       "wheel"
@@ -70,6 +75,7 @@ in
   };
 
   users.users.root = {
+    shell = pkgs.zsh;
     hashedPasswordFile = config.vaultix.secrets."user-pwd".path;
   };
   users.mutableUsers = false;
@@ -83,6 +89,13 @@ in
     helix
     wget
     wl-clipboard
+    bat
+    eza
+    ripgrep
+    dust
+    fd
+    aria2
+    zsh
   ];
 
   services.openssh = {

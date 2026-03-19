@@ -20,8 +20,11 @@ in
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+
+  # zfs
   boot.supportedFilesystems = [ "zfs" ];
   boot.zfs.devNodes = "/dev";
+  services.zfs.trim.enable = true;
   networking.hostId = "${hostPII.netId}";
   networking.hostName = "${hostPII.name}";
 

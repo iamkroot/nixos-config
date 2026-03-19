@@ -47,6 +47,7 @@
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = { inherit pii; };
               home-manager.users."${pii.primaryUser}" = import ./home/user1.nix;
+              home-manager.users.root = import ./home/root.nix;
             }
           ];
         };
@@ -62,6 +63,7 @@
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = { inherit pii; };
               home-manager.users."${pii.primaryUser}" = import ./home/user1.nix;
+              home-manager.users.root = import ./home/root.nix;
             }
           ];
         };
