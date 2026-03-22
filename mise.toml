@@ -26,7 +26,7 @@ vars._.file = "secrets/mise_vars.txt"
 description = "Deploy configuration to a machine using nixos-anywhere"
 # TODO: 1. ssh-keygen a keypair to /tmp, 2. decrypt zfs passphrase via age, 3. Provide password via env.SSHPASS
 interactive = true
-run = '''{{vars.nix_bin}} run github:nix-community/nixos-anywhere -- --flake '.?submodules=1#{{vars.sandbox1_name}}' --extra-files /tmp/{{vars.sandbox1_name}}/keys --disk-encryption-keys /tmp/zfs-secret.key ~/zfs-pass.txt root@192.168.122.122'''
+run = '''{{vars.nix_bin}} run github:nix-community/nixos-anywhere -- --flake '.?submodules=1#{{vars.homelab1_name}}' --extra-files /tmp/{{vars.sandbox1_name}}/keys --disk-encryption-keys /tmp/zfs-secret.key ~/zfs-pass.txt root@192.168.122.122'''
 
 [tasks.rebuild-vm]
 vars._.file = "secrets/mise_vars.txt"
@@ -34,3 +34,19 @@ description = "Invoke nixos-rebuild remotely to vm"
 # TODO: 1. ssh-keygen a keypair to /tmp, 2. decrypt zfs passphrase via age, 3. Provide password via env.SSHPASS
 interactive = true
 run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.sandbox1_name}}' --target-host root@nixos-vm'''
+
+[tasks.deploy-homelab]
+vars._.file = "secrets/mise_vars.txt"
+description = "Deploy configuration to a machine using nixos-anywhere"
+# TODO: 1. ssh-keygen a keypair to /tmp, 2. decrypt zfs passphrase via age, 3. Provide password via env.SSHPASS
+interactive = true
+run = [
+	'cd secrets && mise run decrypt-secrets',
+	'''{{vars.nix_bin}} run github:nix-community/nixos-anywhere -- --flake '.?submodules=1#{{vars.homelab1_name}}' --extra-files /tmp/{{vars.homelab1_name}}/keys --disk-encryption-keys /tmp/zfs-secret.key ~/zfs-pass.txt root@10.0.0.102'''
+]
+
+[tasks.rebuild-homelab]
+vars._.file = "secrets/mise_vars.txt"
+description = "Invoke nixos-rebuild remotely to vm"
+interactive = true
+run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}}'''

@@ -28,9 +28,9 @@ in
 
   programs.git = {
     enable = true;
-    userName = "${pii.nick}";
-    userEmail = "${pii.primaryEmail}";
     settings = {
+      user.name = "${pii.nick}";
+      user.email = "${pii.primaryEmail}";
       init.defaultBranch = "main";
       pull.rebase = true;
       gpg.format = "ssh";
@@ -40,6 +40,7 @@ in
   };
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
     extraOptionOverrides = {
       StrictHostKeyChecking = "accept-new";
     };

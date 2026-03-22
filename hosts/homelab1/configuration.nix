@@ -21,10 +21,13 @@ in
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 10; # Only swap when memory is 90% full
+  };
 
   # zfs
   boot.supportedFilesystems = [ "zfs" ];
-  boot.zfs.devNodes = "/dev";
+  boot.zfs.devNodes = "/dev/disk/by-id";
   services.zfs.trim.enable = true;
   networking.hostId = "${hostPII.netId}";
   networking.hostName = "${hostPII.name}";
@@ -49,7 +52,7 @@ in
       };
       "github-ssh-key" = {
         file = "${hostPII.secrets.github-ssh-key}";
-        path = "/home/${pii.primaryUser}/.ssh/github_ed25519";
+        # path = "/home/${pii.primaryUser}/.ssh/github_ed25519";
         owner = "${pii.primaryUser}";
         mode = "0400";
       };
@@ -76,6 +79,9 @@ in
 
   users.users.root = {
     shell = pkgs.zsh;
+    openssh.authorizedKeys.keys = [
+      "${pii.userPubkey}"
+    ];
     hashedPasswordFile = config.vaultix.secrets."user-pwd".path;
   };
   users.mutableUsers = false;
@@ -85,21 +91,25 @@ in
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
+    aria2
+    bat
+    dust
+    dysk
+    eza
+    fd
     git
     helix
+    ripgrep
     wget
     wl-clipboard
-    bat
-    eza
-    ripgrep
-    dust
-    fd
-    aria2
     zsh
   ];
 
   services.openssh = {
     enable = true;
+    settings = {
+      PermitRootLogin = "prohibit-password";
+    };
   };
   system.stateVersion = "26.05";
 }
