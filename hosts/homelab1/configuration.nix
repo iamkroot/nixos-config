@@ -59,6 +59,10 @@ in
       "ssh-key" = {
         file = "${hostPII.secrets.ssh-key}";
       };
+      "das1-dataset1-key" = {
+        file = "${pii.storage.das1.dataset1.key}";
+        path = "${pii.storage.das1.dataset1.keypath}";
+      };
     };
     beforeUserborn = [ "user-pwd" ];
   };
