@@ -12,6 +12,9 @@ in
     ./hardware-configuration.nix
     ./disko.nix
     ../../modules/networking.nix
+    ../../modules/ports.nix
+    ../../secrets/ports.nix
+    ../../modules/services/atuin.nix
   ];
 
   nix.settings.experimental-features = [

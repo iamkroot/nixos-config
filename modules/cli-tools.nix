@@ -1,4 +1,10 @@
-{ pkgs, ... }:
+{
+  config,
+  osConfig,
+  pkgs,
+  pii,
+  ...
+}:
 
 {
   programs.fzf = {
@@ -37,6 +43,8 @@
     enableZshIntegration = true;
 
     settings = {
+      sync_address = "http://${pii.hosts.homelab1.localIp}:${toString osConfig.infra.services.ports.atuin}";
+
       search_mode = "fuzzy";
       style = "compact";
       auto_sync = true;
