@@ -15,6 +15,7 @@ in
     ../../modules/ports.nix
     ../../secrets/ports.nix
     ../../modules/services/atuin.nix
+    ../../modules/storage.nix
   ];
 
   nix.settings.experimental-features = [
