@@ -15,6 +15,8 @@ in
     ../../modules/ports.nix
     ../../secrets/ports.nix
     ../../modules/services/atuin.nix
+    ../../modules/services/jellyfin.nix
+    ../../modules/services/caddy.nix
     ../../modules/storage.nix
   ];
 
