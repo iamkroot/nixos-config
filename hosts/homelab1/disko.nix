@@ -16,6 +16,14 @@
                 mountpoint = "/boot";
               };
             };
+            swap = {
+              size = "8G";
+              content = {
+                type = "swap";
+                # no hibernation
+                resumeDevice = false;
+              };
+            };
             zfs = {
               size = "100%";
               content = {
@@ -38,7 +46,8 @@
           compression = "zstd";
           acltype = "posixacl";
           xattr = "sa";
-          relatime = "on";
+          # relatime = "on";
+          atime = "off";
           dnodesize = "auto";
           canmount = "off";
           devices = "off";
@@ -64,23 +73,11 @@
           "nix" = {
             type = "zfs_fs";
             mountpoint = "/nix";
-            options.atime = "off";
-            options.mountpoint = "legacy";
-          };
-          "swap" = {
-            type = "zfs_volume";
-            size = "16G"; # Set this to your desired swap size
-            content = {
-              type = "swap";
-              randomEncryption = true; # Highly recommended for SSD health + security
-            };
             options = {
-              "com.sun:auto-snapshot" = "false";
-              # Critical performance tweaks for ZVOL swap:
-              volblocksize = "4K"; # Matches page size
-              sync = "disabled"; # Safe for swap; improves speed
-              compression = "off"; # Swapping compressed data is redundant CPU waste
-              logbias = "throughput";
+              mountpoint = "legacy";
+              quota = "100G";
+              # Guarantee that 20GB is always available for /nix
+              reservation = "20G";
             };
           };
           "jellyfin_data" = {

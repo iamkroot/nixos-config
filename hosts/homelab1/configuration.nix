@@ -2,6 +2,7 @@
   config,
   pkgs,
   pii,
+  lib,
   ...
 }:
 let
@@ -27,9 +28,16 @@ in
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernel.sysctl = {
-    "vm.swappiness" = 10; # Only swap when memory is 90% full
-  };
+
+  # zswap
+  boot.kernelParams = [
+    "zswap.enabled=0"
+    "zswap.compressor=zstd"
+    "zswap.max_pool_percent=20"
+    "zswap.zpool=zsmalloc"
+    # Limit ZFS ARC to 8GB
+    "zfs.zfs_arc_max=8589934592"
+  ];
 
   # zfs
   boot.supportedFilesystems = [ "zfs" ];
@@ -37,12 +45,11 @@ in
   services.zfs.trim.enable = true;
   networking.hostId = "${hostPII.netId}";
   networking.hostName = "${hostPII.name}";
-  systemd.services."dev-zvol-zroot-swap.swap" = {
-    after = [
-      "zfs-import-zroot.service"
-      "zfs-mount.service"
-    ];
-    requires = [ "zfs-import-zroot.service" ];
+
+  services.zfs.autoScrub = {
+    enable = true;
+    interval = "monthly";
+    pools = [ "zroot" ];
   };
 
   time.timeZone = "America/Los_Angeles";
@@ -110,6 +117,7 @@ in
   environment.systemPackages = with pkgs; [
     aria2
     bat
+    btop
     dust
     dysk
     eza
