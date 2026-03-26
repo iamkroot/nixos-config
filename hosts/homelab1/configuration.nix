@@ -37,6 +37,13 @@ in
   services.zfs.trim.enable = true;
   networking.hostId = "${hostPII.netId}";
   networking.hostName = "${hostPII.name}";
+  systemd.services."dev-zvol-zroot-swap.swap" = {
+    after = [
+      "zfs-import-zroot.service"
+      "zfs-mount.service"
+    ];
+    requires = [ "zfs-import-zroot.service" ];
+  };
 
   time.timeZone = "America/Los_Angeles";
 

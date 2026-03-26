@@ -83,6 +83,15 @@
               logbias = "throughput";
             };
           };
+          "jellyfin_data" = {
+            type = "zfs_fs";
+            mountpoint = "/var/lib/jellyfin";
+            options = {
+              mountpoint = "legacy";
+              quota = "50G";
+              recordsize = "16K";
+            };
+          };
         };
       };
     };

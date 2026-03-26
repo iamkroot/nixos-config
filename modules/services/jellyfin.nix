@@ -47,4 +47,10 @@
       iptables -A nixos-fw -s ${localIp}/24 -p udp --dport 1900 -j nixos-fw-accept
       iptables -A nixos-fw -s ${localIp}/24 -p udp --dport 7359 -j nixos-fw-accept
     '';
+
+  # only needed if not done initially with disko
+  fileSystems."/var/lib/jellyfin" = lib.mkDefault {
+    device = "zroot/jellyfin_data";
+    fsType = "zfs";
+  };
 }
