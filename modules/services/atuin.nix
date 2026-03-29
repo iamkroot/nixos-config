@@ -11,8 +11,7 @@
 
   services.atuin = {
     enable = true;
-    # FIXME: Get from config instead of referring to pii directly.
-    host = pii.hosts.homelab1.localIp;
+    host = config.infra.services.hostnames.atuin;
     port = config.infra.services.ports.atuin;
     openRegistration = false;
 

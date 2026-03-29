@@ -48,9 +48,13 @@
       iptables -A nixos-fw -s ${localIp}/24 -p udp --dport 7359 -j nixos-fw-accept
     '';
 
-  # only needed if not done initially with disko
-  fileSystems."/var/lib/jellyfin" = lib.mkDefault {
-    device = "zroot/jellyfin_data";
-    fsType = "zfs";
-  };
+  # set data dir perms
+  systemd.tmpfiles.rules = [
+    # Type | Path | Mode | User | Group | Age | Argument
+    "d /var/lib/jellyfin 0750 jellyfin media - -"
+    "d /var/lib/jellyfin/data 0750 jellyfin media - -"
+    "d /var/lib/jellyfin/data/trickplay 0770 jellyfin media - -"
+    "d /var/lib/jellyfin/data/subtitles 0770 jellyfin media - -"
+    "d /var/lib/jellyfin/transcodes 0770 jellyfin media - -"
+  ];
 }

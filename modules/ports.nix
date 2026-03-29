@@ -1,3 +1,5 @@
+# declare the schemas here
+# actual values can be overriden in secrets/ports.nix
 { lib, pii, ... }:
 
 {

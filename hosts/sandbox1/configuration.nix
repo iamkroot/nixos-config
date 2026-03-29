@@ -12,6 +12,10 @@ in
     ./hardware-configuration.nix
     ./disko.nix
     ../../modules/networking.nix
+    ../../modules/ports.nix
+    ../../secrets/ports.nix
+    ../../modules/services/atuin.nix
+    ../../modules/services/jellyfin.nix
   ];
   nix.settings.experimental-features = [
     "nix-command"
@@ -99,6 +103,8 @@ in
     aria2
     zsh
   ];
+  # atuin is hosted on this machine
+  infra.services.hostnames.atuin = hostPII.localIp;
 
   services.openssh = {
     enable = true;

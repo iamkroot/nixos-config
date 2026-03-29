@@ -130,6 +130,9 @@ in
     zsh
   ];
 
+  # atuin is hosted on this machine
+  infra.services.hostnames.atuin = hostPII.localIp;
+
   services.openssh = {
     enable = true;
     settings = {
