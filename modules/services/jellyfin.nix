@@ -33,6 +33,12 @@
     extraConfig = ''
       reverse_proxy 127.0.0.1:8096
     '';
+    logFormat = ''
+      output file /var/log/caddy/access-${config.infra.services.hostnames.jellyfin}.log {
+        roll_size 50mb
+        roll_keep 5
+      }
+    '';
   };
 
   networking.firewall.extraCommands =
