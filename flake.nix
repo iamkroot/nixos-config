@@ -67,6 +67,14 @@
             }
           ];
         };
+        "${pii.hosts.live.name}" = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs pii; };
+          modules = [
+            vaultix.nixosModules.default
+            ./hosts/live/iso.nix
+          ];
+        };
       };
       vaultix = vaultix.configure {
         cache = "./secrets/cache";

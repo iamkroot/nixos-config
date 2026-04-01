@@ -55,3 +55,23 @@ vars._.file = "secrets/mise_vars.txt"
 description = "Invoke nixos-rebuild remotely to vm"
 interactive = true
 run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}}'''
+
+[tasks."flake:update"]
+alias = "up"
+run = "{{vars.nix_bin}} flake update"
+
+[tasks."nix:bare"]
+alias = "nix"
+run = "{{vars.nix_bin}} "
+
+[tasks.build-iso]
+alias = "iso"
+shell = "zsh -c"
+run = [
+	"rm -f result",
+	'cd secrets && mise run decrypt-secrets && git add live-ssh-key',
+	"{{vars.nix_bin}} build $'.?submodules=1#nixosConfigurations.nixos-live.config.system.build.isoImage'",
+	'cd secrets && git restore --staged live-ssh-key',
+	'ln -sf ${$(readlink ./result):s|/nix|~/.nix} ./result',
+	'''sed -i '/^192./D' /home/kroot/.ssh/known_hosts''',
+]
