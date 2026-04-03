@@ -17,6 +17,7 @@ in
     ../../secrets/ports.nix
     ../../modules/services/atuin.nix
     ../../modules/services/jellyfin.nix
+    ../../modules/services/shoko.nix
     ../../modules/services/caddy.nix
     ../../modules/services/crowdsec.nix
     ../../modules/storage.nix

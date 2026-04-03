@@ -1,7 +1,7 @@
 { ... }:
 {
   services.crowdsec = {
-    enable = true;
+    enable = false;
 
     hub.collections = [
       "crowdsecurity/caddy"
@@ -18,14 +18,17 @@
     ];
   };
 
-  # 2. The Muscle: Drops the connections at the kernel/firewall level
+  # Drops the connections at the kernel/firewall level
   services.crowdsec-firewall-bouncer = {
-    enable = true;
+    enable = false;
   };
 
-  # 3. The Permissions Fix: Let CrowdSec read Caddy's logs
+  # Permissions Fix: Let CrowdSec read Caddy's logs
   # Add the crowdsec user to the caddy group
   users.users.crowdsec.extraGroups = [ "caddy" ];
+  users.users.crowdsec.isSystemUser = true;
+  users.users.crowdsec.group = "crowdsec";
+       users.groups.crowdsec = {};
 
   # Ensure Caddy creates new log files with group-read permissions (0640)
   # rather than default strict permissions (0600)

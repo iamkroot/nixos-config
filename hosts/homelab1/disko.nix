@@ -2,6 +2,7 @@
 let
   serviceFiles = [
     (inputs.self + /modules/datasets/jellyfin.nix)
+    (inputs.self + /modules/datasets/shoko.nix)
   ];
 
   customDatasets = lib.foldl' (acc: path: acc // (import path { })) { } serviceFiles;
