@@ -8,18 +8,21 @@
   vaultix.secrets."duckdns-token".file = "${pii.duckdnsToken}";
   systemd.services.duckdns-update = {
     description = "Update DuckDNS IP";
-    after = [ "network-online.target" ];
+    requires = [ "vaultix.service" ];
+    after = [
+      "network-online.target"
+      "vaultix.service"
+    ];
     wants = [ "network-online.target" ];
 
     # Loads the token into an environment variable so it stays out of the Nix store
     serviceConfig = {
       Type = "oneshot";
-      LoadCredential = "duckdns_token:${config.vaultix.secrets.duckdns-token.path}";
     };
 
     script = ''
       # Read the token from the securely loaded credential
-      TOKEN=$(cat "$CREDENTIALS_DIRECTORY/duckdns_token")
+      TOKEN=$(cat "${config.vaultix.secrets.duckdns-token.path}")
       DOMAIN="${pii.nick}"
 
       # Ping DuckDNS. Leaving the 'ip=' parameter blank tells DuckDNS to auto-detect your IP
