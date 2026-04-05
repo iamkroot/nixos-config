@@ -46,7 +46,7 @@ description = "Deploy configuration to a machine using nixos-anywhere"
 interactive = true
 run = [
 	'cd secrets && mise run decrypt-secrets',
-	'''{{vars.nix_bin}} run github:nix-community/nixos-anywhere -- --flake '.?submodules=1#{{vars.homelab1_name}}' --extra-files /tmp/{{vars.homelab1_name}}/keys --disk-encryption-keys /tmp/zfs-secret.key ~/zfs-pass.txt root@{{vars.homelab1_ip}}''',
+	'''{{vars.nix_bin}} run github:nix-community/nixos-anywhere -- --flake '.?submodules=1#{{vars.homelab1_name}}' --extra-files /tmp/{{vars.homelab1_name}}/keys --disk-encryption-keys /tmp/zfs-secret.key ~/zfs-pass.txt root@{{vars.homelab1_name}}''',
 	'''sed -i '/^{{vars.homelab1_ip}}/D' /home/kroot/.ssh/known_hosts''',
 ]
 

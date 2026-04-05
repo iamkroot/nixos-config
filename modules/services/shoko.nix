@@ -1,8 +1,14 @@
-{ config, pkgs, lib, pii, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  pii,
+  ...
+}:
 
 let
   mediaGroupGid = 995;
-    
+
   # Helper to generate volume strings for Podman
   animeVolumes = lib.mapAttrsToList (name: path: "${path}:/mnt/anime/${name}") pii.media.animeDirs;
 in
@@ -17,16 +23,17 @@ in
       image = "ghcr.io/shokoanime/server:latest";
       autoStart = true;
       ports = [ "8111:8111" ];
-      
+
       environment = {
         TZ = "America/Los_Angeles";
-        PUID = "1000"; 
+        PUID = "1000";
         PGID = toString mediaGroupGid;
       };
 
       volumes = [
         "/var/lib/shoko:/home/shoko/.shoko"
-      ] ++ animeVolumes;
+      ]
+      ++ animeVolumes;
     };
   };
 

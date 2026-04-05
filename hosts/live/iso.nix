@@ -38,7 +38,8 @@ in
   };
 
   users.users.root = {
-    shell = pkgs.zsh;
+    # can't use zsh here, nixos-anywhere breaks
+    shell = pkgs.bashInteractive;
     openssh.authorizedKeys.keys = [
       "${pii.userPubkey}"
     ];

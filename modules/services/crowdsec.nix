@@ -28,7 +28,7 @@
   users.users.crowdsec.extraGroups = [ "caddy" ];
   users.users.crowdsec.isSystemUser = true;
   users.users.crowdsec.group = "crowdsec";
-       users.groups.crowdsec = {};
+  users.groups.crowdsec = { };
 
   # Ensure Caddy creates new log files with group-read permissions (0640)
   # rather than default strict permissions (0600)
