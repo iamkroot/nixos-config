@@ -20,6 +20,7 @@ in
     ../../modules/services/shoko.nix
     ../../modules/services/caddy.nix
     ../../modules/services/crowdsec.nix
+    ../../modules/services/duckdns.nix
     ../../modules/storage.nix
   ];
 
