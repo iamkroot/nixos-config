@@ -8,10 +8,10 @@
   vaultix.secrets."duckdns-token".file = "${pii.duckdnsToken}";
   systemd.services.duckdns-update = {
     description = "Update DuckDNS IP";
-    requires = [ "vaultix.service" ];
+    requires = [ "vaultix-activate.service" ];
     after = [
       "network-online.target"
-      "vaultix.service"
+      "vaultix-activate.service"
     ];
     wants = [ "network-online.target" ];
 

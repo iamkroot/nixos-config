@@ -128,6 +128,7 @@ in
     fd
     git
     helix
+    inetutils
     ripgrep
     wget
     wl-clipboard
