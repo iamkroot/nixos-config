@@ -15,6 +15,7 @@ in
     ../../modules/networking.nix
     ../../modules/ports.nix
     ../../secrets/ports.nix
+    ../../modules/services/aria2.nix
     ../../modules/services/atuin.nix
     ../../modules/services/jellyfin.nix
     ../../modules/services/shoko.nix
