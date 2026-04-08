@@ -1,6 +1,8 @@
 { config, pii, ... }:
 let
   disk1 = pii.storage.disk1;
+  disk2 = pii.storage.disk2;
+  disk3 = pii.storage.disk3;
 in
 {
   vaultix.secrets."${disk1.name}-luks-key" = {
@@ -40,4 +42,14 @@ in
     # 4. (Optional) Fix existing files if you just migrated
     "Z /media 0775 root media - -"
   ];
+  vaultix.secrets."${disk2.name}-zfs-key" = {
+    file = disk2.key;
+    owner = "root";
+    group = "root";
+  };
+  vaultix.secrets."${disk3.name}-zfs-key" = {
+    file = disk3.key;
+    owner = "root";
+    group = "root";
+  };
 }

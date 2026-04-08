@@ -130,6 +130,7 @@ in
     helix
     inetutils
     ripgrep
+    tmux
     wget
     wl-clipboard
     zsh
