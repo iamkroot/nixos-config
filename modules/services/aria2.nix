@@ -1,4 +1,9 @@
-{ config, pii, lib, ... }:
+{
+  config,
+  pii,
+  lib,
+  ...
+}:
 {
   services.aria2 = {
     enable = true;
