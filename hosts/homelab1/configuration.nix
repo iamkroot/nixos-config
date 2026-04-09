@@ -22,6 +22,7 @@ in
     ../../modules/services/caddy.nix
     ../../modules/services/crowdsec.nix
     ../../modules/services/duckdns.nix
+    ../../modules/services/lldap.nix
     ../../modules/storage.nix
   ];
 
@@ -136,6 +137,7 @@ in
     zsh
   ];
 
+  infra.domain = hostPII.domain;
   # atuin is hosted on this machine
   infra.services.hostnames.atuin = hostPII.localIp;
 

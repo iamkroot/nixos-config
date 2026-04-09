@@ -52,9 +52,15 @@ run = [
 
 [tasks.rebuild-homelab]
 vars._.file = "secrets/mise_vars.txt"
-description = "Invoke nixos-rebuild remotely to vm"
+description = "Invoke nixos-rebuild remotely to homelab"
 interactive = true
 run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}}'''
+
+[tasks.check-homelab]
+vars._.file = "secrets/mise_vars.txt"
+description = "Dry-activate nixos-rebuild remotely for homelab"
+interactive = true
+run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- dry-activate --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}}'''
 
 [tasks."flake:update"]
 alias = "up"

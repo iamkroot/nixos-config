@@ -30,11 +30,12 @@
     }@inputs:
     let
       pii = import ./secrets/pii.nix;
+      myUtils = import ./modules/utils.nix { inherit (nixpkgs) lib; };
     in
     {
       nixosConfigurations = {
         "${pii.hosts.sandbox1.name}" = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs pii; };
+          specialArgs = { inherit inputs pii myUtils; };
           modules = [
             disko.nixosModules.disko
             vaultix.nixosModules.default
@@ -52,7 +53,7 @@
           ];
         };
         "${pii.hosts.homelab1.name}" = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs pii; };
+          specialArgs = { inherit inputs pii myUtils; };
           modules = [
             disko.nixosModules.disko
             vaultix.nixosModules.default
