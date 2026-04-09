@@ -7,9 +7,7 @@
   ...
 }:
 let
-  domainToBaseDN =
-    domain: lib.concatStringsSep "," (map (part: "dc=${part}") (lib.splitString "." domain));
-  baseDN = domainToBaseDN config.infra.domain;
+  baseDN = myUtils.domainToBaseDN config.infra.domain;
 in
 {
   vaultix.secrets."lldap-admin-pass" = {
@@ -23,11 +21,21 @@ in
     group = "lldap";
   };
 
+  systemd.services.lldap = {
+    serviceConfig = {
+      # This 'pushes' the secret into the service's private space
+      LoadCredential = [
+        "lldap_jwt:${config.vaultix.secrets.lldap-jwt.path}"
+        "lldap_admin_pass:${config.vaultix.secrets.lldap-admin-pass.path}"
+      ];
+    };
+  };
+
   services.lldap = {
     enable = true;
     settings = {
-      ldap_user_pass_file = config.vaultix.secrets.lldap-admin-pass.path;
-      jwt_secret_file = config.vaultix.secrets.lldap-jwt.path;
+      ldap_user_pass_file = "/run/credentials/lldap.service/lldap_admin_pass";
+      jwt_secret_file = "/run/credentials/lldap.service/lldap_jwt";
       force_ldap_user_pass_reset = "always"; # override webui
       http_url = "https://${config.infra.services.hostnames.ldap}";
       ldap_base_dn = baseDN;
@@ -36,5 +44,17 @@ in
       http_host = "127.0.0.1";
       http_port = config.infra.services.ports.lldap_http;
     };
+  };
+
+  services.caddy.virtualHosts."${config.infra.services.hostnames.ldap}" = {
+    extraConfig = ''
+      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.lldap_http}
+    '';
+    logFormat = ''
+      output file /var/log/caddy/access-${config.infra.services.hostnames.ldap}.log {
+        roll_size 50mb
+        roll_keep 5
+      }
+    '';
   };
 }

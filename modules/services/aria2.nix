@@ -17,7 +17,7 @@
   };
   services.caddy.virtualHosts."${config.infra.services.hostnames.aria2}" = {
     extraConfig = ''
-      reverse_proxy 127.0.0.1:6800
+      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.aria2}
     '';
     logFormat = ''
       output file /var/log/caddy/access-${config.infra.services.hostnames.aria2}.log {

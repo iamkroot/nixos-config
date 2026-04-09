@@ -3,6 +3,7 @@ let
   serviceFiles = [
     (inputs.self + /modules/datasets/jellyfin.nix)
     (inputs.self + /modules/datasets/shoko.nix)
+    (inputs.self + /modules/datasets/authelia.nix)
   ];
 
   customDatasets = lib.foldl' (acc: path: acc // (import path { })) { } serviceFiles;

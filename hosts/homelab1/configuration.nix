@@ -23,6 +23,8 @@ in
     ../../modules/services/crowdsec.nix
     ../../modules/services/duckdns.nix
     ../../modules/services/lldap.nix
+    ../../modules/services/authelia.nix
+    ../../modules/services/whoami.nix
     ../../modules/storage.nix
   ];
 

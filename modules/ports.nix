@@ -15,6 +15,11 @@
     lldap_ldap = myUtils.mkPortOption 3890 "LDAP port for LLDAP";
     lldap_http = myUtils.mkPortOption 17170 "HTTP port for LLDAP";
 
+    authelia = myUtils.mkPortOption 9091 "Port for Authelia service";
+
+    aria2 = myUtils.mkPortOption 6800 "Port for aria2 RPC server";
+
+    whoami = myUtils.mkPortOption 8080 "Port for aria2 RPC server";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;
