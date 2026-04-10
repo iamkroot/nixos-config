@@ -8,6 +8,80 @@ let
   disk1 = pii.storage.disk1;
   media_main = pii.storage.media_main;
   media_bak = pii.storage.media_bak;
+  data_main = pii.storage.data_main;
+  data_bak = pii.storage.data_bak;
+  # util
+  mkZfsAutomount =
+    {
+      poolName,
+      datasetName,
+      secretName,
+      uuid,
+    }:
+    let
+      escapedUuid = builtins.replaceStrings [ "-" ] [ "\\x2d" ] uuid;
+      deviceUnit = "dev-disk-by\\x2duuid-${escapedUuid}.device";
+      datasetSlug = builtins.replaceStrings [ "/" ] [ "-" ] datasetName;
+    in
+    {
+
+      fileSystems."/mnt/${datasetName}" = {
+        device = datasetName;
+        fsType = "zfs";
+        options = [
+          "zfsutil"
+          "nofail"
+          "x-systemd.automount"
+          "x-systemd.idle-timeout=10min"
+          "x-systemd.requires=zfs-unlock-${datasetSlug}.service"
+        ];
+      };
+
+      # THE MASTER POOL SERVICE
+      # Nix will see this defined multiple times and safely merge them into one.
+      systemd.services."zfs-pool-${poolName}" = {
+        description = "Master import/export for ZFS pool ${poolName}";
+        bindsTo = [ deviceUnit ];
+        after = [ deviceUnit ];
+        path = [ pkgs.zfs ];
+
+        # When no active datasets require this service anymore, stop it.
+        unitConfig = {
+          StopWhenUnneeded = true;
+        };
+
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "-${pkgs.zfs}/bin/zfs import -N ${poolName}";
+          ExecStop = "-${pkgs.zfs}/bin/zfs export ${poolName}";
+        };
+      };
+
+      # THE DATASET SPECIFIC SERVICE
+      systemd.services."zfs-unlock-${datasetSlug}" = {
+        description = "Unlock ZFS dataset ${datasetName}";
+
+        # Tell systemd: "We cannot run unless the Master Pool Service is running"
+        requires = [ "zfs-pool-${poolName}.service" ];
+        after = [
+          "zfs-pool-${poolName}.service"
+          deviceUnit
+        ];
+        bindsTo = [ deviceUnit ];
+        before = [ "mnt-${datasetSlug}.mount" ];
+        path = [ pkgs.zfs ];
+
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${pkgs.zfs}/bin/zfs load-key -L file://${
+            config.vaultix.secrets."${secretName}".path
+          } ${datasetName}";
+          ExecStop = "-${pkgs.zfs}/bin/zfs unload-key ${datasetName}";
+        };
+      };
+    };
 in
 {
   vaultix.secrets."${disk1.name}-luks-key" = {
@@ -24,6 +98,7 @@ in
       # <target name>  <source device>       <key file>    <options>
       ${disk1.name}     UUID=${disk1.uuid}   ${disk1-key}  nofail,x-systemd.device-timeout=5s
     '';
+
   fileSystems."/mnt/${disk1.name}" = {
     device = "/dev/mapper/${disk1.name}";
     fsType = "ext4";
@@ -47,16 +122,33 @@ in
     # 4. (Optional) Fix existing files if you just migrated
     "Z /media 0775 root media - -"
   ];
+
   vaultix.secrets."${media_main.name}-zfs-key" = {
     file = media_main.key;
     owner = "root";
     group = "root";
   };
-  vaultix.secrets."${media_bak.name}-zfs-key" = {
-    file = media_bak.key;
+
+  vaultix.secrets."${data_main.name}-data-zfs-key" = {
+    file = data_main.key;
     owner = "root";
     group = "root";
   };
+
+  imports = [
+    (mkZfsAutomount {
+      poolName = media_main.name;
+      datasetName = "${media_main.name}/media";
+      secretName = "${media_main.name}-zfs-key";
+      uuid = media_main.uuid;
+    })
+    (mkZfsAutomount {
+      poolName = data_main.name;
+      datasetName = "${data_main.name}/data";
+      secretName = "${data_main.name}-data-zfs-key";
+      uuid = data_main.uuid;
+    })
+  ];
 
   services.syncoid = {
     enable = true;
