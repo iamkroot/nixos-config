@@ -33,20 +33,23 @@
     file = "${pii.networks.wifi1.pwd}";
   };
   vaultix.templates.network-secrets.content = "wifi1=${config.vaultix.placeholder."wifi1-pwd"}";
-  # don't prioritize lan over wifi
+  # don't prioritize lan over wifi for ANY ethernet connection
   networking.networkmanager.ensureProfiles.profiles = {
     eth-local = {
       connection = {
         id = "eth-local";
         type = "ethernet";
-        interface-name = "enp*"; # You might need the exact name here, like enp3s0
-        # Don't wait for this connection to finish boot
         wait-device-timeout = 1;
+        # Allow this profile to be active on multiple ports simultaneously
+        multi-connect = 3;
+      };
+      match = {
+        # This covers standard Linux 'eth' names and predictable 'en' names (eno, enp, ens)
+        "interface-name" = "en*;eth*";
       };
       ipv4 = {
         method = "auto";
         route-metric = 2000;
-        # Tell NM never to use this as the default route for internet
         never-default = true;
       };
     };
