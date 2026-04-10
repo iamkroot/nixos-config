@@ -20,6 +20,8 @@
     aria2 = myUtils.mkPortOption 6800 "Port for aria2 RPC server";
 
     whoami = myUtils.mkPortOption 8080 "Port for aria2 RPC server";
+
+    adguard = myUtils.mkPortOption 3000 "Port for adguard webui";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;

@@ -25,6 +25,7 @@ in
     ../../modules/services/lldap.nix
     ../../modules/services/authelia.nix
     ../../modules/services/whoami.nix
+    ../../modules/services/adguard.nix
     ../../modules/storage.nix
   ];
 
