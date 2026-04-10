@@ -31,8 +31,8 @@
       "com.sun:auto-snapshot" = "false";
     };
   };
-  "services/jellyfin/transcodes" = {
-    mountpoint = "/var/lib/jellyfin/transcodes";
+  "services/jellyfin/cache" = {
+    mountpoint = "/var/cache/jellyfin";
     type = "zfs_fs";
     options = {
       mountpoint = "legacy";
