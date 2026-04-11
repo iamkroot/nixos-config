@@ -1,4 +1,5 @@
 {
+  lib,
   config,
   pkgs,
   pii,
@@ -103,8 +104,19 @@ in
     aria2
     zsh
   ];
+  # FIXME: Should ensure the derived sub-domains for services are correct
+  infra.domain = "localhost";
   # atuin is hosted on this machine
   infra.services.hostnames.atuin = hostPII.localIp;
+
+  disko.zfs = {
+    enable = true;
+    settings = {
+      logLevel = "trace";
+      ignoredDatasets = ["zroot/root"];
+      ignoredProperties = ["keylocation" "nixos:shutdown-time"];
+    };
+  };
 
   services.openssh = {
     enable = true;

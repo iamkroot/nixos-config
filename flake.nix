@@ -17,6 +17,12 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    disko-zfs = {
+      url = "github:numtide/disko-zfs";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.disko.follows = "disko";
+    };
   };
 
   outputs =
@@ -26,6 +32,7 @@
       home-manager,
       vaultix,
       disko,
+      disko-zfs,
       ...
     }@inputs:
     let
@@ -38,6 +45,7 @@
           specialArgs = { inherit inputs pii myUtils; };
           modules = [
             disko.nixosModules.disko
+            disko-zfs.nixosModules.default
             vaultix.nixosModules.default
 
             ./hosts/sandbox1/configuration.nix
@@ -56,6 +64,7 @@
           specialArgs = { inherit inputs pii myUtils; };
           modules = [
             disko.nixosModules.disko
+            disko-zfs.nixosModules.default
             vaultix.nixosModules.default
             ./hosts/homelab1/configuration.nix
             home-manager.nixosModules.home-manager
