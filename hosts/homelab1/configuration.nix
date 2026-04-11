@@ -143,6 +143,14 @@ in
   infra.domain = hostPII.domain;
   # atuin is hosted on this machine
   infra.services.hostnames.atuin = hostPII.localIp;
+  # needed to get sso working for jellyfin
+  networking.hosts = {
+    "127.0.0.1" = [ 
+      config.infra.services.hostnames.jellyfin
+      config.infra.services.hostnames.auth
+      config.infra.services.hostnames.ldap
+    ];
+  };
 
   services.openssh = {
     enable = true;

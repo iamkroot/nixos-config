@@ -1,4 +1,5 @@
 {
+  lib,
   config,
   pii,
   myUtils,
@@ -9,26 +10,22 @@ let
 in
 {
 
-  vaultix.secrets."authelia-jwt" = {
-    file = pii.secrets.authelia-jwt;
-    owner = "authelia-main";
-    group = "authelia-main";
-  };
-  vaultix.secrets."authelia-ldap" = {
-    file = pii.secrets.authelia-ldap;
-    owner = "authelia-main";
-    group = "authelia-main";
-  };
-  vaultix.secrets."authelia-session" = {
-    file = pii.secrets.authelia-session;
-    owner = "authelia-main";
-    group = "authelia-main";
-  };
-  vaultix.secrets."authelia-storage" = {
-    file = pii.secrets.authelia-storage;
-    owner = "authelia-main";
-    group = "authelia-main";
-  };
+  vaultix.secrets =
+    lib.genAttrs
+      [
+        "authelia-jwt"
+        "authelia-ldap"
+        "authelia-session"
+        "authelia-storage"
+        "authelia-oidc-cert"
+        "authelia-oidc-hmac"
+      ]
+      (name: {
+        file = pii.secrets.${name};
+        owner = "authelia-main";
+        group = "authelia-main";
+      });
+
   systemd.services."authelia-main" = {
     serviceConfig = {
       LoadCredential = [
@@ -36,6 +33,8 @@ in
         "session_secret:${config.vaultix.secrets.authelia-session.path}"
         "storage_secret:${config.vaultix.secrets.authelia-storage.path}"
         "ldap_password:${config.vaultix.secrets.authelia-ldap.path}"
+        "oidc_cert:${config.vaultix.secrets.authelia-oidc-cert.path}"
+        "oidc_hmac:${config.vaultix.secrets.authelia-oidc-hmac.path}"
       ];
     };
   };
@@ -47,6 +46,8 @@ in
       jwtSecretFile = "/run/credentials/authelia-main.service/jwt_secret";
       sessionSecretFile = "/run/credentials/authelia-main.service/session_secret";
       storageEncryptionKeyFile = "/run/credentials/authelia-main.service/storage_secret";
+      oidcIssuerPrivateKeyFile = "/run/credentials/authelia-main.service/oidc_cert";
+      oidcHmacSecretFile = "/run/credentials/authelia-main.service/oidc_hmac";
     };
 
     environmentVariables = {
@@ -76,15 +77,11 @@ in
       };
 
       authentication_backend.ldap = {
-        # 1. Use the native LLDAP implementation
         implementation = "lldap";
 
         address = "ldap://127.0.0.1:${toString config.infra.services.ports.lldap_ldap}";
         base_dn = baseDN;
         user = "uid=authelia_svc,ou=people,${baseDN}";
-
-        # Keep this blank password so your environmentVariable/systemd secret can overwrite it
-        password = "";
       };
 
       access_control = {
@@ -102,6 +99,20 @@ in
           }
         ];
       };
+
+      identity_providers.oidc.clients = [
+        {
+          client_id = pii.secrets.authelia-jellyfin-client-id;
+          client_secret = pii.secrets.authelia-jellyfin-client-secret;
+          client_name = "Jellyfin";
+          public = false;
+          token_endpoint_auth_method = "client_secret_post";
+          authorization_policy = "one_factor";
+          redirect_uris = [
+            "https://${config.infra.services.hostnames.jellyfin}/sso/OID/redirect/authelia"
+          ];
+        }
+      ];
     };
   };
 
