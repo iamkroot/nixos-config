@@ -113,8 +113,11 @@ in
     enable = true;
     settings = {
       logLevel = "trace";
-      ignoredDatasets = ["zroot/root"];
-      ignoredProperties = ["keylocation" "nixos:shutdown-time"];
+      ignoredDatasets = [ "zroot/root" ];
+      ignoredProperties = [
+        "keylocation"
+        "nixos:shutdown-time"
+      ];
     };
   };
 

@@ -1,4 +1,9 @@
-{ inputs, lib, ... }:
+{
+  inputs,
+  lib,
+  pii,
+  ...
+}:
 let
   serviceFiles = [
     (inputs.self + /modules/datasets/jellyfin.nix)
@@ -7,8 +12,28 @@ let
   ];
 
   customDatasets = lib.foldl' (acc: path: acc // (import path { })) { } serviceFiles;
+
+  externalDisks = lib.remove null (
+    lib.unique (lib.mapAttrsToList (name: value: lib.attrByPath [ "name" ] null value) pii.storage)
+  );
 in
 {
+  disko.zfs = {
+    enable = true;
+    settings = {
+      ignoredDatasets = [
+        "zroot/root"
+      ]
+      ++ lib.concatMap (d: [
+        d
+        "${d}/*"
+      ]) externalDisks;
+      ignoredProperties = [
+        "keylocation"
+        "nixos:shutdown-time"
+      ];
+    };
+  };
   disko.devices = {
     disk = {
       main = {
