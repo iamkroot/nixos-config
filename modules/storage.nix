@@ -168,11 +168,15 @@ in
 
   systemd.services."media-backup-hardware" = {
     description = "Manage backup pool hardware state";
-    path = with pkgs; [ zfs hdparm coreutils ]; # Added coreutils for sleep
+    path = with pkgs; [
+      zfs
+      hdparm
+      coreutils
+    ];
 
     serviceConfig = {
       Type = "oneshot";
-      RemainAfterExit = true; 
+      RemainAfterExit = true;
 
       ExecStart = pkgs.writeShellScript "import-pool" ''
         zpool status ${media_bak.name} >/dev/null 2>&1 || zpool import ${media_bak.name}
@@ -187,34 +191,59 @@ in
     };
   };
   systemd.services."syncoid-media-backup" = {
-    path = with pkgs; [ zfs systemd zfs-prune-snapshots ];
+    path = with pkgs; [
+      zfs
+      systemd
+      zfs-prune-snapshots
+    ];
 
     after = [ "sanoid.service" ];
     wants = [ "sanoid.service" ];
 
     serviceConfig = {
+      # Tells systemd to create and manage /var/lib/media-backup/ for persistent state
+      StateDirectory = "media-backup";
+
       ExecCondition = "+${pkgs.writeShellScript "check-zfs-changes" ''
         LATEST_SNAP=$(${pkgs.zfs}/bin/zfs list -t snapshot -H -o name -S creation -d 1 ${media_main.name}/media | head -n 1)
         if [ -z "$LATEST_SNAP" ]; then exit 0; fi
 
-        WRITTEN=$(${pkgs.zfs}/bin/zfs get -H -p -o value written "$LATEST_SNAP")
+        STATE_FILE="/var/lib/media-backup/last_synced_snap"
 
+        # 1. Did we ALREADY sync this exact snapshot?
+        if [ -f "$STATE_FILE" ]; then
+          if [ "$LATEST_SNAP" == "$(cat "$STATE_FILE")" ]; then
+            echo "Snapshot $LATEST_SNAP already synced. Keeping drive asleep."
+            exit 1
+          fi
+        fi
+
+        # 2. Is this a completely empty snapshot?
+        WRITTEN=$(${pkgs.zfs}/bin/zfs get -H -p -o value written "$LATEST_SNAP")
         if [ "$WRITTEN" -eq 0 ]; then
-          echo "0 bytes written since previous snapshot. Skipping backup to keep drive asleep."
+          echo "0 bytes written since previous snapshot. Keeping drive asleep."
           exit 1
         fi
+
         exit 0
       ''}";
 
       ExecStartPre = "+${pkgs.systemd}/bin/systemctl start media-backup-hardware.service";
 
+      # ExecStartPost only triggers if Syncoid finishes with a "Success" exit code
       ExecStartPost = [
+        # 1. Save the newly synced snapshot name so we remember it tomorrow
+        "+${pkgs.writeShellScript "save-sync-state" ''
+          ${pkgs.zfs}/bin/zfs list -t snapshot -H -o name -S creation -d 1 ${media_main.name}/media | head -n 1 > /var/lib/media-backup/last_synced_snap
+        ''}"
+
+        # 2. Run the prune
         "+${pkgs.writeShellScript "prune-backup-snapshots" ''
           if ${pkgs.zfs}/bin/zfs list ${media_bak.name}/media >/dev/null 2>&1; then
             echo "Cleaning up backup snapshots older than 6 months..."
             ${pkgs.zfs-prune-snapshots}/bin/zfs-prune-snapshots -p 'autosnap_' 6M ${media_bak.name}/media || true
           else
-            echo "Target dataset does not exist yet. Skipping prune for the first run."
+            echo "Target dataset does not exist yet. Skipping prune."
           fi
         ''}"
       ];
