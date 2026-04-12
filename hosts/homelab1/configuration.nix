@@ -142,8 +142,6 @@ in
   ];
 
   infra.domain = hostPII.domain;
-  # atuin is hosted on this machine
-  infra.services.hostnames.atuin = hostPII.localIp;
   # needed to get sso working for jellyfin
   networking.hosts = {
     "127.0.0.1" = [

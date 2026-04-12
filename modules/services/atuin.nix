@@ -11,7 +11,7 @@
 
   services.atuin = {
     enable = true;
-    host = config.infra.services.hostnames.atuin;
+    host = "0.0.0.0";
     port = config.infra.services.ports.atuin;
     openRegistration = false;
 
