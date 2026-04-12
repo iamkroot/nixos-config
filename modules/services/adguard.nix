@@ -1,4 +1,7 @@
 { config, pii, ... }:
+let
+  hostname = config.infra.services.hostnames.adguard;
+in
 {
   networking.firewall.allowedTCPPorts = [ 53 ];
   networking.firewall.allowedUDPPorts = [ 53 ];
@@ -14,6 +17,17 @@
           "https://dns.cloudflare.com/dns-query"
           "8.8.8.8"
         ];
+      };
+      tls = {
+        enabled = true;
+        server_name = hostname;
+        port_dns_over_tls = 853; # TCP
+        port_dns_over_quic = 853; # UDP
+
+        # WARNING: AdGuard runs as the 'adguardhome' user.
+        # It MUST have read permissions to wherever these files live.
+        certificate_path = "/var/lib/acme/${hostname}/cert.pem";
+        private_key_path = "/var/lib/acme/${hostname}/key.pem";
       };
 
       # Bypass Hairpin NAT
@@ -36,13 +50,41 @@
       };
     };
   };
-  services.caddy.virtualHosts."${config.infra.services.hostnames.adguard}" = {
+
+  systemd.services.adguardhome = {
+    # 1. Don't start AdGuard until the certificate is successfully generated
+    wants = [ "acme-${hostname}.cert.service" ];
+    after = [
+      "acme-${hostname}.cert.service"
+      "systemd-tmpfiles-setup.service"
+    ];
+
+    serviceConfig = {
+      # 2. Grant the dynamic user read access to the ACME group
+      SupplementaryGroups = [ "adguard-cert" ];
+    };
+  };
+  security.acme.certs.${hostname} = {
+    dnsProvider = "duckdns";
+    credentialFiles = {
+      "DUCKDNS_TOKEN_FILE" = config.vaultix.secrets.duckdns-token.path;
+    };
+    group = "adguard-cert";
+  };
+  users.groups.adguard-cert = { };
+  systemd.tmpfiles.rules = [
+    "d /var/lib/acme/${hostname} 0750 acme adguard-cert - -"
+    "z /var/lib/acme/${hostname}/* 0640 acme adguard-cert - -"
+  ];
+  users.users.caddy.extraGroups = [ "adguard-cert" ];
+  services.caddy.virtualHosts."${hostname}" = {
+    useACMEHost = hostname;
     extraConfig = ''
       import authelia
       reverse_proxy 127.0.0.1:${toString config.infra.services.ports.adguard}
     '';
     logFormat = ''
-      output file /var/log/caddy/access-${config.infra.services.hostnames.adguard}.log {
+      output file /var/log/caddy/access-${hostname}.log {
         roll_size 50mb
         roll_keep 5
       }

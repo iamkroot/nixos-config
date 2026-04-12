@@ -26,6 +26,7 @@ in
     ../../modules/services/authelia.nix
     ../../modules/services/whoami.nix
     ../../modules/services/adguard.nix
+    ../../modules/services/redlib.nix
     ../../modules/storage.nix
     ../../modules/initrd.nix
   ];
@@ -149,6 +150,12 @@ in
       config.infra.services.hostnames.auth
       config.infra.services.hostnames.ldap
     ];
+  };
+
+  # needed for adguard DoT
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = pii.primaryEmail;
   };
 
   services.openssh = {
