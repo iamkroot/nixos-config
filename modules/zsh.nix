@@ -4,10 +4,14 @@
   pkgs,
   lib,
   pii,
+  inputs,
   ...
 }:
 
 {
+  home.packages = [
+    inputs.zsh-patina.packages.${pkgs.stdenv.hostPlatform.system}.default
+  ];
   programs.zsh = {
     enable = true;
 
@@ -33,11 +37,11 @@
         src = pkgs.zsh-fzf-tab;
         file = "share/fzf-tab/fzf-tab.plugin.zsh";
       }
-      {
-        name = "fast-syntax-highlighting";
-        src = pkgs.zsh-fast-syntax-highlighting;
-        file = "share/zsh/site-functions/fast-syntax-highlighting.plugin.zsh";
-      }
+      # {
+      #   name = "fast-syntax-highlighting";
+      #   src = pkgs.zsh-fast-syntax-highlighting;
+      #   file = "share/zsh/site-functions/fast-syntax-highlighting.plugin.zsh";
+      # }
     ];
 
     # Use mkMerge to combine your top and bottom scripts safely
@@ -97,6 +101,7 @@
         elif [ -f "$HOME/.p10k.zsh" ]; then
           source "$HOME/.p10k.zsh"
         fi
+        eval "$(zsh-patina activate)"
       '')
     ];
   };

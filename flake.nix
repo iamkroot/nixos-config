@@ -23,6 +23,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.disko.follows = "disko";
     };
+
+    zsh-patina = {
+      url = "github:michel-kraemer/zsh-patina";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -54,7 +59,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit pii; };
+              home-manager.extraSpecialArgs = { inherit inputs pii; };
               home-manager.users."${pii.primaryUser}" = import ./home/user1.nix;
               home-manager.users.root = import ./home/root.nix;
             }
@@ -71,7 +76,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit pii; };
+              home-manager.extraSpecialArgs = { inherit inputs pii; };
               home-manager.users."${pii.primaryUser}" = import ./home/user1.nix;
               home-manager.users.root = import ./home/root.nix;
             }
