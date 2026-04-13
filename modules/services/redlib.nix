@@ -46,6 +46,11 @@ in
     port = config.infra.services.ports.redlib;
     # Expose to local network
     openFirewall = true;
+    settings = {
+      REDLIB_DEFAULT_USE_HLS = "on";
+      REDLIB_DEFAULT_SHOW_NSFW = "on";
+      REDLIB_DEFAULT_HIDE_HLS_NOTIFICATION = "on";
+    };
   };
   services.caddy.virtualHosts."${domain}" = {
     extraConfig = ''
