@@ -24,6 +24,7 @@
     adguard = myUtils.mkPortOption 3000 "Port for adguard webui";
 
     redlib = myUtils.mkPortOption 18080 "Port for redlib webui";
+    anubis_redlib = myUtils.mkPortOption 38080 "Port for anubis middleware for redlib";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;

@@ -37,22 +37,64 @@ let
       "--skip=oauth::tests::test_mobile_spoof_backend"
     ];
   });
+  domain = config.infra.services.hostnames.redlib;
 in
 {
   services.redlib = {
     enable = true;
     package = redlib-fork;
     port = config.infra.services.ports.redlib;
+    # Expose to local network
+    openFirewall = true;
   };
-  services.caddy.virtualHosts."${config.infra.services.hostnames.redlib}" = {
+  services.caddy.virtualHosts."${domain}" = {
     extraConfig = ''
-      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.redlib}
+      # Match ClaudeBot and other common AI scrapers
+      @aiBots {
+        header User-Agent *ClaudeBot*
+        header User-Agent *GPTBot*
+        header User-Agent *CCBot*
+        header User-Agent *anthropic-ai*
+        header User-Agent *OmgiliBot*
+      }
+
+      # Drop the connection or return a 403 Forbidden
+      respond @aiBots "AI Scraping Blocked" 403
+      respond /robots.txt "User-agent: ClaudeBot\nDisallow: /\n\nUser-agent: GPTBot\nDisallow: /" 200
+
+      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.anubis_redlib} {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+      }
     '';
     logFormat = ''
-      output file /var/log/caddy/access-${config.infra.services.hostnames.redlib}.log {
+      output file /var/log/caddy/access-${domain}.log {
         roll_size 50mb
         roll_keep 5
       }
     '';
   };
+
+  # Anubis Middleware
+  services.anubis.instances."redlib" = {
+    enable = true;
+    settings = {
+      TARGET = "http://127.0.0.1:${toString config.infra.services.ports.redlib}";
+
+      BIND_NETWORK = "tcp";
+      BIND = "127.0.0.1:${toString config.infra.services.ports.anubis_redlib}";
+
+      # Anubis needs to know your domain context to safely issue cookies
+      # and handle redirects after the PoW challenge is solved.
+      REDIRECT_DOMAINS = domain;
+      COOKIE_DOMAIN = domain;
+
+      # 5 or 6 is usually a good sweet spot
+      # for keeping scrapers out without hanging older devices.
+      DIFFICULTY = 6;
+    };
+  };
+
 }
