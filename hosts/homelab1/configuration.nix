@@ -64,11 +64,6 @@ in
 
   time.timeZone = "America/Los_Angeles";
 
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
-  xdg.portal.enable = true;
-
   services.pipewire = {
     enable = true;
     pulse.enable = true;
@@ -88,10 +83,6 @@ in
       };
       "ssh-key" = {
         file = "${hostPII.secrets.ssh-key}";
-      };
-      "das1-dataset1-key" = {
-        file = "${pii.storage.das1.dataset1.key}";
-        path = "${pii.storage.das1.dataset1.keypath}";
       };
     };
     beforeUserborn = [ "user-pwd" ];
@@ -164,5 +155,12 @@ in
       PermitRootLogin = "prohibit-password";
     };
   };
+
+  services.eternal-terminal = {
+    enable = true;
+    port = config.infra.services.ports.et;
+  };
+  networking.firewall.allowedTCPPorts = [ config.infra.services.ports.et ];
+
   system.stateVersion = "26.05";
 }

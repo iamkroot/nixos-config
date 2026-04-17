@@ -25,6 +25,8 @@
 
     redlib = myUtils.mkPortOption 18080 "Port for redlib webui";
     anubis_redlib = myUtils.mkPortOption 38080 "Port for anubis middleware for redlib";
+
+    et = myUtils.mkPortOption 2022 "Port for eternal terminal server";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;
