@@ -27,7 +27,7 @@ in
     ../../modules/services/whoami.nix
     ../../modules/services/adguard.nix
     ../../modules/services/redlib.nix
-    ../../modules/storage.nix
+    ../../modules/storage
     ../../modules/initrd.nix
   ];
 
