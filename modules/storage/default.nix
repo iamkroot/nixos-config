@@ -1,9 +1,9 @@
 { config, ... }:
 {
   imports = [
-    ./backup.nix
     ./luks-disks.nix
     ./media-pool.nix
+    ./zfs-backup.nix
   ];
 
   # something for local media
