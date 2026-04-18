@@ -42,7 +42,9 @@
     }@inputs:
     let
       pii = import ./secrets/pii.nix;
-      myUtils = import ./modules/utils.nix { inherit (nixpkgs) lib; };
+      myUtils = import ./modules/utils.nix {
+        inherit (nixpkgs) lib;
+      };
     in
     {
       nixosConfigurations = {

@@ -1,8 +1,21 @@
-{ config, pii, ... }:
+{
+  config,
+  pii,
+  myUtils,
+  ...
+}:
 let
   hostname = config.infra.services.hostnames.adguard;
 in
 {
+  imports = [
+    (myUtils.mkCaddyModule "adguard" {
+      authelia = true;
+      extraHostConfig = {
+        useACMEHost = hostname;
+      };
+    })
+  ];
   networking.firewall.allowedTCPPorts = [ 53 ];
   networking.firewall.allowedUDPPorts = [ 53 ];
   services.adguardhome = {
@@ -77,17 +90,4 @@ in
     "z /var/lib/acme/${hostname}/* 0640 acme adguard-cert - -"
   ];
   users.users.caddy.extraGroups = [ "adguard-cert" ];
-  services.caddy.virtualHosts."${hostname}" = {
-    useACMEHost = hostname;
-    extraConfig = ''
-      import authelia
-      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.adguard}
-    '';
-    logFormat = ''
-      output file /var/log/caddy/access-${hostname}.log {
-        roll_size 50mb
-        roll_keep 5
-      }
-    '';
-  };
 }
