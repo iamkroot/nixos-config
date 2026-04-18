@@ -71,7 +71,7 @@ in
             options = {
               mountpoint = "legacy";
               quota = "100G";
-              "com.sun:auto-snapshot" = "false";
+              "sanoid:autosnap" = "false";
             };
           };
           "var/log" = {
@@ -81,7 +81,7 @@ in
               mountpoint = "legacy";
               quota = "50G";
               recordsize = "128k";
-              "com.sun:auto-snapshot" = "false";
+              "sanoid:autosnap" = "false";
             };
           };
           "var/lib" = {
@@ -100,7 +100,7 @@ in
               quota = "400G";
               recordsize = "1M";
               compression = "off";
-              "com.sun:auto-snapshot" = "false";
+              "sanoid:autosnap" = "false";
             };
           };
         }

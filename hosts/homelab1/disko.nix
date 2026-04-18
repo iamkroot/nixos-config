@@ -113,7 +113,7 @@ in
               quota = "100G";
               # Guarantee that 20GB is always available for /nix
               reservation = "20G";
-              "com.sun:auto-snapshot" = "false";
+              "sanoid:autosnap" = "false";
             };
           };
           "var/log" = {
@@ -123,7 +123,7 @@ in
               mountpoint = "legacy";
               quota = "50G";
               recordsize = "128k";
-              "com.sun:auto-snapshot" = "false";
+              "sanoid:autosnap" = "false";
             };
           };
           "var/lib" = {
@@ -142,7 +142,7 @@ in
               quota = "400G";
               recordsize = "1M";
               compression = "off";
-              "com.sun:auto-snapshot" = "false";
+              "sanoid:autosnap" = "false";
             };
           };
         }

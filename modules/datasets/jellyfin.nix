@@ -7,7 +7,7 @@
       mountpoint = "legacy";
       quota = "100G";
       recordsize = "16K";
-      "com.sun:auto-snapshot" = "true";
+      "sanoid:autosnap" = "true";
     };
   };
   "services/jellyfin/data/trickplay" = {
@@ -18,7 +18,7 @@
       refquota = "50G";
       recordsize = "1M";
       compression = "off";
-      "com.sun:auto-snapshot" = "false";
+      "sanoid:autosnap" = "false";
     };
   };
   "services/jellyfin/data/subtitles" = {
@@ -28,7 +28,7 @@
       mountpoint = "legacy";
       refquota = "10G";
       recordsize = "1M";
-      "com.sun:auto-snapshot" = "false";
+      "sanoid:autosnap" = "false";
     };
   };
   "services/jellyfin/cache" = {
@@ -39,7 +39,7 @@
       compression = "off";
       recordsize = "1M";
       sync = "disabled"; # don't care about consistency
-      "com.sun:auto-snapshot" = "false";
+      "sanoid:autosnap" = "false";
     };
   };
 }

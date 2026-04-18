@@ -7,7 +7,7 @@
       mountpoint = "legacy";
       quota = "50G";
       recordsize = "16K";
-      "com.sun:auto-snapshot" = "true";
+      "sanoid:autosnap" = "true";
     };
   };
 }
