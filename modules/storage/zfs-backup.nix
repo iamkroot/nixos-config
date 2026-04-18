@@ -2,30 +2,44 @@
   config,
   pii,
   pkgs,
+  lib,
   ...
 }:
 let
   primary_pool = pii.storage.media_main;
   secondary_pool = pii.storage.media_bak;
-  
+
   # Define all the datasets we want backed up here
-  target_datasets = [ "data" "media" ];
-in
-{
-  # 1. Dynamically generate Sanoid snapshot policies for all target datasets
-  services.sanoid = {
-    enable = true;
-    datasets = builtins.listToAttrs (map (ds: {
-      name = "${primary_pool.name}/${ds}";
-      value = {
-        autosnap = true;
-        autoprune = true;
-        hourly = 0; daily = 7; weekly = 4; monthly = 3; yearly = 0;
-      };
-    }) target_datasets);
+  targetDatasets = {
+    "data" = {
+      recursive = true;
+    };
+    "media" = { };
+    "images" = { };
   };
 
-  # 2. Define a unified timer
+  # Define the base sanoid policy applied to everything
+  defaultPolicy = {
+    autosnap = true;
+    autoprune = true;
+    hourly = 0;
+    daily = 7;
+    weekly = 4;
+    monthly = 3;
+    yearly = 0;
+  };
+in
+{
+  # Dynamically generate Sanoid snapshot policies for all target datasets
+  services.sanoid = {
+    enable = true;
+    datasets = lib.mapAttrs' (name: conf: {
+      name = "${primary_pool.name}/${name}";
+      value = defaultPolicy // conf;
+    }) targetDatasets;
+  };
+
+  # Define a unified timer directly instead of using syncoid module
   systemd.timers."zfs-backup-das" = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
@@ -34,7 +48,7 @@ in
     };
   };
 
-  # 3. The Unified Backup Service
+  # The Unified Backup Service
   systemd.services."zfs-backup-das" = {
     description = "Sequential ZFS Backup to Secondary Pool";
     path = with pkgs; [
@@ -55,7 +69,7 @@ in
       PRUNE_BIN = "${pkgs.zfs-prune-snapshots}/bin/zfs-prune-snapshots";
       PRIMARY_POOL = primary_pool.name;
       SECONDARY_POOL = secondary_pool.name;
-      TARGET_DATASETS = builtins.concatStringsSep " " target_datasets;
+      TARGET_DATASETS = builtins.concatStringsSep " " (builtins.attrNames targetDatasets);
       # silence mbuffer error
       HOME = "/var/empty";
     };
