@@ -30,16 +30,20 @@ for ds_path in "${ALL_DATASETS[@]}"; do
     SNAP_NAME="${LAST_SYNCED_SNAP#*@}"
     WRITTEN=$($ZFS_BIN get -H -p -o value "written@$SNAP_NAME" "$ds_path" 2>/dev/null)
     
-    if [ -n "$WRITTEN" ] && [ "$WRITTEN" -eq 0 ]; then
+    if [ "$WRITTEN" = "0" ]; then
       echo "Skipping $ds_path: 0 bytes written since last sync."
       # We still update the state file to the newer empty snapshot to keep states current
       echo "$LATEST_SNAP" > "$STATE_FILE"
       continue
+    elif [ "$WRITTEN" = "-" ]; then
+      # If the snapshot no longer exists on the source, 'written' returns '-'.
+      # We let this fall through to run syncoid so it can find the next common base.
+      echo "Notice: Snapshot $SNAP_NAME no longer exists on source. Proceeding with sync."
     fi
   fi
 
   echo "Syncing $ds_path to backup pool..."
-  if $SYNCOID_BIN --no-sync-snap "$ds_path" "$SECONDARY_POOL/$rel_path" -o canmount=noauto; then
+  if $SYNCOID_BIN --sendoptions=w --no-sync-snap "$ds_path" "$SECONDARY_POOL/$rel_path" -o canmount=noauto; then
     echo "Saving state for $ds_path..."
     echo "$LATEST_SNAP" > "$STATE_FILE"
 

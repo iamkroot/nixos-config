@@ -102,7 +102,7 @@ in
       source = "zroot";
       target = "${primary_pool.name}/backup-homelab";
       recursive = true;
-      extraArgs = syncoidExclusions;
+      extraArgs = [ "--sendoptions=w" ] ++ syncoidExclusions;
     };
   };
 
@@ -111,10 +111,11 @@ in
     User = lib.mkForce "root";
     Group = lib.mkForce "root";
     
-    # 1. Device Protection (The magic fix)
-    # Turn PrivateDevices back ON, but explicitly whitelist the ZFS device node.
+    # 1. Device Protection
+    # Turn PrivateDevices ON, but explicitly whitelist the ZFS device node.
     PrivateDevices = lib.mkForce true;
     DeviceAllow = lib.mkForce [ "/dev/zfs rw" ];
+    BindPaths = lib.mkForce [ "/dev/zfs" ];
     
     # 2. Filesystem Protection
     # 'full' mounts /usr, /boot, and /etc as read-only. 
@@ -133,6 +134,10 @@ in
       "CAP_DAC_OVERRIDE" 
       "CAP_DAC_READ_SEARCH" 
       "CAP_FOWNER" 
+      "CAP_CHOWN"         # Required when receiving a stream that restores file ownership
+      "CAP_FSETID"        # Required when receiving a stream that restores setuid/setgid bits
+      "CAP_SYS_RESOURCE"  # ZFS userland utilities often adjust their own wait-states/OOM limits
+      "CAP_SYS_MODULE"    # Prevents libzfs from crashing if it ever decides it needs to verify the kernel module
     ];
   };
 
