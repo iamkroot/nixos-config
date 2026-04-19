@@ -21,6 +21,7 @@ in
   disko.zfs = {
     enable = true;
     settings = {
+      # logLevel = "trace";
       ignoredDatasets = [
         "zroot/root"
       ]
@@ -132,6 +133,16 @@ in
             options = {
               mountpoint = "legacy";
               reservation = "1G";
+            };
+          };
+          "var/lib/containers" = {
+            type = "zfs_fs";
+            mountpoint = "/var/lib/containers";
+            options = {
+              mountpoint = "legacy";
+              "sanoid:autosnap" = "false";
+              "syncoid:sync" = "no";
+              relatime = "on";
             };
           };
           "media" = {
