@@ -106,39 +106,70 @@ in
     };
   };
 
+  vaultix.secrets."zroot-zfs-key" = {
+    file = pii.storage.zroot.key;
+    owner = "root";
+    group = "root";
+  };
+
   systemd.services."syncoid-backup-zroot".serviceConfig = { 
-    # Keep root to bypass NixOS's messy ZFS delegation logic
     User = lib.mkForce "root";
     Group = lib.mkForce "root";
+
+    # Turn off the seccomp filters that cause the SIGSYS core dump
+    SystemCallFilter = lib.mkForce [];
+    SystemCallArchitectures = lib.mkForce "";
+
+    # Give ZFS the raw capabilities it needs to mount and chown
+    CapabilityBoundingSet = lib.mkForce "~";
+
+    # Turn off namespaces so ZFS can see block devices (zvols)
+    PrivateDevices = lib.mkForce false;
+    PrivateMounts = lib.mkForce false;
+    PrivateTmp = lib.mkForce false;
+    PrivateUsers = lib.mkForce false;
     
-    # 1. Device Protection
-    # Turn PrivateDevices ON, but explicitly whitelist the ZFS device node.
-    PrivateDevices = lib.mkForce true;
-    DeviceAllow = lib.mkForce [ "/dev/zfs rw" ];
-    BindPaths = lib.mkForce [ "/dev/zfs" ];
+    # Disable filesystem protections so it can actually write the datasets
+    ProtectSystem = lib.mkForce false;
+    ProtectHome = lib.mkForce false;
+    ProtectControlGroups = lib.mkForce false;
     
-    # 2. Filesystem Protection
-    # 'full' mounts /usr, /boot, and /etc as read-only. 
-    # (Do not use 'strict', because ZFS needs to be able to create dataset mountpoints dynamically)
-    ProtectSystem = lib.mkForce "full";
-    
-    # Block access to user directories since this is a local-to-local sync
-    ProtectHome = lib.mkForce true;
-    
-    # 3. Capability Bounding
-    # Give ZFS exactly the capabilities it needs, rather than "~" (everything).
-    # SYS_ADMIN is required for dataset management/mounting.
-    # DAC/FOWNER bypasses file ownership locks during the replication process.
-    CapabilityBoundingSet = lib.mkForce [ 
-      "CAP_SYS_ADMIN" 
-      "CAP_DAC_OVERRIDE" 
-      "CAP_DAC_READ_SEARCH" 
-      "CAP_FOWNER" 
-      "CAP_CHOWN"         # Required when receiving a stream that restores file ownership
-      "CAP_FSETID"        # Required when receiving a stream that restores setuid/setgid bits
-      "CAP_SYS_RESOURCE"  # ZFS userland utilities often adjust their own wait-states/OOM limits
-      "CAP_SYS_MODULE"    # Prevents libzfs from crashing if it ever decides it needs to verify the kernel module
-    ];
+    # Disable privilege escalation limits
+    NoNewPrivileges = lib.mkForce false;
+    RestrictNamespaces = lib.mkForce false;
+    RestrictAddressFamilies = lib.mkForce "~";
+
+    ExecStartPre = [
+        "+${pkgs.writeShellScript "syncoid-bootstrap" ''
+          TARGET="${config.services.syncoid.commands."backup-zroot".target}"
+          SOURCE="${config.services.syncoid.commands."backup-zroot".source}"
+
+          KEYFILE="${config.vaultix.secrets.zroot-zfs-key.path}" 
+
+          # 1. If target exists, the foundation is already laid. Exit silently.
+          if ${pkgs.zfs}/bin/zfs list -H -o name "$TARGET" >/dev/null 2>&1; then
+            exit 0
+          fi
+
+          echo "Target missing. Bootstrapping raw encrypted foundation..."
+
+          # 2. Snapshot only the parent dataset
+          SNAP="bootstrap-$(date +%s)"
+          ${pkgs.zfs}/bin/zfs snapshot "$SOURCE@$SNAP"
+
+          # 3. Raw send the parent to lock in the Master Key and Wrapper Key
+          ${pkgs.zfs}/bin/zfs send -w "$SOURCE@$SNAP" | ${pkgs.zfs}/bin/zfs receive "$TARGET"
+
+          # 4. Unlock the new backup dataset using your stored passphrase file
+          ${pkgs.zfs}/bin/zfs load-key -L "file://$KEYFILE" "$TARGET"
+
+          # 5. Point the backup dataset's keylocation to this file permanently
+          # so it auto-unlocks on future reboots without you typing anything.
+          ${pkgs.zfs}/bin/zfs change-key -o keylocation="file://$KEYFILE" "$TARGET"
+
+          echo "Bootstrap complete. Target unlocked. Handing off to Syncoid..."
+        ''}"
+      ];
   };
 
   # Define a unified timer directly instead of using syncoid module
