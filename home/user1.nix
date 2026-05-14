@@ -22,6 +22,11 @@ in
     # If the dotfiles repo doesn't exist on this machine, clone it
     if [ ! -d "${dotfiles}" ]; then
       export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh -o StrictHostKeyChecking=accept-new"
+      echo "Waiting for network to reach GitHub..."
+      # Loop until git can successfully talk to the remote repository
+      while ! ${pkgs.git}/bin/git ls-remote "${pii.dotfilesRepo}" >/dev/null 2>&1; do
+        sleep 2
+      done
       $DRY_RUN_CMD ${pkgs.git}/bin/git clone "${pii.dotfilesRepo}" "${dotfiles}"
     fi
   '';
