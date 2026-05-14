@@ -37,12 +37,6 @@ in
     };
   };
 
-  fileSystems."/var/lib/shoko" = {
-    device = "zroot/services/shoko";
-    fsType = "zfs";
-    options = [ "nofail" ]; # Prevents boot hang if the pool is exported
-  };
-
   systemd.services.shoko-perms = {
     description = "Set permissions for Shoko ZFS mount";
     after = [ "var-lib-shoko.mount" ];
