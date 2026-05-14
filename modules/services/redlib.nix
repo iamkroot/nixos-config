@@ -10,7 +10,7 @@ let
     owner = "redlib-org";
     repo = "redlib";
     rev = "a4d36e954cf1bd64f209cd8868c5a29edc81b374";
-    hash = "";
+    hash = "sha256-siyD6A12UALQIV7BMd7zu1TaojleTEYtpxPszuhx1/Y=";
   };
   redlib-latest = pkgs.redlib.overrideAttrs (oldAttrs: {
     version = "0.36.0-unstable-2026-05-13";
@@ -18,7 +18,7 @@ let
     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
       inherit src;
       name = "redlib-0.36.0-unstable-2026-05-13-vendor";
-      hash = "";
+      hash = "sha256-eO3c7rlFna3DuO31etJ6S4c7NmcvgvIWZ1KVkNIuUqQ=";
     };
     # BoringSSL (via boring-sys2) needs cmake, go, git, perl, and libclang for bindgen
     nativeBuildInputs =
