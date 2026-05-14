@@ -7,20 +7,18 @@
 
 let
   src = pkgs.fetchFromGitHub {
-    owner = "Silvenga";
+    owner = "redlib-org";
     repo = "redlib";
-    rev = "af002ab216d271890e715c2d3413f7193c07c640";
-    hash = "sha256-Ny/pdBZFgUAV27e3wREPV8DUtP3XfMdlw0T01q4b70U=";
+    rev = "a4d36e954cf1bd64f209cd8868c5a29edc81b374";
+    hash = "";
   };
-  # Use Silvenga's wreq fork (redlib-org/redlib#544) which uses BoringSSL
-  # to emulate browser TLS fingerprints and evade bot detection
-  redlib-fork = pkgs.redlib.overrideAttrs (oldAttrs: {
-    version = "0.36.0-unstable-2026-04-04";
+  redlib-latest = pkgs.redlib.overrideAttrs (oldAttrs: {
+    version = "0.36.0-unstable-2026-05-13";
     inherit src;
     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
       inherit src;
-      name = "redlib-0.36.0-unstable-2026-04-04-vendor";
-      hash = "sha256-eO3c7rlFna3DuO31etJ6S4c7NmcvgvIWZ1KVkNIuUqQ=";
+      name = "redlib-0.36.0-unstable-2026-05-13-vendor";
+      hash = "";
     };
     # BoringSSL (via boring-sys2) needs cmake, go, git, perl, and libclang for bindgen
     nativeBuildInputs =
@@ -42,7 +40,7 @@ in
 {
   services.redlib = {
     enable = true;
-    package = redlib-fork;
+    package = redlib-latest;
     port = config.infra.services.ports.redlib;
     # Expose to local network
     openFirewall = true;
