@@ -41,7 +41,7 @@ in
 
   # This service dynamically hooks into every mount unit generated above.
   systemd.services."load-${poolName}-keys" = {
-    description = "Load encryption keys for all datasets on ${poolName}";
+    description = "Load encryption keys for datasets on ${poolName} that have keys available";
     unitConfig.DefaultDependencies = false;
     requires = [ "zfs-import-${poolName}.service" ];
     after = [ "zfs-import-${poolName}.service" ];
@@ -57,7 +57,16 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.zfs}/bin/zfs load-key -r ${poolName} || true'";
+      ExecStart = pkgs.writeShellScript "load-zfs-keys" ''
+        ${pkgs.zfs}/bin/zfs get -H -o name,value keylocation -r "${poolName}" | \
+        while IFS=$'\t' read -r name value; do
+          # Check if the keylocation starts with file:// (indicating it's on disk)
+          if [[ "$value" == file://* ]]; then
+            echo "Loading key for $name from $value..."
+            ${pkgs.zfs}/bin/zfs load-key "$name" || true
+          fi
+        done
+      '';
     };
   };
 
