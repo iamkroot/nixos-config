@@ -174,6 +174,8 @@ in
 
   # Define a unified timer directly instead of using syncoid module
   systemd.timers."zfs-backup-das" = {
+    # FIXME: Disabling temporarily - RAM issues
+    enable = false;
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "*-*-* 08:00:00";
