@@ -15,7 +15,9 @@ let
       recursive = true;
     };
     "media" = { };
-    "backup-homelab" = { recursive = true; };
+    "backup-homelab" = {
+      recursive = true;
+    };
     # "images" = { };
   };
 
@@ -36,12 +38,17 @@ let
 
       # Check explicit "false" to exclude. Leaves missing options as `null` to
       # prevent forced overwriting of native ZFS inheritance states.
-      autoSnap = (ds.options or {})."sanoid:autosnap" 
-              or (ds.options or {})."com.sun:auto-snapshot" 
-              or null;
+      autoSnap =
+        (ds.options or { })."sanoid:autosnap" or (ds.options or { })."com.sun:auto-snapshot" or null;
 
       # Check against Nix booleans AND common ZFS string values
-      isIncluded = !(builtins.elem autoSnap [ false "false" "no" "off" ]);
+      isIncluded =
+        !(builtins.elem autoSnap [
+          false
+          "false"
+          "no"
+          "off"
+        ]);
       template = sanoidTemplateOverrides.${path} or "defaultDASPolicy";
     in
     {
@@ -112,12 +119,12 @@ in
     group = "root";
   };
 
-  systemd.services."syncoid-backup-zroot".serviceConfig = { 
+  systemd.services."syncoid-backup-zroot".serviceConfig = {
     User = lib.mkForce "root";
     Group = lib.mkForce "root";
 
     # Turn off the seccomp filters that cause the SIGSYS core dump
-    SystemCallFilter = lib.mkForce [];
+    SystemCallFilter = lib.mkForce [ ];
     SystemCallArchitectures = lib.mkForce "";
 
     # Give ZFS the raw capabilities it needs to mount and chown
@@ -128,48 +135,48 @@ in
     PrivateMounts = lib.mkForce false;
     PrivateTmp = lib.mkForce false;
     PrivateUsers = lib.mkForce false;
-    
+
     # Disable filesystem protections so it can actually write the datasets
     ProtectSystem = lib.mkForce false;
     ProtectHome = lib.mkForce false;
     ProtectControlGroups = lib.mkForce false;
-    
+
     # Disable privilege escalation limits
     NoNewPrivileges = lib.mkForce false;
     RestrictNamespaces = lib.mkForce false;
     RestrictAddressFamilies = lib.mkForce "~";
 
     ExecStartPre = [
-        "+${pkgs.writeShellScript "syncoid-bootstrap" ''
-          TARGET="${config.services.syncoid.commands."backup-zroot".target}"
-          SOURCE="${config.services.syncoid.commands."backup-zroot".source}"
+      "+${pkgs.writeShellScript "syncoid-bootstrap" ''
+        TARGET="${config.services.syncoid.commands."backup-zroot".target}"
+        SOURCE="${config.services.syncoid.commands."backup-zroot".source}"
 
-          KEYFILE="${config.vaultix.secrets.zroot-zfs-key.path}" 
+        KEYFILE="${config.vaultix.secrets.zroot-zfs-key.path}" 
 
-          # 1. If target exists, the foundation is already laid. Exit silently.
-          if ${pkgs.zfs}/bin/zfs list -H -o name "$TARGET" >/dev/null 2>&1; then
-            exit 0
-          fi
+        # 1. If target exists, the foundation is already laid. Exit silently.
+        if ${pkgs.zfs}/bin/zfs list -H -o name "$TARGET" >/dev/null 2>&1; then
+          exit 0
+        fi
 
-          echo "Target missing. Bootstrapping raw encrypted foundation..."
+        echo "Target missing. Bootstrapping raw encrypted foundation..."
 
-          # 2. Snapshot only the parent dataset
-          SNAP="bootstrap-$(date +%s)"
-          ${pkgs.zfs}/bin/zfs snapshot "$SOURCE@$SNAP"
+        # 2. Snapshot only the parent dataset
+        SNAP="bootstrap-$(date +%s)"
+        ${pkgs.zfs}/bin/zfs snapshot "$SOURCE@$SNAP"
 
-          # 3. Raw send the parent to lock in the Master Key and Wrapper Key
-          ${pkgs.zfs}/bin/zfs send -w "$SOURCE@$SNAP" | ${pkgs.zfs}/bin/zfs receive "$TARGET"
+        # 3. Raw send the parent to lock in the Master Key and Wrapper Key
+        ${pkgs.zfs}/bin/zfs send -w "$SOURCE@$SNAP" | ${pkgs.zfs}/bin/zfs receive "$TARGET"
 
-          # 4. Unlock the new backup dataset using your stored passphrase file
-          ${pkgs.zfs}/bin/zfs load-key -L "file://$KEYFILE" "$TARGET"
+        # 4. Unlock the new backup dataset using your stored passphrase file
+        ${pkgs.zfs}/bin/zfs load-key -L "file://$KEYFILE" "$TARGET"
 
-          # 5. Point the backup dataset's keylocation to this file permanently
-          # so it auto-unlocks on future reboots without you typing anything.
-          ${pkgs.zfs}/bin/zfs change-key -o keylocation="file://$KEYFILE" "$TARGET"
+        # 5. Point the backup dataset's keylocation to this file permanently
+        # so it auto-unlocks on future reboots without you typing anything.
+        ${pkgs.zfs}/bin/zfs change-key -o keylocation="file://$KEYFILE" "$TARGET"
 
-          echo "Bootstrap complete. Target unlocked. Handing off to Syncoid..."
-        ''}"
-      ];
+        echo "Bootstrap complete. Target unlocked. Handing off to Syncoid..."
+      ''}"
+    ];
   };
 
   # Define a unified timer directly instead of using syncoid module
