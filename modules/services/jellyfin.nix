@@ -9,13 +9,23 @@
   services.jellyfin = {
     enable = true;
     openFirewall = true;
+    hardwareAcceleration = {
+      enable = true;
+      type = "vaapi";
+      device = "/dev/dri/renderD128";
+    };
+    transcoding.enableHardwareEncoding = true;
   };
 
   hardware.graphics = {
     enable = true;
+    enable32Bit = true; # Highly recommended for some decoding pipelines
     extraPackages = with pkgs; [
       libva
       libvdpau-va-gl
+      vulkan-loader
+      vulkan-validation-layers
+      vulkan-extension-layer
     ];
   };
 
@@ -31,7 +41,7 @@
 
   services.caddy.virtualHosts."${config.infra.services.hostnames.jellyfin}" = {
     extraConfig = ''
-      reverse_proxy 127.0.0.1:8096
+      reverse_proxy 127.0.0.1:${config.infra.services.ports.jellyfin}
     '';
     logFormat = ''
       output file /var/log/caddy/access-${config.infra.services.hostnames.jellyfin}.log {
@@ -46,8 +56,8 @@
       localIp = pii.hosts.homelab1.localIp;
     in
     ''
-      # Allow TCP 8096 (HTTP) only from the ${localIp}/24 subnet
-      iptables -A nixos-fw -s ${localIp}/24 -p tcp --dport 8096 -j nixos-fw-accept
+      # Allow TCP ${config.infra.services.ports.jellyfin} (HTTP) only from the ${localIp}/24 subnet
+      iptables -A nixos-fw -s ${localIp}/24 -p tcp --dport ${config.infra.services.ports.jellyfin} -j nixos-fw-accept
 
       # Optional: Allow UDP 1900 and 7359 for Jellyfin auto-discovery (DLNA/Clients) on the local subnet
       iptables -A nixos-fw -s ${localIp}/24 -p udp --dport 1900 -j nixos-fw-accept

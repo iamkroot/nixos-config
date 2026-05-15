@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  myUtils,
   pii,
   ...
 }:
@@ -13,6 +14,10 @@ let
   animeVolumes = lib.mapAttrsToList (name: path: "${path}:/mnt/anime/${name}") pii.media.animeDirs;
 in
 {
+  imports = [
+    # didn't find a way to setup authelia
+    (myUtils.mkCaddyModule "shoko" { authelia = false; })
+  ];
   virtualisation.podman.enable = true;
 
   users.users."${pii.primaryUser}".extraGroups = [ "podman" ];
@@ -46,6 +51,4 @@ in
       ExecStart = "${pkgs.coreutils}/bin/chown -R 1000:${toString mediaGroupGid} /var/lib/shoko";
     };
   };
-
-  networking.firewall.allowedTCPPorts = [ 8111 ];
 }

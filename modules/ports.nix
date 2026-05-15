@@ -31,6 +31,10 @@
     yopass = myUtils.mkPortOption 1337 "Port for yopass";
 
     httpserver = myUtils.mkPortOption 12345 "Port for httpserver";
+
+    shoko = myUtils.mkPortOption 8111 "Port for shokoserver";
+
+    jellyfin = myUtils.mkPortOption 8096 "Port for jellyfin";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;
