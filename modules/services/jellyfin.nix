@@ -41,7 +41,7 @@
 
   services.caddy.virtualHosts."${config.infra.services.hostnames.jellyfin}" = {
     extraConfig = ''
-      reverse_proxy 127.0.0.1:${config.infra.services.ports.jellyfin}
+      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.jellyfin}
     '';
     logFormat = ''
       output file /var/log/caddy/access-${config.infra.services.hostnames.jellyfin}.log {
@@ -56,8 +56,8 @@
       localIp = pii.hosts.homelab1.localIp;
     in
     ''
-      # Allow TCP ${config.infra.services.ports.jellyfin} (HTTP) only from the ${localIp}/24 subnet
-      iptables -A nixos-fw -s ${localIp}/24 -p tcp --dport ${config.infra.services.ports.jellyfin} -j nixos-fw-accept
+      # Allow TCP ${toString config.infra.services.ports.jellyfin} (HTTP) only from the ${localIp}/24 subnet
+      iptables -A nixos-fw -s ${localIp}/24 -p tcp --dport ${toString config.infra.services.ports.jellyfin} -j nixos-fw-accept
 
       # Optional: Allow UDP 1900 and 7359 for Jellyfin auto-discovery (DLNA/Clients) on the local subnet
       iptables -A nixos-fw -s ${localIp}/24 -p udp --dport 1900 -j nixos-fw-accept
