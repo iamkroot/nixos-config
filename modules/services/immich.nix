@@ -78,7 +78,11 @@ in
 
     immich-server = {
       image = "ghcr.io/immich-app/immich-server:${immichVersion}";
-      extraOptions = [ "--network=immich" ];
+      extraOptions = [
+        "--network=immich"
+        # needed to get sso working
+        "--add-host=${config.infra.services.hostnames.auth}:host-gateway"
+      ];
       ports = [ "${toString config.infra.services.ports.immich}:2283" ];
       dependsOn = [
         "immich-postgres"
