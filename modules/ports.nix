@@ -35,6 +35,8 @@
     shoko = myUtils.mkPortOption 8111 "Port for shokoserver";
 
     jellyfin = myUtils.mkPortOption 8096 "Port for jellyfin";
+
+    vaultwarden = myUtils.mkPortOption 8222 "Port for vaultwarden Rocket";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;

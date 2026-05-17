@@ -28,6 +28,7 @@ in
     ../../modules/services/adguard.nix
     ../../modules/services/redlib.nix
     ../../modules/services/yopass.nix
+    ../../modules/services/vaultwarden.nix
     ../../modules/storage
     ../../modules/initrd.nix
   ];

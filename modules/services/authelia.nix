@@ -92,6 +92,13 @@ in
             domain = config.infra.services.hostnames.auth;
             policy = "bypass";
           }
+          {
+            domain = config.infra.services.hostnames.vaultwarden;
+            policy = "one_factor";
+            subject = [
+              "group:vaultwarden_users"
+            ];
+          }
           # TODO: Require 2FA for everything else by default
           {
             domain = "*.${config.infra.domain}";
@@ -111,6 +118,17 @@ in
           redirect_uris = [
             "https://${config.infra.services.hostnames.jellyfin}/sso/OID/redirect/authelia"
           ];
+        }
+        {
+          client_id = pii.secrets.authelia-vaultwarden-client-id;
+          client_secret = pii.secrets.authelia-vaultwarden-client-secret;
+          client_name = "Vaultwarden";
+          public = false;
+          authorization_policy = "one_factor";
+          redirect_uris = [
+            "https://${config.infra.services.hostnames.vaultwarden}/identity/connect/oidc-signin"
+          ];
+          userinfo_signed_response_alg = "none";
         }
       ];
     };
