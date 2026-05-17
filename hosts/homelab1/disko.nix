@@ -9,11 +9,12 @@ let
     (inputs.self + /modules/datasets/jellyfin.nix)
     (inputs.self + /modules/datasets/shoko.nix)
     (inputs.self + /modules/datasets/authelia.nix)
+    (inputs.self + /modules/datasets/immich.nix)
   ];
 
   customDatasets = lib.foldl' (acc: path: acc // (import path { })) { } serviceFiles;
 
-  externalDisks = lib.remove null (
+  externalDisks = lib.subtractLists [ null "zroot" ] (
     lib.unique (lib.mapAttrsToList (name: value: lib.attrByPath [ "name" ] null value) pii.storage)
   );
 in

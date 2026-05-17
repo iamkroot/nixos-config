@@ -26,6 +26,7 @@ in
     ../../modules/services/authelia.nix
     ../../modules/services/redlib.nix
     ../../modules/services/vaultwarden.nix
+    ../../modules/services/immich.nix
     ../../modules/storage
     ../../modules/initrd.nix
   ];

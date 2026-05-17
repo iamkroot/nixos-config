@@ -130,6 +130,19 @@ in
           ];
           userinfo_signed_response_alg = "none";
         }
+        {
+          client_id = pii.secrets.authelia-immich-client-id;
+          client_secret = pii.secrets.authelia-immich-client-secret;
+          client_name = "Immich";
+          public = false;
+          authorization_policy = "one_factor";
+          redirect_uris = [
+            "https://${config.infra.services.hostnames.immich}/auth/login"
+            "https://${config.infra.services.hostnames.immich}/user-settings"
+            "app.immich:///oauth-callback"
+          ];
+          userinfo_signed_response_alg = "none";
+        }
       ];
     };
   };
