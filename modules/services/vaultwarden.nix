@@ -10,7 +10,7 @@ let
 in
 {
   imports = [
-    (myUtils.mkCaddyModule "vaultwarden" { authelia = true; })
+    (myUtils.mkCaddyModule "vaultwarden" { authelia = false; })
   ];
   services.vaultwarden = {
     enable = true;
