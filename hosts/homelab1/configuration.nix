@@ -24,10 +24,7 @@ in
     ../../modules/services/duckdns.nix
     ../../modules/services/lldap.nix
     ../../modules/services/authelia.nix
-    ../../modules/services/whoami.nix
-    ../../modules/services/adguard.nix
     ../../modules/services/redlib.nix
-    ../../modules/services/yopass.nix
     ../../modules/services/vaultwarden.nix
     ../../modules/storage
     ../../modules/initrd.nix
