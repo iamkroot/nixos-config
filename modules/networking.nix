@@ -2,6 +2,7 @@
   host,
   config,
   pii,
+  lib,
   ...
 }:
 {
@@ -33,9 +34,10 @@
     file = "${pii.networks.wifi1.pwd}";
   };
   vaultix.templates.network-secrets.content = "wifi1=${config.vaultix.placeholder."wifi1-pwd"}";
-  # don't prioritize lan over wifi for ANY ethernet connection
+  # OLD: don't prioritize lan over wifi for ANY ethernet connection
+  # TODO: Make this a config option
   networking.networkmanager.ensureProfiles.profiles = {
-    eth-local = {
+    eth-local = lib.mkIf false {
       connection = {
         id = "eth-local";
         type = "ethernet";
