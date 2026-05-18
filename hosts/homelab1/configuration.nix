@@ -47,6 +47,8 @@ in
     "zswap.zpool=zsmalloc"
     # Limit ZFS ARC to 8GB
     "zfs.zfs_arc_max=8589934592"
+
+    "consoleblank=600"
   ];
 
   # zfs
