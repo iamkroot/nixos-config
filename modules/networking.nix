@@ -34,6 +34,32 @@
     file = "${pii.networks.wifi1.pwd}";
   };
   vaultix.templates.network-secrets.content = "wifi1=${config.vaultix.placeholder."wifi1-pwd"}";
+
+  # Create a bridge between two eth ports
+  # FIXME: This is specific to the homelab.
+  networking.bridges = {
+    "br0" = {
+      interfaces = [
+        "eno1"
+        "enp4s0"
+      ];
+    };
+  };
+
+  networking.interfaces.br0.useDHCP = true;
+
+  networking.interfaces.eno1.useDHCP = false;
+  networking.interfaces.enp4s0.useDHCP = false;
+  networking.networkmanager.unmanaged = [
+    "eno1"
+    "enp4s0"
+  ];
+
+  networking.firewall.trustedInterfaces = [ "br0" ];
+  networking.firewall.allowPing = true;
+  # needed cuz packets from eno1 end up in br0 which is v sus for firewall
+  networking.firewall.checkReversePath = "loose";
+
   # OLD: don't prioritize lan over wifi for ANY ethernet connection
   # TODO: Make this a config option
   networking.networkmanager.ensureProfiles.profiles = {
