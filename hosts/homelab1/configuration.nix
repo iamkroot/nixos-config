@@ -65,6 +65,8 @@ in
   };
 
   time.timeZone = "America/Los_Angeles";
+  services.timesyncd.enable = false;
+  services.chrony.enable = true;
 
   services.pipewire = {
     enable = true;
