@@ -13,7 +13,7 @@ in
     ./hardware-configuration.nix
     ./disko.nix
     ../../modules/networking.nix
-    ../../modules/ports.nix
+    ../../modules/infra.nix
     ../../secrets/ports.nix
     ../../modules/services/aria2.nix
     ../../modules/services/atuin.nix
@@ -27,6 +27,7 @@ in
     ../../modules/services/redlib.nix
     ../../modules/services/vaultwarden.nix
     ../../modules/services/immich.nix
+    ../../modules/services/account-center.nix
     ../../modules/storage
     ../../modules/initrd.nix
   ];

@@ -144,6 +144,25 @@ in
           userinfo_signed_response_alg = "none";
           token_endpoint_auth_method = "client_secret_post";
         }
+        {
+          client_id = pii.secrets.authelia-account-center-client-id;
+          client_secret = pii.secrets.authelia-account-center-client-secret;
+          client_name = "Account Center";
+          public = false;
+          authorization_policy = "one_factor";
+          scopes = [
+            "openid"
+            "profile"
+            "groups"
+            "email"
+            "offline_access"
+          ];
+          redirect_uris = [
+            "https://${config.infra.services.hostnames."account-center"}/oidc-callback"
+          ];
+          userinfo_signed_response_alg = "none";
+          token_endpoint_auth_method = "client_secret_post";
+        }
       ];
     };
   };

@@ -1,6 +1,7 @@
 # declare the schemas here
 # actual values can be overriden in secrets/ports.nix
 {
+  config,
   lib,
   pii,
   myUtils,
@@ -39,6 +40,8 @@
     vaultwarden = myUtils.mkPortOption 8222 "Port for vaultwarden Rocket";
 
     immich = myUtils.mkPortOption 2283 "Port for immich";
+
+    "account-center" = myUtils.mkPortOption 8085 "Port for account-center";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;
@@ -49,4 +52,23 @@
     default = { };
     description = "Mapping of my homelab services to their hostnames.";
   };
+  options.infra.services.catalog = lib.mkOption {
+    type = lib.types.attrsOf (lib.types.submodule {
+      options = {
+        enable = lib.mkEnableOption "Include in Account Center catalog" // { default = true; };
+        name = lib.mkOption { type = lib.types.str; };
+        url = lib.mkOption { type = lib.types.str; };
+        icon = lib.mkOption { type = lib.types.nullOr lib.types.str; default = null; };
+        roles = lib.mkOption { type = lib.types.attrsOf lib.types.str; default = {}; };
+      };
+    });
+    default = {};
+    description = "Account Center catalog entries.";
+  };
+
+  config.infra.services.catalog = lib.mapAttrs (svc: host: {
+    enable = lib.mkDefault (config.services.caddy.virtualHosts ? "${host}");
+    name = lib.mkDefault (lib.toUpper (lib.substring 0 1 svc) + lib.substring 1 (-1) svc);
+    url = lib.mkDefault "https://${host}";
+  }) config.infra.services.hostnames;
 }
