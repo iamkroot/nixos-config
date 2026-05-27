@@ -27,7 +27,7 @@ in
     containers."shoko-server" = {
       image = "ghcr.io/shokoanime/server:latest";
       autoStart = true;
-      ports = [ "8111:8111" ];
+      ports = [ "${toString config.infra.services.ports.shoko}:8111" ];
 
       environment = {
         TZ = "America/Los_Angeles";
