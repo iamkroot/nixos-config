@@ -39,75 +39,58 @@ in
 
   boot.zfs.extraPools = [ poolName ];
 
-  # This service dynamically hooks into every mount unit generated above.
+  # This listens for any block device being added that is formatted
+  # as a ZFS member and belongs to the "poolName" pool.
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_TYPE}=="zfs_member", ENV{ID_FS_LABEL}=="${poolName}", TAG+="systemd", ENV{SYSTEMD_WANTS}+="load-${poolName}-keys.service"
+  '';
+
+  # Override the native NixOS import service to handle safe exports
+  systemd.services."zfs-import-${poolName}" = {
+    serviceConfig = {
+      # The minus sign (-) ignores the error if the pool is already gone
+      ExecStop = "-${pkgs.zfs}/bin/zpool export ${poolName}";
+    };
+  };
+
+  # Key loading and mounting (Self-contained)
   systemd.services."load-${poolName}-keys" = {
-    description = "Load encryption keys for datasets on ${poolName} that have keys available";
+    description = "Load encryption keys and mount datasets for ${poolName}";
     unitConfig.DefaultDependencies = false;
+
     requires = [ "zfs-import-${poolName}.service" ];
     after = [ "zfs-import-${poolName}.service" ];
 
-    # This ensures it runs BEFORE systemd attempts to mount local filesystems
-    before = [
-      # "zfs-mount.service"
-      "local-fs.target"
-    ];
-    # Trigger this service as part of the ZFS import target
-    wantedBy = [ "zfs-import-${poolName}.service" ];
+    # BindsTo ensures that if the import service stops, this state resets too
+    bindsTo = [ "zfs-import-${poolName}.service" ];
+    before = [ "local-fs.target" ];
+    # Auto start the media apps
+    wants = [ "media-apps.target" ];
 
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = pkgs.writeShellScript "load-zfs-keys" ''
+      ExecStart = pkgs.writeShellScript "load-zfs-keys-and-mount" ''
         ${pkgs.zfs}/bin/zfs get -H -o name,value keylocation -r "${poolName}" | \
         while IFS=$'\t' read -r name value; do
-          # Check if the keylocation starts with file:// (indicating it's on disk)
           if [[ "$value" == file://* ]]; then
             echo "Loading key for $name from $value..."
             ${pkgs.zfs}/bin/zfs load-key "$name" || true
           fi
         done
+
+        # Mount the datasets natively
+        ${pkgs.zfs}/bin/zfs mount -a || true
       '';
     };
   };
 
-  # This listens for any block device being added that is formatted
-  # as a ZFS member and belongs to the "castor" pool.
-  services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_TYPE}=="zfs_member", ENV{ID_FS_LABEL}=="${poolName}", TAG+="systemd", ENV{SYSTEMD_WANTS}+="${poolName}-automount.service"
-  '';
-
-  # Auto mount on hotplug
-  systemd.services."${poolName}-automount" = {
-    description = "Automount ${poolName} DAS and start media apps";
-
-    # We don't want this starting during normal boot, ONLY when triggered by udev
-    unitConfig = {
-      DefaultDependencies = false;
-    };
-
-    serviceConfig = {
-      Type = "oneshot";
-      # Prevents udev from spamming the script if multiple disks connect at once
-      RemainAfterExit = true;
-    };
-
-    path = with pkgs; [
-      zfs
-      systemd
-      coreutils
-    ];
-
-    script = ''
-      sleep 5
-      zpool import -l ${poolName} || true
-
-      systemctl daemon-reload
-      systemctl start media-apps.target
-    '';
-  };
   systemd.targets.media-apps = {
     description = "Target for all media-related services tied to the DAS";
-    wantedBy = [ "multi-user.target" ];
+    # BindsTo means: If load-keys stops (drive exported), drop this target.
+    # After means: Do not let apps start until load-keys has successfully finished mounting.
+    bindsTo = [ "load-${poolName}-keys.service" ];
+    after = [ "load-${poolName}-keys.service" ];
   };
 
   systemd.services.jellyfin = lib.mkIf config.services.jellyfin.enable mediaServiceAttrs;
