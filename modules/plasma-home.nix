@@ -30,13 +30,9 @@
       };
     };
 
-    startup.desktopScript = {
-      "disable-baloo" = {
-        text = ''
-          balooctl6 suspend
-          balooctl6 disable
-        '';
-        priority = 1;
+    configFile."baloofilerc" = {
+      "Basic Settings" = {
+        "Indexing-Enabled" = false;
       };
     };
 
