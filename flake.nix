@@ -8,6 +8,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     vaultix = {
       url = "github:milieuim/vaultix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -35,6 +41,7 @@
       self,
       nixpkgs,
       home-manager,
+      plasma-manager,
       vaultix,
       disko,
       disko-zfs,
@@ -61,6 +68,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
+              home-manager.sharedModules = [ plasma-manager.homeModules.plasma-manager ];
               home-manager.extraSpecialArgs = { inherit inputs pii; };
               home-manager.users."${pii.primaryUser}" = import ./home/user1.nix;
               home-manager.users.root = import ./home/root.nix;
@@ -78,6 +86,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
+              home-manager.sharedModules = [ plasma-manager.homeModules.plasma-manager ];
               home-manager.extraSpecialArgs = { inherit inputs pii; };
               home-manager.users."${pii.primaryUser}" = import ./home/user1.nix;
               home-manager.users.root = import ./home/root.nix;

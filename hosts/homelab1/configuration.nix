@@ -30,6 +30,7 @@ in
     ../../modules/services/account-center.nix
     ../../modules/storage
     ../../modules/initrd.nix
+    ../../modules/kde.nix
   ];
 
   nix.settings.experimental-features = [

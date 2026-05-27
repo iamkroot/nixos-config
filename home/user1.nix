@@ -15,6 +15,7 @@ in
     ../modules/zsh.nix
     ../modules/cli-tools.nix
     ../modules/aliases.nix
+    ../modules/plasma-home.nix
   ];
 
   xdg.configFile."mise/config.toml".source = link "${dotfiles}/.config/mise/config.toml";
