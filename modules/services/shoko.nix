@@ -39,6 +39,10 @@ in
         "/var/lib/shoko:/home/shoko/.shoko"
       ]
       ++ animeVolumes;
+
+      extraOptions = [
+        "--no-healthcheck"
+      ];
     };
   };
 
