@@ -12,15 +12,9 @@ let
   poolName = media_main.name;
   mediaMount = "mnt-${poolName}-media.mount";
   mediaServiceAttrs = {
-    bindsTo = [
-      "media-apps.target"
-      mediaMount
-    ];
-    after = [
-      "media-apps.target"
-      mediaMount
-      "load-${poolName}-keys.service"
-    ];
+    # Bind to the target so the app dies if the drive is exported
+    bindsTo = [ "media-apps.target" ];    
+    after = [ "load-${poolName}-keys.service" ];
     wantedBy = [ "media-apps.target" ];
   };
 in
@@ -74,8 +68,15 @@ in
         ${pkgs.zfs}/bin/zfs get -H -o name,value keylocation -r "${poolName}" | \
         while IFS=$'\t' read -r name value; do
           if [[ "$value" == file://* ]]; then
-            echo "Loading key for $name from $value..."
-            ${pkgs.zfs}/bin/zfs load-key "$name" || true
+            # Check if the key is actually needed
+            keystatus=$(${pkgs.zfs}/bin/zfs get -H -o value keystatus "$name")
+            
+            if [ "$keystatus" = "unavailable" ]; then
+              echo "Loading key for $name from $value..."
+              ${pkgs.zfs}/bin/zfs load-key "$name" || true
+            else
+              echo "Key for $name is already loaded. Skipping..."
+            fi
           fi
         done
 
