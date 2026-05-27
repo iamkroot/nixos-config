@@ -15,11 +15,14 @@ let
     global_access = {
       lldap_admin = "system_administrator";
     };
-    services = lib.mapAttrsToList (n: v: {
-      name = v.name;
-      url = v.url;
-    } // lib.optionalAttrs (v.icon != null) { icon = v.icon; }
-      // lib.optionalAttrs (v.roles != {}) { roles = v.roles; }
+    services = lib.mapAttrsToList (
+      n: v:
+      {
+        name = v.name;
+        url = v.url;
+      }
+      // lib.optionalAttrs (v.icon != null) { icon = v.icon; }
+      // lib.optionalAttrs (v.roles != { }) { roles = v.roles; }
     ) enabledServices;
   };
   catalogFile = yamlFormat.generate "catalog.yaml" catalogData;

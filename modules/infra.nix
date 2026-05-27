@@ -53,16 +53,26 @@
     description = "Mapping of my homelab services to their hostnames.";
   };
   options.infra.services.catalog = lib.mkOption {
-    type = lib.types.attrsOf (lib.types.submodule {
-      options = {
-        enable = lib.mkEnableOption "Include in Account Center catalog" // { default = true; };
-        name = lib.mkOption { type = lib.types.str; };
-        url = lib.mkOption { type = lib.types.str; };
-        icon = lib.mkOption { type = lib.types.nullOr lib.types.str; default = null; };
-        roles = lib.mkOption { type = lib.types.attrsOf lib.types.str; default = {}; };
-      };
-    });
-    default = {};
+    type = lib.types.attrsOf (
+      lib.types.submodule {
+        options = {
+          enable = lib.mkEnableOption "Include in Account Center catalog" // {
+            default = true;
+          };
+          name = lib.mkOption { type = lib.types.str; };
+          url = lib.mkOption { type = lib.types.str; };
+          icon = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+          };
+          roles = lib.mkOption {
+            type = lib.types.attrsOf lib.types.str;
+            default = { };
+          };
+        };
+      }
+    );
+    default = { };
     description = "Account Center catalog entries.";
   };
 
