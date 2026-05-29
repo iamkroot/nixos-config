@@ -59,6 +59,16 @@ in
     };
   };
 
+  systemd.services."podman-account-center" = {
+    requires = [ "authelia-main.service" ];
+    after = [ "authelia-main.service" ];
+
+    serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = "5s";
+    };
+  };
+
   system.activationScripts.accountCenterVolumes = ''
     mkdir -p /var/lib/account-center
     chmod 755 /var/lib/account-center
