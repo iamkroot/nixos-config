@@ -10,6 +10,7 @@ let
     (inputs.self + /modules/datasets/shoko.nix)
     (inputs.self + /modules/datasets/authelia.nix)
     (inputs.self + /modules/datasets/immich.nix)
+    (inputs.self + /modules/datasets/seerr.nix)
   ];
 
   customDatasets = lib.foldl' (acc: path: acc // (import path { })) { } serviceFiles;
@@ -32,6 +33,8 @@ in
       ]) externalDisks;
       ignoredProperties = [
         "keylocation"
+        "keyformat"
+        "encryption"
         "nixos:shutdown-time"
       ];
     };

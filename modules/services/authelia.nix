@@ -99,6 +99,17 @@ in
               "group:vaultwarden_users"
             ];
           }
+          # Bypass API so *arr apps and external tools can talk to Seerr
+          {
+            domain = [ config.infra.services.hostnames.seerr ];
+            resources = [ "^/api.*" ];
+            policy = "bypass";
+          }
+          # Require auth for the human-facing web UI
+          {
+            domain = [ config.infra.services.hostnames.seerr ];
+            policy = "one_factor";
+          }
           # TODO: Require 2FA for everything else by default
           {
             domain = "*.${config.infra.domain}";

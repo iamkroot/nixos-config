@@ -36,6 +36,7 @@
     shoko = myUtils.mkPortOption 8111 "Port for shokoserver";
 
     jellyfin = myUtils.mkPortOption 8096 "Port for jellyfin";
+    seerr = myUtils.mkPortOption 5055 "Port for seerr";
 
     vaultwarden = myUtils.mkPortOption 8222 "Port for vaultwarden Rocket";
 
