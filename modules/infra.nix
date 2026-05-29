@@ -42,6 +42,8 @@
     immich = myUtils.mkPortOption 2283 "Port for immich";
 
     "account-center" = myUtils.mkPortOption 8085 "Port for account-center";
+
+    icons = myUtils.mkPortOption 0 "Fake port";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;
@@ -80,5 +82,6 @@
     enable = lib.mkDefault (config.services.caddy.virtualHosts ? "${host}");
     name = lib.mkDefault (lib.toUpper (lib.substring 0 1 svc) + lib.substring 1 (-1) svc);
     url = lib.mkDefault "https://${host}";
+    icon = lib.mkDefault "https://${config.infra.services.hostnames.icons}/${svc}.svg";
   }) config.infra.services.hostnames;
 }

@@ -34,6 +34,11 @@
       url = "github:michel-kraemer/zsh-patina";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    dashboard-icons = {
+      url = "github:homarr-labs/dashboard-icons";
+      flake = false;
+    };
   };
 
   outputs =

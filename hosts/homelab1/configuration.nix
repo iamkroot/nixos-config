@@ -28,6 +28,7 @@ in
     ../../modules/services/vaultwarden.nix
     ../../modules/services/immich.nix
     ../../modules/services/account-center.nix
+    ../../modules/services/icons.nix
     ../../modules/storage
     ../../modules/initrd.nix
     ../../modules/kde.nix

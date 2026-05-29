@@ -31,6 +31,22 @@
         "type": "github"
       }
     },
+    "dashboard-icons": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1779963460,
+        "narHash": "sha256-LKZzGIdowY4ePo2nw5MSO3oXXLgL0vdt9RRhIy4+FlM=",
+        "owner": "homarr-labs",
+        "repo": "dashboard-icons",
+        "rev": "159b55c82cc3874d7239d12455cc331cd161f680",
+        "type": "github"
+      },
+      "original": {
+        "owner": "homarr-labs",
+        "repo": "dashboard-icons",
+        "type": "github"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -263,6 +279,7 @@
     },
     "root": {
       "inputs": {
+        "dashboard-icons": "dashboard-icons",
         "disko": "disko",
         "disko-zfs": "disko-zfs",
         "home-manager": "home-manager",
