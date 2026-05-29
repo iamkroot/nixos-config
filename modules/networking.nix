@@ -23,7 +23,11 @@
           key-mgmt = "wpa-psk";
           psk = "$wifi1";
         };
-        ipv4.method = "auto";
+        ipv4 = {
+          method = "auto";
+          route-metric = 2000;
+          dhcp-client-id = "mac";
+        };
       };
     };
     ensureProfiles.environmentFiles = [
