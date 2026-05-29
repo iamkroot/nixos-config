@@ -116,6 +116,7 @@ in
               # Guarantee that 20GB is always available for /nix
               reservation = "20G";
               "sanoid:autosnap" = "false";
+              "syncoid:sync" = "no";
             };
           };
           "var/log" = {
@@ -126,6 +127,7 @@ in
               quota = "50G";
               recordsize = "128k";
               "sanoid:autosnap" = "false";
+              "syncoid:sync" = "no";
             };
           };
           "var/lib" = {

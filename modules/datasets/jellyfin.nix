@@ -19,6 +19,7 @@
       recordsize = "1M";
       compression = "off";
       "sanoid:autosnap" = "false";
+      "syncoid:sync" = "no";
     };
   };
   "services/jellyfin/data/subtitles" = {
@@ -29,6 +30,7 @@
       refquota = "10G";
       recordsize = "1M";
       "sanoid:autosnap" = "false";
+      "syncoid:sync" = "no";
     };
   };
   "services/jellyfin/cache" = {
@@ -40,6 +42,7 @@
       recordsize = "1M";
       sync = "disabled"; # don't care about consistency
       "sanoid:autosnap" = "false";
+      "syncoid:sync" = "no";
     };
   };
 }

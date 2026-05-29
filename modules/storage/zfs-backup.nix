@@ -9,7 +9,7 @@ let
   primary_pool = pii.storage.media_main;
   secondary_pool = pii.storage.media_bak;
 
-  # Define all the datasets we want backed up here
+  # Define all the datasets on primary that need to be backed up to secondary
   targetDatasets = {
     "data" = {
       recursive = true;
@@ -17,6 +17,8 @@ let
     "media" = { };
     "backup-homelab" = {
       recursive = true;
+      autosnap = false;
+      autoprune = true;  
     };
     # "images" = { };
   };
