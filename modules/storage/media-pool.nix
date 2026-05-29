@@ -13,7 +13,7 @@ let
   mediaMount = "mnt-${poolName}-media.mount";
   mediaServiceAttrs = {
     # Bind to the target so the app dies if the drive is exported
-    bindsTo = [ "media-apps.target" ];    
+    bindsTo = [ "media-apps.target" ];
     after = [ "load-${poolName}-keys.service" ];
     wantedBy = [ "media-apps.target" ];
   };

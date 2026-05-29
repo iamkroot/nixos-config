@@ -30,7 +30,7 @@
       mountpoint = "legacy";
       recordsize = "128K"; # Standard recordsize is fine here
       atime = "off";
-      "sanoid:autosnap" = "false";      
+      "sanoid:autosnap" = "false";
       "syncoid:sync" = "no";
     };
   };

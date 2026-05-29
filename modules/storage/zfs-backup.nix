@@ -18,7 +18,7 @@ let
     "backup-homelab" = {
       recursive = true;
       autosnap = false;
-      autoprune = true;  
+      autoprune = true;
     };
     # "images" = { };
   };
