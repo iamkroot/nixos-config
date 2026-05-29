@@ -66,10 +66,7 @@ in
       respond /robots.txt "User-agent: ClaudeBot\nDisallow: /\n\nUser-agent: GPTBot\nDisallow: /" 200
 
       reverse_proxy 127.0.0.1:${toString config.infra.services.ports.anubis_redlib} {
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
+        header_up X-Real-IP {client_ip}
       }
     '';
     logFormat = ''
