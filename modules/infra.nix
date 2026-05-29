@@ -19,6 +19,7 @@
     authelia = myUtils.mkPortOption 9091 "Port for Authelia service";
 
     aria2 = myUtils.mkPortOption 6800 "Port for aria2 RPC server";
+    ariang = myUtils.mkPortOption 0 "Fake port";
 
     whoami = myUtils.mkPortOption 8080 "Port for aria2 RPC server";
 
