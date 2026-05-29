@@ -3,9 +3,14 @@
   pkgs,
   lib,
   pii,
+  myUtils,
   ...
 }:
 {
+  imports = [
+    (myUtils.mkCaddyModule "jellyfin" { authelia = false; })
+  ];
+
   services.jellyfin = {
     enable = true;
     openFirewall = true;
@@ -38,18 +43,6 @@
     "render"
     "media"
   ];
-
-  services.caddy.virtualHosts."${config.infra.services.hostnames.jellyfin}" = {
-    extraConfig = ''
-      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.jellyfin}
-    '';
-    logFormat = ''
-      output file /var/log/caddy/access-${config.infra.services.hostnames.jellyfin}.log {
-        roll_size 50mb
-        roll_keep 5
-      }
-    '';
-  };
 
   networking.firewall.extraCommands =
     let
