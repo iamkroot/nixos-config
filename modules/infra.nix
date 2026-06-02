@@ -46,6 +46,11 @@
     "account-center" = myUtils.mkPortOption 8085 "Port for account-center";
 
     icons = myUtils.mkPortOption 0 "Fake port";
+
+    radarr = myUtils.mkPortOption 7878 "Port for radarr";
+    sonarr = myUtils.mkPortOption 8989 "Port for sonarr";
+    prowlarr = myUtils.mkPortOption 9696 "Port for prowlarr";
+    decypharr = myUtils.mkPortOption 8282 "Port for decypharr";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;
