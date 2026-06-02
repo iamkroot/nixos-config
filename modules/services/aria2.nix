@@ -18,6 +18,10 @@
     })
   ];
 
+  systemd.tmpfiles.rules = [
+    "f /var/lib/aria2/aria2.session 0644 aria2 aria2 - -"
+  ];
+
   services.aria2 = {
     enable = true;
     openPorts = true;
@@ -32,6 +36,9 @@
       dir = "/media/Downloads";
       continue = true;
       file-allocation = "falloc";
+      input = "/var/lib/aria2/aria2.session";
+      save-session = "/var/lib/aria2/aria2.session";
+      save-session-interval = 60;
       # Helps with some race during boot where ipv4 fails to bind cuz ip address isn't available yet
       disable-ipv6 = true;
     };
