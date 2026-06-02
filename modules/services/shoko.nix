@@ -8,7 +8,7 @@
 }:
 
 let
-  mediaGroupGid = 995;
+  mediaGroupGid = config.users.groups.media.gid;
 
   # Helper to generate volume strings for Podman
   animeVolumes = lib.mapAttrsToList (name: path: "${path}:/mnt/anime/${name}") pii.media.animeDirs;

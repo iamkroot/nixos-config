@@ -76,7 +76,9 @@
           };
           roles = lib.mkOption {
             type = lib.types.attrsOf lib.types.str;
-            default = { };
+            default = {
+              lldap_admin = "system_administrator";
+            };
           };
         };
       }

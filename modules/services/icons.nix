@@ -22,5 +22,5 @@
       };
     })
   ];
-
+  infra.services.catalog.icons.enable = false;
 }
