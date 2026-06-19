@@ -7,6 +7,23 @@
   ...
 }:
 {
+  # FIXME: Needed to work around https://github.com/NixOS/nixpkgs/issues/523144
+  nixpkgs.overlays = [
+    (final: prev: {
+      ariang = prev.ariang.override {
+        buildNpmPackage = args: prev.buildNpmPackage (args // {
+          version = "1.3.14";
+          src = final.fetchFromGitHub {
+            owner = "timhae";
+            repo = "AriaNg";
+            rev = "7d0538b";
+            hash = "sha256-iUgUT1Vq0KExDT+xSrbvZDDs48GOk+gE6wPAKooFhuU=";
+          };
+          npmDepsHash = "sha256-XHoPPrebNgGZnVQmA0d5OeR+ZWJQEdZU4Ibcbd80/oM=";
+        });
+      };
+    })
+  ];
   imports = [
     (myUtils.mkCaddyModule "aria2" { authelia = false; })
     (myUtils.mkCaddyModule "ariang" {
