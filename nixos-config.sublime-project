@@ -2,14 +2,14 @@
 	"folders":
 	[
 		{
-			"path": "."
-		}
+			"path": ".",
+		},
 	],
 	"build_systems": [
 		{
 			"name": "Build homelab",
 			"cmd": ["mise", "run", "rebuild-homelab"],
-			"file_regex": "-source/(?<filename>modules/.*[.]nix)': (.*)"
+			"file_regex": "-source/(?<filename>modules/.*[.]nix)': (.*)",
 		},
-	]
+	],
 }
