@@ -61,17 +61,48 @@ if [ -n "$VM_EXISTS" ]; then
         exit 0
     fi
 
-    echo "VM $VM exists but is running an old image. Stopping VM $VM..."
+    echo "VM $VM exists but is running an old image."
+    
+    PROV_STATE=$(az vm show -g "$RG" -n "$VM" --query "provisioningState" -o tsv || echo "")
+    if [ "$PROV_STATE" != "Succeeded" ] && [ -n "$PROV_STATE" ]; then
+        echo "VM $VM is in state $PROV_STATE. Reapplying to fix state before update..."
+        az vm reapply --resource-group "$RG" --name "$VM" || true
+    fi
+
+    echo "Stopping VM $VM..."
     az vm deallocate --resource-group "$RG" --name "$VM"
 
     echo "Swapping OS Disk for VM $VM..."
-    az vm update \
+    if ! az vm update \
         --resource-group "$RG" \
         --name "$VM" \
-        --os-disk "$NEW_DISK_NAME"
-
-    echo "Starting VM $VM..."
-    az vm start --resource-group "$RG" --name "$VM"
+        --os-disk "$NEW_DISK_NAME"; then
+        
+        echo "VM OS disk update failed (likely due to guest provisioning state). Attempting to recreate the VM..."
+        
+        NIC_ID=$(az vm show -g "$RG" -n "$VM" --query "networkProfile.networkInterfaces[0].id" -o tsv || echo "")
+        VM_SIZE=$(az vm show -g "$RG" -n "$VM" --query "hardwareProfile.vmSize" -o tsv || echo "")
+        
+        if [ -z "$NIC_ID" ]; then
+            echo "Error: Could not retrieve NIC ID for VM $VM. Cannot safely recreate."
+            exit 1
+        fi
+        
+        echo "Deleting VM $VM (preserving NIC)..."
+        az vm delete --resource-group "$RG" --name "$VM" --yes
+        
+        echo "Recreating VM $VM with new OS disk..."
+        az vm create \
+            --resource-group "$RG" \
+            --name "$VM" \
+            --size "${VM_SIZE:-Standard_B2s}" \
+            --attach-os-disk "$NEW_DISK_NAME" \
+            --nics "$NIC_ID" \
+            --os-type Linux
+    else
+        echo "Starting VM $VM..."
+        az vm start --resource-group "$RG" --name "$VM"
+    fi
 
     if [ -n "$OLD_DISK_ID" ]; then
         echo "Deleting old OS disk ($OLD_DISK_ID)..."

@@ -66,18 +66,19 @@ run = [
 
 [tasks.build-cloud-vhd]
 vars._.file = "secrets/mise_vars.txt"
-description = "Build configuration to a VHD image using nixos-rebuild and inject SSH key"
+description = "Build configuration to a VHD image using nixos-rebuild"
 run = [
 	'''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- build-image --image-variant {{vars.cloud1_variant}} --flake .?submodules=1#{{vars.cloud1_name}}''',
+	'ln -sf $(readlink ./result | sed "s|^/nix|$HOME/.nix|") ./result',
 	'cd secrets && mise run decrypt-secrets',
 	'cp -L result/*.vhd ./{{vars.cloud1_name}}.vhd',
 	'./tools/inject-ssh-vhd.sh ./{{vars.cloud1_name}}.vhd /tmp/{{vars.cloud1_name}}-ssh-key'
 ]
 
-[tasks.recreate-cloud-vm]
+[tasks.deploy-cloud-vm]
 vars._.file = "secrets/mise_vars.txt"
-description = "Recreate Azure VM from generated VHD using Azure CLI"
-run = '''./tools/recreate-azure-vm.sh {{vars.cloud1_rg}} {{vars.cloud1_name}} ./{{vars.cloud1_name}}.vhd {{vars.cloud1_storage_account}} vhds'''
+description = "Deploy Cloud VM from generated VHD"
+run = '''./tools/deploy-{{vars.cloud1_variant}}-vm.sh {{vars.cloud1_rg}} {{vars.cloud1_name}} ./{{vars.cloud1_name}}.vhd {{vars.cloud1_storage_account}} vhds'''
 
 [tasks.rebuild-homelab]
 vars._.file = "secrets/mise_vars.txt"
@@ -98,6 +99,11 @@ run = "{{vars.nix_bin}} flake update"
 [tasks."nix:bare"]
 alias = "nix"
 run = "{{vars.nix_bin}} "
+
+[tasks."nix:bin"]
+alias = "nixbin"
+run = "{{vars.nix_chroot_bin}}/{{usage.all|join(sep=' ')}}"
+usage = '''arg <all...>'''
 
 [tasks.build-iso]
 alias = "iso"
