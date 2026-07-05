@@ -29,7 +29,7 @@ interactive = true
 run = [
 	'cd secrets && mise run decrypt-secrets',
 	'''{{vars.nix_bin}} run github:nix-community/nixos-anywhere -- --flake '.?submodules=1#{{vars.sandbox1_name}}' --extra-files /tmp/{{vars.sandbox1_name}}/keys --disk-encryption-keys /tmp/zfs-secret.key ~/zfs-pass.txt root@nixos-vm''',
-	'''sed -i '/^{{vars.sandbox1_ip}}/D' /home/kroot/.ssh/known_hosts''',
+	'''sed -i '/^{{vars.sandbox1_ip}}/D' $USER/.ssh/known_hosts''',
 ]
 
 [tasks.rebuild-vm]
@@ -61,8 +61,23 @@ depends_post = [
 run = [
 	'cd secrets && mise run decrypt-secrets',
 	'''{{vars.nix_bin}} run github:nix-community/nixos-anywhere -- --flake '.?submodules=1#{{vars.homelab1_name}}' --extra-files /tmp/{{vars.homelab1_name}}/keys --disk-encryption-keys /tmp/zfs-secret.key /tmp/{{vars.homelab1_name}}-zroot-key -i ~/.ssh/vm root@nixos-live.lan''',
-	'''sed -i '/^{{vars.homelab1_ip}}/D' /home/kroot/.ssh/known_hosts''',
+	'''sed -i '/^{{vars.homelab1_ip}}/D' $USER/.ssh/known_hosts''',
 ]
+
+[tasks.build-cloud-vhd]
+vars._.file = "secrets/mise_vars.txt"
+description = "Build configuration to a VHD image using nixos-rebuild and inject SSH key"
+run = [
+	'''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- build-image --image-variant {{vars.cloud1_variant}} --flake .?submodules=1#{{vars.cloud1_name}}''',
+	'cd secrets && mise run decrypt-secrets',
+	'cp -L result/*.vhd ./{{vars.cloud1_name}}.vhd',
+	'./tools/inject-ssh-vhd.sh ./{{vars.cloud1_name}}.vhd /tmp/{{vars.cloud1_name}}-ssh-key'
+]
+
+[tasks.recreate-cloud-vm]
+vars._.file = "secrets/mise_vars.txt"
+description = "Recreate Azure VM from generated VHD using Azure CLI"
+run = '''./tools/recreate-azure-vm.sh {{vars.cloud1_rg}} {{vars.cloud1_name}} ./{{vars.cloud1_name}}.vhd {{vars.cloud1_storage_account}} vhds'''
 
 [tasks.rebuild-homelab]
 vars._.file = "secrets/mise_vars.txt"
@@ -93,5 +108,25 @@ run = [
 	"{{vars.nix_bin}} build $'.?submodules=1#nixosConfigurations.nixos-live.config.system.build.isoImage'",
 	'cd secrets && git restore --staged live-ssh-key && rm live-ssh-key',
 	'ln -sf ${$(readlink ./result):s|/nix|~/.nix} ./result',
-	'''sed -i '/^192./D' /home/kroot/.ssh/known_hosts''',
+	'''sed -i '/^192./D' $USER/.ssh/known_hosts''',
 ]
+
+[tasks.rebuild-cloud]
+depends = [{task="chown-sshd"}]
+depends_post = [
+	{task="chown-sshd", args=["root"]}
+]
+vars._.file = "secrets/mise_vars.txt"
+description = "Invoke nixos-rebuild remotely to cloud1"
+interactive = true
+run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.cloud1_name}}' --target-host root@{{vars.cloud1_name}}'''
+
+[tasks.check-cloud]
+depends = [{task="chown-sshd"}]
+depends_post = [
+	{task="chown-sshd", args=["root"]}
+]
+vars._.file = "secrets/mise_vars.txt"
+description = "Dry-activate nixos-rebuild remotely for cloud1"
+interactive = true
+run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- dry-activate --flake '.?submodules=1#{{vars.cloud1_name}}' --target-host root@{{vars.cloud1_name}}'''

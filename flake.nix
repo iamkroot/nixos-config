@@ -98,6 +98,22 @@
             }
           ];
         };
+        "${pii.hosts.cloud1.name}" = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs pii myUtils; };
+          modules = [
+            vaultix.nixosModules.default
+            ./hosts/cloud1/configuration.nix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.sharedModules = [ plasma-manager.homeModules.plasma-manager ];
+              home-manager.extraSpecialArgs = { inherit inputs pii; };
+              home-manager.users."${pii.primaryUser}" = import ./home/user1.nix;
+              home-manager.users.root = import ./home/root.nix;
+            }
+          ];
+        };
         "${pii.hosts.live.name}" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs pii; };
