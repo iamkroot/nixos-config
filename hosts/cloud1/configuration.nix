@@ -48,7 +48,7 @@ in
 
   services.cloud-init.settings = {
     ssh_deletekeys = false;
-    ssh_genkeytypes = [];
+    ssh_genkeytypes = [ ];
     cloud_init_modules = pkgs.lib.mkForce [
       "migrator"
       "seed_random"
