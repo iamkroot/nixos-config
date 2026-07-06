@@ -1,4 +1,10 @@
-{ config, pkgs, myUtils, pii, ... }:
+{
+  config,
+  pkgs,
+  myUtils,
+  pii,
+  ...
+}:
 let
   domain = "https://${config.infra.services.hostnames.revaulter}";
 in

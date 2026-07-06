@@ -13,6 +13,8 @@
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+    # atuin handles ctrl+r
+    historyWidget.command = "";
   };
 
   programs.eza = {

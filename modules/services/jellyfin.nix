@@ -35,7 +35,9 @@
   };
 
   # Create a dedicated group for media access
-  users.groups.media = { };
+  users.groups.media = {
+    gid = 993;
+  };
 
   users.users."${pii.primaryUser}".extraGroups = [ "media" ];
   users.users.jellyfin.extraGroups = [

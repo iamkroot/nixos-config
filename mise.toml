@@ -81,12 +81,20 @@ description = "Deploy Cloud VM from generated VHD"
 run = '''./tools/deploy-{{vars.cloud1_variant}}-vm.sh {{vars.cloud1_rg}} {{vars.cloud1_name}} ./{{vars.cloud1_name}}.vhd {{vars.cloud1_storage_account}} vhds'''
 
 [tasks.rebuild-homelab]
+depends = [{task="chown-sshd"}]
+depends_post = [
+	{task="chown-sshd", args=["root"]}
+]
 vars._.file = "secrets/mise_vars.txt"
 description = "Invoke nixos-rebuild remotely to homelab"
 interactive = true
 run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}}'''
 
 [tasks.check-homelab]
+depends = [{task="chown-sshd"}]
+depends_post = [
+	{task="chown-sshd", args=["root"]}
+]
 vars._.file = "secrets/mise_vars.txt"
 description = "Dry-activate nixos-rebuild remotely for homelab"
 interactive = true

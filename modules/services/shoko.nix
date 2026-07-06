@@ -52,7 +52,7 @@ in
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.coreutils}/bin/chown -R 1000:${toString mediaGroupGid} /var/lib/shoko";
+      ExecStart = "${pkgs.coreutils}/bin/chown -R 1000:media /var/lib/shoko";
     };
   };
 }
