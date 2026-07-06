@@ -13,6 +13,8 @@ in
     "${modulesPath}/virtualisation/azure-image.nix"
     ../../modules/infra.nix
     ../../secrets/ports.nix
+    ../../modules/services/caddy.nix
+    ../../modules/services/revaulter.nix
   ];
   nixpkgs.hostPlatform = "x86_64-linux";
   virtualisation.diskSize = 8192;

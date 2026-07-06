@@ -51,6 +51,7 @@
     sonarr = myUtils.mkPortOption 8989 "Port for sonarr";
     prowlarr = myUtils.mkPortOption 9696 "Port for prowlarr";
     decypharr = myUtils.mkPortOption 8282 "Port for decypharr";
+    revaulter = myUtils.mkPortOption 28081 "Port for revaulter";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;
