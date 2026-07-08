@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  pii,
   ...
 }:
 
@@ -121,16 +122,16 @@ in
       if [ -t 0 ]; then
         read -s -p "Enter dataset keyphrase to wrap: " KEYPHRASE
         echo
-        INPUT=$(echo -n "$KEYPHRASE")
+        INPUT="$KEYPHRASE"
       else
         INPUT=$(cat)
       fi
 
-      echo -n "$INPUT" | revaulter encrypt \
+      printf "%s" "$INPUT" | revaulter encrypt \
           --algorithm aes-256-gcm \
           --key-label "$REVAULTER_KEY_LABEL" \
           --input - \
-          --aad "$(echo -n "$REVAULTER_AAD" | base64 -w0)" \
+          --aad "$(printf "%s" "$REVAULTER_AAD" | base64 -w0)" \
           --note "ZFS dataset $DATASET_NAME" \
           --format json \
       > "$JSON_KEY_FILE"
@@ -138,4 +139,110 @@ in
       echo "Wrapped key saved to $JSON_KEY_FILE"
     '')
   ];
+
+  # Ensure the directory exists so Vaultix can write to it without failing
+  systemd.tmpfiles.rules = [
+    "d /etc/revaulter/cli 0700 root root -"
+  ];
+
+  # Use Vaultix template to write the decrypted key directly to a persistent path
+  vaultix.templates."revaulter-request-key" = {
+    content = "${config.vaultix.placeholder."revaulter/request_key"}";
+    path = "/etc/revaulter/cli/request_key";
+    mode = "0400";
+  };
+
+  # --- INITRD SUPPORT ---
+  # Read the request key from the target machine's /etc.
+  boot.initrd.secrets = {
+    "/etc/revaulter/cli/request_key" = "/etc/revaulter/cli/request_key";
+  };
+
+  # If the user has committed zroot.json to secrets/revaulter/..., bundle it natively:
+  boot.initrd.systemd.contents = lib.mkIf (builtins.pathExists pii.storage.zroot.revaulterKey) {
+    "/etc/revaulter/keys/${pii.storage.zroot.name}.json".source = pii.storage.zroot.revaulterKey;
+    "/etc/revaulter/cli/trust.json".source = pii.hosts.cloud1.revaulterTrust;
+  };
+
+  # Bundle required binaries and CA certs into initrd
+  boot.initrd.systemd.storePaths = [
+    revaulterPkg
+    pkgs.socat
+    pkgs.gnugrep
+    pkgs.coreutils
+    "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+  ];
+
+  boot.initrd.systemd.services."revaulter-unlock-${pii.storage.zroot.name}" =
+    lib.mkIf (builtins.pathExists pii.storage.zroot.revaulterKey)
+      {
+        description = "Unlock ZFS ${pii.storage.zroot.name} via Revaulter";
+        # Run concurrently with the ZFS import process
+        wantedBy = [ "zfs-import-${pii.storage.zroot.name}.service" ];
+        after = [
+          "systemd-networkd.service"
+          "systemd-resolved.service"
+        ];
+        requires = [ "network-online.target" ];
+        path = [
+          revaulterPkg
+          pkgs.socat
+          pkgs.gnugrep
+          pkgs.coreutils
+        ];
+        environment = {
+          SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+        };
+        unitConfig.DefaultDependencies = false;
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script = ''
+          set -euo pipefail
+
+          echo "[revaulter-zfs] Starting Revaulter ZFS unlock process..."
+
+          # Wait for the ZFS ask-password prompt to appear
+          echo "[revaulter-zfs] Waiting for ${pii.storage.zroot.name} password prompt from systemd..."
+          while ! grep -q "${pii.storage.zroot.name}" /run/systemd/ask-password/ask.* 2>/dev/null; do
+            sleep 1
+          done
+
+          echo "[revaulter-zfs] Waiting for network and DNS to reach Revaulter server..."
+          while ! socat /dev/null TCP:"${config.infra.services.hostnames.revaulter}:443,connect-timeout=2" >/dev/null 2>&1; do
+            sleep 1
+          done
+
+          # Find the socket path
+          for p in /run/systemd/ask-password/ask.*; do
+            if grep -q "${pii.storage.zroot.name}" "$p"; then
+              SOCKET=$(grep '^Socket=' "$p" | cut -d= -f2)
+              break
+            fi
+          done
+
+          if [ -z "''${SOCKET:-}" ]; then
+            echo "[revaulter-zfs] Error: Could not find systemd-ask-password socket for ${pii.storage.zroot.name}."
+            exit 1
+          fi
+
+          echo "[revaulter-zfs] Found prompt socket at $SOCKET. Requesting decryption from Revaulter server..."
+          echo "[revaulter-zfs] Please approve the decryption request on your device..."
+
+          while ! PASSWORD=$(revaulter-cli decrypt \
+              --server "https://${config.infra.services.hostnames.revaulter}" \
+              --trust-store /etc/revaulter/cli/trust.json \
+              --request-key "$(cat /etc/revaulter/cli/request_key)" \
+              --json /etc/revaulter/keys/${pii.storage.zroot.name}.json --format raw); do
+            echo "[revaulter-zfs] Decryption failed or denied! Retrying in 5 seconds..."
+            sleep 5
+          done
+
+          echo "[revaulter-zfs] Decryption approved! Feeding password to systemd..."
+          printf "+%s" "$PASSWORD" | socat - "UNIX-SENDTO:$SOCKET"
+
+          echo "[revaulter-zfs] ${pii.storage.zroot.name} unlocked successfully via Revaulter!"
+        '';
+      };
 }
