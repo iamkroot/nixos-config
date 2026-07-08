@@ -5,6 +5,9 @@
 			"path": ".",
 		},
 	],
+	"settings": {
+		"lsp_format_on_save": true
+	},
 	"build_systems": [
 		{
 			"name": "Build homelab",
