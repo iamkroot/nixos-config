@@ -35,6 +35,7 @@ in
     ../../modules/storage/nfs.nix
     ../../modules/initrd.nix
     ../../modules/kde.nix
+    ../../modules/revaulter-cli.nix
   ];
 
   nix.settings.experimental-features = [
