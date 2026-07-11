@@ -135,6 +135,7 @@ in
     eza
     fd
     git
+    hdparm
     helix
     inetutils
     ripgrep
