@@ -9,11 +9,11 @@
 let
   revaulterPkg = pkgs.stdenv.mkDerivation rec {
     pname = "revaulter";
-    version = "2.1.3";
+    version = "2.2.0";
 
     src = pkgs.fetchurl {
       url = "https://github.com/ItalyPaleAle/revaulter/releases/download/v${version}/revaulter-${version}-linux-amd64.tar.gz";
-      hash = "sha256-7Cz8m5Qyo7zH0iwyhfPLNzvxuhvd5iObv1ZCDFroN3A=";
+      hash = "sha256-WthFEpBRbTiDz6wI8s4Mb1oQoAWCNVCMwPHU5+AesJQ=";
     };
 
     installPhase = ''
@@ -35,19 +35,10 @@ let
   commonScriptInit = ''
     source ${config.vaultix.templates."revaulter-cli.env".path}
 
-    mkdir -p /etc/revaulter/cli
-    chmod 0700 /etc/revaulter/cli
-    if [ ! -f /etc/revaulter/cli/trust.json ]; then
-      ${revaulterPkg}/bin/revaulter-cli trust \
-        --server "$REVAULTER_SERVER" \
-        --trust-store /etc/revaulter/cli/trust.json \
-        --request-key "$REVAULTER_REQUEST_KEY"
-    fi
-
     revaulter() {
       ${revaulterPkg}/bin/revaulter-cli "$@" \
         --server "$REVAULTER_SERVER" \
-        --trust-store /etc/revaulter/cli/trust.json \
+        --no-trust-store \
         --request-key "$REVAULTER_REQUEST_KEY"
     }
   '';
@@ -144,6 +135,7 @@ in
   systemd.tmpfiles.rules = [
     "d /etc/revaulter/cli 0700 root root -"
   ];
+  environment.etc."revaulter/cli/trust.json".source = pii.hosts.cloud1.revaulterTrust;
 
   # Use Vaultix template to write the decrypted key directly to a persistent path
   vaultix.templates."revaulter-request-key" = {
@@ -161,7 +153,6 @@ in
   # If the user has committed zroot.json to secrets/revaulter/..., bundle it natively:
   boot.initrd.systemd.contents = lib.mkIf (builtins.pathExists pii.storage.zroot.revaulterKey) {
     "/etc/revaulter/keys/${pii.storage.zroot.name}.json".source = pii.storage.zroot.revaulterKey;
-    "/etc/revaulter/cli/trust.json".source = pii.hosts.cloud1.revaulterTrust;
   };
 
   # Bundle required binaries and CA certs into initrd
@@ -232,7 +223,7 @@ in
 
           while ! PASSWORD=$(revaulter-cli decrypt \
               --server "https://${config.infra.services.hostnames.revaulter}" \
-              --trust-store /etc/revaulter/cli/trust.json \
+              --no-trust-store \
               --request-key "$(cat /etc/revaulter/cli/request_key)" \
               --json /etc/revaulter/keys/${pii.storage.zroot.name}.json --format raw); do
             echo "[revaulter-zfs] Decryption failed or denied! Retrying in 5 seconds..."
