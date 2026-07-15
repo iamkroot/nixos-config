@@ -12,6 +12,7 @@ in
     (myUtils.mkCaddyModule "radarr" { authelia = true; })
     (myUtils.mkCaddyModule "sonarr" { authelia = true; })
     (myUtils.mkCaddyModule "decypharr" { authelia = true; })
+    (myUtils.mkCaddyModule "profilarr" { authelia = true; })
     (myUtils.mkCaddyModule "prowlarr" { authelia = true; })
   ];
 
@@ -48,6 +49,7 @@ in
   # This ensures the 'media' group always has access to files created by the container
   systemd.tmpfiles.rules = [
     "d /var/lib/decypharr 0770 root media - -"
+    "d /var/lib/profilarr 0770 root media - -"
     "d ${downloadsDir} 2775 root media - -"
     "A ${downloadsDir} - - - - default:group:media:rwx"
   ];
@@ -72,6 +74,31 @@ in
     extraOptions = [
       "--health-interval=5m"
       "--health-retries=3"
+    ];
+  };
+
+  virtualisation.oci-containers.containers.profilarr = {
+    image = "ghcr.io/dictionarry-hub/profilarr:latest";
+    ports = [ "${toString config.infra.services.ports.profilarr}:6868" ];
+
+    environment = {
+      PUID = "1000";
+      PGID = toString config.users.groups.media.gid;
+      # handled by authelia
+      AUTH = "off";
+      ORIGIN = "https://${config.infra.services.hostnames.profilarr}";
+    };
+
+    volumes = [
+      "/var/lib/profilarr:/config:rw"
+    ];
+
+    extraOptions = [
+      "--health-interval=5m"
+      "--health-retries=3"
+      # Bypass Hairpin NAT bugs, map the public domain to host
+      "--add-host=${config.infra.services.hostnames.radarr}:host-gateway"
+      "--add-host=${config.infra.services.hostnames.sonarr}:host-gateway"
     ];
   };
 
@@ -107,6 +134,7 @@ in
         "radarr"
         "sonarr"
         "prowlarr"
+        "profilarr"
         "aria2" # FIXME: Move this closer to aria2 module
       ];
 

@@ -99,9 +99,13 @@ in
               "group:vaultwarden_users"
             ];
           }
-          # Bypass API so *arr apps and external tools can talk to Seerr
+          # Bypass API so *arr apps and external tools can talk to each other
           {
-            domain = [ config.infra.services.hostnames.seerr ];
+            domain = [
+              config.infra.services.hostnames.seerr
+              config.infra.services.hostnames.radarr
+              config.infra.services.hostnames.sonarr
+            ];
             resources = [ "^/api.*" ];
             policy = "bypass";
           }
@@ -109,6 +113,14 @@ in
           {
             domain = [ config.infra.services.hostnames.seerr ];
             policy = "one_factor";
+          }
+          # Require lldap_admin for Profilarr
+          {
+            domain = config.infra.services.hostnames.profilarr;
+            policy = "one_factor";
+            subject = [
+              "group:lldap_admin"
+            ];
           }
           # TODO: Require 2FA for everything else by default
           {
