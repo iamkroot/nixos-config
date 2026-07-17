@@ -14,6 +14,7 @@ in
     (myUtils.mkCaddyModule "decypharr" { authelia = true; })
     (myUtils.mkCaddyModule "profilarr" { authelia = true; })
     (myUtils.mkCaddyModule "prowlarr" { authelia = true; })
+    ../../modules/services/byparr.nix
   ];
 
   services.sonarr = {

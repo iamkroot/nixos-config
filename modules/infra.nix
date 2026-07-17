@@ -53,6 +53,7 @@
     decypharr = myUtils.mkPortOption 8282 "Port for decypharr";
     profilarr = myUtils.mkPortOption 6868 "Port for profilarr";
     revaulter = myUtils.mkPortOption 28081 "Port for revaulter";
+    byparr = myUtils.mkPortOption 8191 "Port for byparr";
   };
   options.infra.domain = lib.mkOption {
     type = lib.types.str;
