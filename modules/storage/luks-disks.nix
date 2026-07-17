@@ -23,7 +23,11 @@ in
     fsType = "ext4";
     options = [
       "nofail"
-      "x-systemd.automount"
     ];
   };
+
+  # When the LUKS volume is unlocked and the device mapper block device appears, trigger the systemd mount unit.
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="block", ENV{DM_NAME}=="${disk1.name}", TAG+="systemd", ENV{SYSTEMD_WANTS}+="mnt-${disk1.name}.mount"
+  '';
 }
