@@ -1,4 +1,5 @@
 {
+  lib,
   config,
   pii,
   myUtils,
@@ -6,6 +7,37 @@
 }:
 let
   downloadsDir = "${pii.storage.media_main.mountpoint}/Downloads";
+  decypharr-debrids = lib.mapAttrsToList (
+    name: path:
+    let
+      # Extracts the filename without the extension (e.g., "./rd-key.age" -> "rd-key")
+      secretName = lib.removeSuffix ".age" (builtins.baseNameOf path);
+    in
+    {
+      decypharr = {
+        provider = name;
+        name = name;
+        api_key = config.vaultix.placeholder.${secretName};
+        download_api_keys = [
+          config.vaultix.placeholder.${secretName}
+        ];
+        rate_limit = "250/minute";
+        minimum_free_slot = 1;
+        torrents_refresh_interval = "10m";
+        download_links_refresh_interval = "5m";
+        workers = 600;
+        auto_expire_links_after = "3d";
+      };
+      vaultix = lib.nameValuePair secretName {
+        file = path;
+      };
+    }
+  ) pii.debrids;
+  # 1. Extract just the list of decypharr provider objects
+  debridsList = builtins.map (item: item.decypharr) decypharr-debrids;
+
+  # 2. Extract the vaultix pairs and convert them into an attribute set
+  vaultixSecrets = builtins.listToAttrs (builtins.map (item: item.vaultix) decypharr-debrids);
 in
 {
   imports = [
@@ -102,13 +134,15 @@ in
       "--add-host=${config.infra.services.hostnames.sonarr}:host-gateway"
     ];
   };
+  vaultix.secrets = vaultixSecrets // {
+    "sonarr-key" = {
+      file = pii.secrets.sonarr-key;
+    };
+    "radarr-key" = {
+      file = pii.secrets.radarr-key;
+    };
+  };
 
-  vaultix.secrets."debrid-key" = {
-    file = pii.secrets.debrid-key;
-  };
-  vaultix.secrets."sonarr-key" = {
-    file = pii.secrets.sonarr-key;
-  };
   vaultix.templates."sonarr.env" = {
     content = ''
       SONARR_AUTH_APIKEY=${config.vaultix.placeholder.sonarr-key}
@@ -116,9 +150,6 @@ in
     mode = "640";
     group = "media";
     path = "/var/lib/sonarr/sonarr.env";
-  };
-  vaultix.secrets."radarr-key" = {
-    file = pii.secrets.radarr-key;
   };
   vaultix.templates."radarr.env" = {
     content = ''
@@ -144,22 +175,7 @@ in
     mode = "660";
     content = ''
       {
-        "debrids": [
-          {
-            "provider": "${pii.debridProvider}",
-            "name": "${pii.debridProvider}",
-            "api_key": "${config.vaultix.placeholder."debrid-key"}",
-            "download_api_keys": [
-              "${config.vaultix.placeholder."debrid-key"}"
-            ],
-            "rate_limit": "250/minute",
-            "minimum_free_slot": 1,
-            "torrents_refresh_interval": "10m",
-            "download_links_refresh_interval": "5m",
-            "workers": 600,
-            "auto_expire_links_after": "3d"
-          }
-        ],
+        "debrids": ${builtins.toJSON debridsList},
         "download_folder": "${downloadsDir}",
         "remove_stalled_after": "10m",
         "notifications": {},
