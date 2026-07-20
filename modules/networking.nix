@@ -3,6 +3,7 @@
   config,
   pii,
   lib,
+  pkgs,
   ...
 }:
 {
@@ -84,6 +85,20 @@
         route-metric = 2000;
         never-default = true;
       };
+    };
+  };
+
+  # Flush the IP address assigned by systemd-networkd in initrd
+  # so it doesn't conflict with the bridge (br0) routing.
+  systemd.services."flush-initrd-eno1" = {
+    description = "Flush initrd IP on eno1";
+    before = [ "network-pre.target" ];
+    wants = [ "network-pre.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.iproute2}/bin/ip addr flush dev eno1";
     };
   };
 }
