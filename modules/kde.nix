@@ -1,9 +1,19 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  pii,
+  ...
+}:
 
 {
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
+  };
+
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "${pii.primaryUser}";
   };
 
   services.desktopManager.plasma6.enable = true;

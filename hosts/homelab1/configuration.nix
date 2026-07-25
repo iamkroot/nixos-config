@@ -31,6 +31,7 @@ in
     ../../modules/services/account-center.nix
     ../../modules/services/icons.nix
     ../../modules/services/arr.nix
+    ../../modules/services/gaming.nix
     ../../modules/storage
     ../../modules/storage/nfs.nix
     ../../modules/initrd.nix
