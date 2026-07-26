@@ -29,12 +29,7 @@ in
   systemd.services."authelia-main" = {
     serviceConfig = {
       LoadCredential = [
-        "jwt_secret:${config.vaultix.secrets.authelia-jwt.path}"
-        "session_secret:${config.vaultix.secrets.authelia-session.path}"
-        "storage_secret:${config.vaultix.secrets.authelia-storage.path}"
         "ldap_password:${config.vaultix.secrets.authelia-ldap.path}"
-        "oidc_cert:${config.vaultix.secrets.authelia-oidc-cert.path}"
-        "oidc_hmac:${config.vaultix.secrets.authelia-oidc-hmac.path}"
       ];
     };
   };
@@ -43,11 +38,11 @@ in
     enable = true;
 
     secrets = {
-      jwtSecretFile = "/run/credentials/authelia-main.service/jwt_secret";
-      sessionSecretFile = "/run/credentials/authelia-main.service/session_secret";
-      storageEncryptionKeyFile = "/run/credentials/authelia-main.service/storage_secret";
-      oidcIssuerPrivateKeyFile = "/run/credentials/authelia-main.service/oidc_cert";
-      oidcHmacSecretFile = "/run/credentials/authelia-main.service/oidc_hmac";
+      jwtSecretFile = config.vaultix.secrets.authelia-jwt.path;
+      sessionSecretFile = config.vaultix.secrets.authelia-session.path;
+      storageEncryptionKeyFile = config.vaultix.secrets.authelia-storage.path;
+      oidcIssuerPrivateKeyFile = config.vaultix.secrets.authelia-oidc-cert.path;
+      oidcHmacSecretFile = config.vaultix.secrets.authelia-oidc-hmac.path;
     };
 
     environmentVariables = {
