@@ -53,8 +53,8 @@ in
     "zswap.compressor=zstd"
     "zswap.max_pool_percent=20"
     "zswap.zpool=zsmalloc"
-    # Limit ZFS ARC to 8GB
-    "zfs.zfs_arc_max=8589934592"
+    # Limit ZFS ARC to 4GB
+    "zfs.zfs_arc_max=4294967296"
 
     "consoleblank=600"
   ];
