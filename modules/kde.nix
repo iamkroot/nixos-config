@@ -41,4 +41,12 @@
     kate
     gwenview
   ];
+
+  # KDE bug - getting recursive stack traces
+  systemd.user.services."drkonqi-coredump-launcher@" = {
+    enable = false;
+  };
+  systemd.user.services."drkonqi-coredump-processor@" = {
+    enable = false;
+  };
 }
