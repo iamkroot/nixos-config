@@ -51,6 +51,7 @@ in
     };
   };
   services.caddy.virtualHosts."${domain}" = {
+    useACMEHost = config.infra.domain;
     extraConfig = ''
       # Match ClaudeBot and other common AI scrapers
       @aiBots {

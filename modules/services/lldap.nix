@@ -10,6 +10,10 @@ let
   baseDN = myUtils.domainToBaseDN config.infra.domain;
 in
 {
+  imports = [
+    (myUtils.mkCaddyModule "ldap" { portKey = "lldap_http"; })
+  ];
+
   vaultix.secrets."lldap-admin-pass" = {
     file = pii.secrets.lldap-admin-pass;
     owner = "lldap";
@@ -44,17 +48,5 @@ in
       http_host = "127.0.0.1";
       http_port = config.infra.services.ports.lldap_http;
     };
-  };
-
-  services.caddy.virtualHosts."${config.infra.services.hostnames.ldap}" = {
-    extraConfig = ''
-      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.lldap_http}
-    '';
-    logFormat = ''
-      output file /var/log/caddy/access-${config.infra.services.hostnames.ldap}.log {
-        roll_size 50mb
-        roll_keep 5
-      }
-    '';
   };
 }

@@ -9,6 +9,9 @@ let
   baseDN = myUtils.domainToBaseDN config.infra.domain;
 in
 {
+  imports = [
+    (myUtils.mkCaddyModule "auth" { portKey = "authelia"; })
+  ];
 
   vaultix.secrets =
     lib.genAttrs
@@ -183,17 +186,5 @@ in
         }
       ];
     };
-  };
-
-  services.caddy.virtualHosts."${config.infra.services.hostnames.auth}" = {
-    extraConfig = ''
-      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.authelia}
-    '';
-    logFormat = ''
-      output file /var/log/caddy/access-${config.infra.services.hostnames.auth}.log {
-        roll_size 50mb
-        roll_keep 5
-      }
-    '';
   };
 }

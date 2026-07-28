@@ -85,4 +85,19 @@
       roles = lib.mkDefault (s.catalog.roles or { lldap_admin = "system_administrator"; });
     }
   ) services;
+
+  config.services.caddy.virtualHosts = lib.mkMerge (
+    lib.mapAttrsToList (
+      name: s:
+      let
+        oldHost = "${s.subdomain or name}.${pii.oldDomain}";
+        newHost = "${s.subdomain or name}.${config.infra.domain}";
+      in
+      lib.mkIf (s.host == hostKey) {
+        "${oldHost}" = {
+          extraConfig = "redir https://${newHost}{uri}";
+        };
+      }
+    ) services
+  );
 }

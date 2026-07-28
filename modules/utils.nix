@@ -17,15 +17,17 @@
     {
       authelia ? false,
       extraHostConfig ? { },
+      portKey ? name,
     }:
     { config, ... }:
     let
       hostname = config.infra.services.hostnames."${name}";
-      port = config.infra.services.ports."${name}";
+      port = config.infra.services.ports."${portKey}";
     in
     {
       services.caddy.virtualHosts."${hostname}" = lib.mkMerge [
         {
+          useACMEHost = config.infra.domain;
           extraConfig = ''
             ${if authelia then "import authelia" else ""}
             reverse_proxy 127.0.0.1:${toString port}

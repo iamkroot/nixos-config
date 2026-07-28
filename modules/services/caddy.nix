@@ -18,7 +18,10 @@
   vaultix.templates."caddy-porkbun.env" = {
     content = ''
       PORKBUN_API_KEY=${config.vaultix.placeholder."porkbun-api-key"}
+      # for caddy
       PORKBUN_API_SECRET=${config.vaultix.placeholder."porkbun-secret-key"}
+      # for lego
+      PORKBUN_SECRET_API_KEY=${config.vaultix.placeholder."porkbun-secret-key"}
     '';
   };
 
@@ -43,14 +46,19 @@
         }
       }
     '';
+  };
 
-    # Use DNS-01 challenge globally via Porkbun — works for LAN-only services and wildcards
-    globalConfig = ''
-      acme_dns porkbun {
-        api_key {env.PORKBUN_API_KEY}
-        api_secret_key {env.PORKBUN_API_SECRET}
-      }
-    '';
+  security.acme = {
+    acceptTerms = true;
+    defaults = {
+      email = pii.primaryEmail;
+      dnsProvider = "porkbun";
+      environmentFile = config.vaultix.templates."caddy-porkbun.env".path;
+    };
+    certs."${config.infra.domain}" = {
+      domain = "*.${config.infra.domain}";
+      group = config.services.caddy.group;
+    };
   };
 
   # Load Porkbun env vars into the Caddy service
