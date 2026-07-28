@@ -3,6 +3,7 @@
   osConfig,
   pkgs,
   pii,
+  services,
   ...
 }:
 
@@ -47,7 +48,9 @@
     enableZshIntegration = true;
 
     settings = {
-      sync_address = "http://${pii.hosts.homelab1.localIp}:${toString osConfig.infra.services.ports.atuin}";
+      sync_address = "http://${
+        pii.hosts.${services.atuin.host}.localIp
+      }:${toString osConfig.infra.services.ports.atuin}";
 
       search_mode = "fuzzy";
       style = "compact";

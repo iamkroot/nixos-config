@@ -1,69 +1,35 @@
-# declare the schemas here
-# actual values can be overriden in secrets/ports.nix
 {
   config,
   lib,
   pii,
+  services,
+  hostKey,
   myUtils,
   ...
 }:
 {
-  options.infra.services.ports = {
-    atuin = myUtils.mkPortOption 8888 "Port for the Atuin sync server";
-
-    caddy = myUtils.mkPortOption 443 "HTTPS port for Caddy reverse proxy";
-
-    lldap_ldap = myUtils.mkPortOption 3890 "LDAP port for LLDAP";
-    lldap_http = myUtils.mkPortOption 17170 "HTTP port for LLDAP";
-
-    authelia = myUtils.mkPortOption 9091 "Port for Authelia service";
-
-    aria2 = myUtils.mkPortOption 6800 "Port for aria2 RPC server";
-    ariang = myUtils.mkPortOption 0 "Fake port";
-
-    whoami = myUtils.mkPortOption 8080 "Port for aria2 RPC server";
-
-    adguard = myUtils.mkPortOption 3000 "Port for adguard webui";
-
-    redlib = myUtils.mkPortOption 18080 "Port for redlib webui";
-    anubis_redlib = myUtils.mkPortOption 38080 "Port for anubis middleware for redlib";
-
-    et = myUtils.mkPortOption 2022 "Port for eternal terminal server";
-
-    yopass = myUtils.mkPortOption 1337 "Port for yopass";
-
-    httpserver = myUtils.mkPortOption 12345 "Port for httpserver";
-
-    shoko = myUtils.mkPortOption 8111 "Port for shokoserver";
-
-    jellyfin = myUtils.mkPortOption 8096 "Port for jellyfin";
-    seerr = myUtils.mkPortOption 5055 "Port for seerr";
-
-    vaultwarden = myUtils.mkPortOption 8222 "Port for vaultwarden Rocket";
-
-    immich = myUtils.mkPortOption 2283 "Port for immich";
-
-    "account-center" = myUtils.mkPortOption 8085 "Port for account-center";
-
-    icons = myUtils.mkPortOption 0 "Fake port";
-
-    radarr = myUtils.mkPortOption 7878 "Port for radarr";
-    sonarr = myUtils.mkPortOption 8989 "Port for sonarr";
-    prowlarr = myUtils.mkPortOption 9696 "Port for prowlarr";
-    decypharr = myUtils.mkPortOption 8282 "Port for decypharr";
-    profilarr = myUtils.mkPortOption 6868 "Port for profilarr";
-    revaulter = myUtils.mkPortOption 28081 "Port for revaulter";
-    byparr = myUtils.mkPortOption 8191 "Port for byparr";
+  options.infra.hostKey = lib.mkOption {
+    type = lib.types.str;
+    description = "Key into pii.hosts for this machine.";
   };
+
   options.infra.domain = lib.mkOption {
     type = lib.types.str;
     description = "Base domain name";
   };
+
+  options.infra.services.ports = lib.mkOption {
+    type = lib.types.attrsOf lib.types.port;
+    default = { };
+    description = "Service ports. Auto-populated from services.nix.";
+  };
+
   options.infra.services.hostnames = lib.mkOption {
     type = lib.types.attrsOf lib.types.str;
     default = { };
-    description = "Mapping of my homelab services to their hostnames.";
+    description = "Mapping of my services to their hostnames.";
   };
+
   options.infra.services.catalog = lib.mkOption {
     type = lib.types.attrsOf (
       lib.types.submodule {
@@ -90,10 +56,31 @@
     description = "Account Center catalog entries.";
   };
 
-  config.infra.services.catalog = lib.mapAttrs (svc: host: {
-    enable = lib.mkDefault (config.services.caddy.virtualHosts ? "${host}");
-    name = lib.mkDefault (lib.toUpper (lib.substring 0 1 svc) + lib.substring 1 (-1) svc);
-    url = lib.mkDefault "https://${host}";
-    icon = lib.mkDefault "https://${config.infra.services.hostnames.icons}/${svc}.svg";
-  }) config.infra.services.hostnames;
+  config.infra.hostKey = hostKey;
+  config.infra.domain = pii.hosts.${hostKey}.domain;
+
+  config.infra.services.ports = lib.mkMerge (
+    [ (lib.mapAttrs (_: s: lib.mkDefault (s.port or 0)) services) ]
+    ++ (lib.mapAttrsToList (_: s: lib.mapAttrs (_: port: lib.mkDefault port) (s.extraPorts or { })) services)
+  );
+
+  config.infra.services.hostnames = lib.mapAttrs (
+    name: s: "${s.subdomain or name}.${config.infra.domain}"
+  ) services;
+
+  config.infra.services.catalog = lib.mapAttrs (
+    name: s:
+    let
+      hostname = "${s.subdomain or name}.${config.infra.domain}";
+    in
+    {
+      enable = lib.mkDefault (
+        (s.catalog.enable or true) && (config.services.caddy.virtualHosts ? "${hostname}")
+      );
+      name = lib.mkDefault (lib.toUpper (lib.substring 0 1 name) + lib.substring 1 (-1) name);
+      url = lib.mkDefault "https://${hostname}";
+      icon = lib.mkDefault "https://${config.infra.services.hostnames.icons}/${name}.svg";
+      roles = lib.mkDefault (s.catalog.roles or { lldap_admin = "system_administrator"; });
+    }
+  ) services;
 }

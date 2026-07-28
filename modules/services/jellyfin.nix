@@ -4,6 +4,7 @@
   lib,
   pii,
   myUtils,
+  hostKey,
   ...
 }:
 {
@@ -48,7 +49,7 @@
 
   networking.firewall.extraCommands =
     let
-      localIp = pii.hosts.homelab1.localIp;
+      localIp = pii.hosts.${hostKey}.localIp;
     in
     ''
       # Allow TCP ${toString config.infra.services.ports.jellyfin} (HTTP) only from the ${localIp}/24 subnet

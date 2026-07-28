@@ -2,6 +2,7 @@
   config,
   pii,
   myUtils,
+  hostKey,
   ...
 }:
 let
@@ -50,13 +51,13 @@ in
           {
             # Wildcard rewrite: sends all subdomains to Caddy server's LAN IP
             domain = "*.${config.infra.domain}";
-            answer = "${pii.hosts.homelab1.localIp}";
+            answer = "${pii.hosts.${hostKey}.localIp}";
             enabled = true;
           }
           {
             # Base domain rewrite
             domain = "${config.infra.domain}";
-            answer = "${pii.hosts.homelab1.localIp}";
+            answer = "${pii.hosts.${hostKey}.localIp}";
             enabled = true;
           }
         ];

@@ -14,7 +14,6 @@ in
     ./disko.nix
     ../../modules/networking.nix
     ../../modules/infra.nix
-    ../../secrets/ports.nix
     ../../modules/services/atuin.nix
     ../../modules/services/jellyfin.nix
   ];

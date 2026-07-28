@@ -12,9 +12,8 @@ in
   imports = [
     "${modulesPath}/virtualisation/azure-image.nix"
     ../../modules/infra.nix
-    ../../secrets/ports.nix
     ../../modules/services/caddy.nix
-    ../../modules/services/revaulter.nix
+    ../../modules/dns.nix
   ];
   nixpkgs.hostPlatform = "x86_64-linux";
   virtualisation.diskSize = 8192;
@@ -120,8 +119,6 @@ in
     port = config.infra.services.ports.et;
   };
   networking.firewall.allowedTCPPorts = [ config.infra.services.ports.et ];
-
-  infra.domain = hostPII.domain;
 
   system.stateVersion = "26.05";
 }

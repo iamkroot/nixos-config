@@ -14,23 +14,10 @@ in
     ./disko.nix
     ../../modules/networking.nix
     ../../modules/infra.nix
-    ../../secrets/ports.nix
-    ../../modules/services/aria2.nix
     ../../modules/services/atuin.nix
-    ../../modules/services/jellyfin.nix
-    ../../modules/services/seerr.nix
-    ../../modules/services/shoko.nix
     ../../modules/services/caddy.nix
     ../../modules/services/crowdsec.nix
-    ../../modules/services/duckdns.nix
-    ../../modules/services/lldap.nix
-    ../../modules/services/authelia.nix
-    ../../modules/services/redlib.nix
-    ../../modules/services/vaultwarden.nix
-    ../../modules/services/immich.nix
-    ../../modules/services/account-center.nix
-    ../../modules/services/icons.nix
-    ../../modules/services/arr.nix
+    ../../modules/dns.nix
     ../../modules/services/gaming.nix
     ../../modules/storage
     ../../modules/storage/nfs.nix
@@ -146,7 +133,6 @@ in
     zsh
   ];
 
-  infra.domain = hostPII.domain;
   # needed to get sso working for jellyfin
   networking.hosts = {
     "127.0.0.1" = [
@@ -156,7 +142,7 @@ in
     ];
   };
 
-  # needed for adguard DoT
+  # DNS-01 ACME is handled by Caddy globally via Porkbun plugin
   security.acme = {
     acceptTerms = true;
     defaults.email = pii.primaryEmail;

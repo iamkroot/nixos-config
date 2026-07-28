@@ -15,8 +15,9 @@ in
     ../modules/zsh.nix
     ../modules/cli-tools.nix
     ../modules/aliases.nix
-    ../modules/plasma-home.nix
-  ];
+  ]
+  ++ lib.optional (osConfig.services.desktopManager.plasma6.enable or false
+  ) ../modules/plasma-home.nix;
 
   xdg.configFile."mise/config.toml".source = link "${dotfiles}/.config/mise/config.toml";
   home.activation.cloneDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

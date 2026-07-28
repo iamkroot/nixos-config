@@ -3,6 +3,7 @@
   pkgs,
   lib,
   pii,
+  services,
   ...
 }:
 
@@ -135,7 +136,8 @@ in
   systemd.tmpfiles.rules = [
     "d /etc/revaulter/cli 0700 root root -"
   ];
-  environment.etc."revaulter/cli/trust.json".source = pii.hosts.cloud1.revaulterTrust;
+  environment.etc."revaulter/cli/trust.json".source =
+    pii.hosts.${services.revaulter.host}.revaulterTrust;
 
   # Use Vaultix template to write the decrypted key directly to a persistent path
   vaultix.templates."revaulter-request-key" = {
