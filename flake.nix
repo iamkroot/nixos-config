@@ -54,7 +54,8 @@
     }@inputs:
     let
       pii = import ./secrets/pii.nix;
-      services = import ./secrets/services.nix;
+      rawServices = import ./secrets/services.nix;
+      services = nixpkgs.lib.filterAttrs (_: s: s.enable or true) rawServices;
       myUtils = import ./modules/utils.nix {
         inherit (nixpkgs) lib;
       };

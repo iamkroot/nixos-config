@@ -11,7 +11,7 @@ def ddns_sub: $pii.hosts.homelab1.name;
 def is_cloud(h): $pii.hosts[h] | has("publicIp");
 
 $svcs | to_entries
-| map(select(.value.dns != false))
+| map(select(.value.dns != false and .value.enable != false))
 | {
     domain: domain,
     ddnsSubdomain: ddns_sub,
