@@ -4,7 +4,7 @@ NIX_SSHOPTS = "-F {{env.HOME}}/.ssh/config"
 
 [vars]
 nix_chroot_bin = "nix-user-chroot {{env.HOME}}/.nix {{env.HOME}}/.nix-profile/bin"
-nix_bin = '''{{vars.nix_chroot_bin}}/nix --extra-experimental-features nix-command --extra-experimental-features flakes '''
+nix_bin = '''{{vars.nix_chroot_bin}}/nix --option builders-use-substitutes true --option max-jobs auto --option cores 8 --extra-experimental-features nix-command --extra-experimental-features flakes '''
 
 [tasks.fmt]
 description = "Run nixfmt via nix-user-chroot"
@@ -93,7 +93,7 @@ run = '''./tools/deploy-{{vars.cloud1_variant}}-vm.sh {{vars.cloud1_rg}} {{vars.
 vars._.file = "secrets/mise_vars.txt"
 description = "Invoke nixos-rebuild remotely to homelab"
 interactive = true
-run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}}'''
+run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}} --build-host root@{{vars.homelab1_name}}'''
 
 [tasks.check-homelab]
 vars._.file = "secrets/mise_vars.txt"
