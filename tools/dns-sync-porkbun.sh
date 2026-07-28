@@ -4,10 +4,12 @@ set -euo pipefail
 : "${PORKBUN_API_KEY:?must be set}"
 : "${PORKBUN_SECRET_KEY:?must be set}"
 
-cd "$(dirname "$0")/.."
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR/.."
 
-DATA=$($NIX_BIN eval '.?submodules=1#nixosConfigurations.'"$NIXOS_HOST"'.config.infra.dns.data' \
-  --json --extra-experimental-features "nix-command flakes")
+PII=$($NIX_BIN eval -f secrets/pii.nix --json)
+SVCS=$($NIX_BIN eval -f secrets/services.nix --json)
+DATA=$(jq -n --argjson pii "$PII" --argjson svcs "$SVCS" -f tools/dns-data.jq)
 
 DOMAIN=$(echo "$DATA" | jq -r '.domain')
 
@@ -22,29 +24,34 @@ sync_record() {
   local sub="$1" type="$2" content="$3" ttl="${4:-600}"
   echo "  Syncing $type $sub.$DOMAIN -> $content"
 
-  RESP=$(curl -sf -X POST \
-    "https://api.porkbun.com/api/json/v3/dns/editByNameType/$DOMAIN/$type/$sub" \
-    -H 'Content-Type: application/json' \
-    -d "{\"apikey\":\"$PORKBUN_API_KEY\",\"secretapikey\":\"$PORKBUN_SECRET_KEY\",\"content\":\"$content\",\"ttl\":\"$ttl\"}" \
-    2>/dev/null || echo '{"status":"ERROR"}')
+  EXISTS=$(echo "$CURRENT" | jq -e ".records[] | select(.name == \"$sub.$DOMAIN\" and .type == \"$type\")" >/dev/null 2>&1 && echo "yes" || echo "no")
 
-  STATUS=$(echo "$RESP" | jq -r '.status')
-  if [ "$STATUS" = "SUCCESS" ]; then
-    echo "    OK (updated)"
-    return
-  fi
+  if [ "$EXISTS" = "yes" ]; then
+    RESP=$(curl -sf -X POST \
+      "https://api.porkbun.com/api/json/v3/dns/editByNameType/$DOMAIN/$type/$sub" \
+      -H 'Content-Type: application/json' \
+      -d "{\"apikey\":\"$PORKBUN_API_KEY\",\"secretapikey\":\"$PORKBUN_SECRET_KEY\",\"content\":\"$content\",\"ttl\":\"$ttl\"}" \
+      2>/dev/null || echo '{"status":"ERROR"}')
 
-  RESP=$(curl -sf -X POST \
-    "https://api.porkbun.com/api/json/v3/dns/create/$DOMAIN" \
-    -H 'Content-Type: application/json' \
-    -d "{\"apikey\":\"$PORKBUN_API_KEY\",\"secretapikey\":\"$PORKBUN_SECRET_KEY\",\"type\":\"$type\",\"name\":\"$sub\",\"content\":\"$content\",\"ttl\":\"$ttl\"}" \
-    2>/dev/null || echo '{"status":"ERROR"}')
-
-  STATUS=$(echo "$RESP" | jq -r '.status')
-  if [ "$STATUS" = "SUCCESS" ]; then
-    echo "    OK (created)"
+    STATUS=$(echo "$RESP" | jq -r '.status')
+    if [ "$STATUS" = "SUCCESS" ]; then
+      echo "    OK (updated)"
+    else
+      echo "    FAILED to update: $RESP" >&2
+    fi
   else
-    echo "    FAILED: $RESP" >&2
+    RESP=$(curl -sf -X POST \
+      "https://api.porkbun.com/api/json/v3/dns/create/$DOMAIN" \
+      -H 'Content-Type: application/json' \
+      -d "{\"apikey\":\"$PORKBUN_API_KEY\",\"secretapikey\":\"$PORKBUN_SECRET_KEY\",\"type\":\"$type\",\"name\":\"$sub\",\"content\":\"$content\",\"ttl\":\"$ttl\"}" \
+      2>/dev/null || echo '{"status":"ERROR"}')
+
+    STATUS=$(echo "$RESP" | jq -r '.status')
+    if [ "$STATUS" = "SUCCESS" ]; then
+      echo "    OK (created)"
+    else
+      echo "    FAILED to create: $RESP" >&2
+    fi
   fi
 }
 

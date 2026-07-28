@@ -57,11 +57,13 @@
   };
 
   config.infra.hostKey = hostKey;
-  config.infra.domain = pii.hosts.${hostKey}.domain;
+  config.infra.domain = pii.primaryDomain;
 
   config.infra.services.ports = lib.mkMerge (
     [ (lib.mapAttrs (_: s: lib.mkDefault (s.port or 0)) services) ]
-    ++ (lib.mapAttrsToList (_: s: lib.mapAttrs (_: port: lib.mkDefault port) (s.extraPorts or { })) services)
+    ++ (lib.mapAttrsToList (
+      _: s: lib.mapAttrs (_: port: lib.mkDefault port) (s.extraPorts or { })
+    ) services)
   );
 
   config.infra.services.hostnames = lib.mapAttrs (

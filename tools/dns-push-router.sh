@@ -2,16 +2,18 @@
 set -euo pipefail
 
 ROUTER="${1:-router}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR/.."
 
-DATA=$($NIX_BIN eval '.?submodules=1#nixosConfigurations.'"$NIXOS_HOST"'.config.infra.dns.data' \
-  --json --extra-experimental-features "nix-command flakes")
-
-
+PII=$($NIX_BIN eval -f secrets/pii.nix --json)
+SVCS=$($NIX_BIN eval -f secrets/services.nix --json)
+DATA=$(jq -n --argjson pii "$PII" --argjson svcs "$SVCS" -f tools/dns-data.jq)
 
 # Build address= lines: router.local + all homelab services
 ENTRIES=$(echo "$DATA" | jq -r '
-  ["address=/router.local/\(.routerIp)"]
-  + [.homelab[] | "address=/\(.subdomain).\(.domain)/\(.ip)"]
+  .domain as $d | .routerIp as $r |
+  ["address=/router.local/\($r)"]
+  + [.homelab[] | "address=/\(.subdomain).\($d)/\(.ip)"]
   | .[]')
 
 COUNT=$(echo "$ENTRIES" | wc -l)

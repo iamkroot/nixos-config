@@ -17,7 +17,6 @@ in
     ../../modules/services/atuin.nix
     ../../modules/services/caddy.nix
     ../../modules/services/crowdsec.nix
-    ../../modules/dns.nix
     ../../modules/services/gaming.nix
     ../../modules/storage
     ../../modules/storage/nfs.nix

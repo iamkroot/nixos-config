@@ -1,6 +1,6 @@
 [vars]
-nix_chroot_bin = "nix-user-chroot ~/.nix ~/.nix-profile/bin"
-nix_bin = '{{vars.nix_chroot_bin}}/nix --extra-experimental-features "nix-command flakes"'
+nix_chroot_bin = "nix-user-chroot {{env.HOME}}/.nix {{env.HOME}}/.nix-profile/bin"
+nix_bin = '''{{vars.nix_chroot_bin}}/nix --extra-experimental-features nix-command --extra-experimental-features flakes '''
 
 [tasks.fmt]
 description = "Run nixfmt via nix-user-chroot"
@@ -9,14 +9,14 @@ run = "{{vars.nix_chroot_bin}}/nix-shell -p nixfmt-tree --run \"treefmt ${@:-.}\
 [tasks."dns:push-router"]
 vars._.file = "secrets/mise_vars.txt"
 description = "Push dnsmasq address entries to OpenWrt (derived from Nix)"
-run = 'NIXOS_HOST={{vars.homelab1_name}} NIX_BIN="{{vars.nix_bin}}" ./tools/dns-push-router.sh "${@:-router}"'
+run = 'NIX_BIN="{{vars.nix_bin}}" ./tools/dns-push-router.sh "${@:-router}"'
 
 [tasks."dns:sync-porkbun"]
 vars._.file = "secrets/mise_vars.txt"
 description = "Sync DNS records to Porkbun (derived from Nix)"
 run = '''
 eval "$(cd secrets && mise run decrypt-porkbun)"
-NIXOS_HOST={{vars.homelab1_name}} NIX_BIN="{{vars.nix_bin}}" ./tools/dns-sync-porkbun.sh
+NIX_BIN="{{vars.nix_bin}}" ./tools/dns-sync-porkbun.sh
 '''
 
 [tasks."secret:renc"]
