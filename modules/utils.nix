@@ -23,6 +23,7 @@
     let
       hostname = config.infra.services.hostnames."${name}";
       port = config.infra.services.ports."${portKey}";
+      userExtraConfig = extraHostConfig.extraConfig or null;
     in
     {
       services.caddy.virtualHosts."${hostname}" = lib.mkMerge [
@@ -30,7 +31,7 @@
           useACMEHost = config.infra.domain;
           extraConfig = ''
             ${if authelia then "import authelia" else ""}
-            reverse_proxy 127.0.0.1:${toString port}
+            ${if userExtraConfig != null then userExtraConfig else "reverse_proxy 127.0.0.1:${toString port}"}
           '';
 
           logFormat = lib.mkDefault ''
@@ -40,7 +41,7 @@
             }
           '';
         }
-        extraHostConfig
+        (builtins.removeAttrs extraHostConfig [ "extraConfig" ])
       ];
     };
 }

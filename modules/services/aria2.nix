@@ -30,10 +30,17 @@
     })
   ];
   imports = [
-    (myUtils.mkCaddyModule "aria2" { authelia = false; })
+    (myUtils.mkCaddyModule "aria2" {
+      # authelia = false; doesn't work due to mkForce below
+      extraHostConfig.extraConfig = ''
+        @denied not remote_ip private_ranges
+        abort @denied
+        reverse_proxy 127.0.0.1:${toString config.infra.services.ports.aria2}
+      '';
+    })
     (myUtils.mkCaddyModule "ariang" {
-      authelia = true;
-      extraHostConfig.extraConfig = lib.mkForce ''
+      # authelia = true; doesn't work due to mkForce below
+      extraHostConfig.extraConfig = ''
         root * ${pkgs.ariang}/share/ariang
         file_server
       '';
@@ -52,6 +59,7 @@
       enable-rpc = true;
       # Allow connections from local network, direct external access will still be blocked by router
       rpc-listen-all = true;
+      rpc-allow-origin-all = true;
       rpc-listen-port = config.infra.services.ports.aria2;
       max-connection-per-server = 4;
       split = 4;

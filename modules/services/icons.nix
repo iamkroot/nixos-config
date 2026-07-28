@@ -8,7 +8,7 @@
   imports = [
     (myUtils.mkCaddyModule "icons" {
       extraHostConfig = {
-        extraConfig = lib.mkForce ''
+        extraConfig = ''
           		  # Serve the SVG folder
           		  root * ${inputs.dashboard-icons}/svg
           		  file_server
