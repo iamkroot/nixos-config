@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROUTER="${1:-router}"
+DRY_RUN=0
+ROUTER="router"
+
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    --dry-run) DRY_RUN=1; shift ;;
+    *) ROUTER="$1"; shift ;;
+  esac
+done
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/.."
 
@@ -9,14 +18,21 @@ PII=$($NIX_BIN eval -f secrets/pii.nix --json)
 SVCS=$($NIX_BIN eval --json --impure --expr 'let flake = builtins.getFlake (toString ./.); in (flake.inputs.nixpkgs.lib.evalModules { modules = [ ./modules/services-schema.nix ]; }).config.myServices')
 DATA=$(jq -n --argjson pii "$PII" --argjson svcs "$SVCS" -f tools/dns-data.jq)
 
-# Build address= lines: router.local + all homelab services
+# Build address lines: router.local + all homelab services
 ENTRIES=$(echo "$DATA" | jq -r '
   .domain as $d | .routerIp as $r |
-  ["address=/router.local/\($r)"]
-  + [.homelab[] | "address=/\(.subdomain).\($d)/\(.ip)"]
+  ["/router.local/\($r)"]
+  + [.homelab[] | "/\(.subdomain).\($d)/\(.ip)"]
   | .[]')
 
 COUNT=$(echo "$ENTRIES" | wc -l)
+
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "Dry run: would push $COUNT dnsmasq entries to $ROUTER:"
+  echo "$ENTRIES" | sed 's/^/  /'
+  exit 0
+fi
+
 echo "Pushing $COUNT dnsmasq entries to $ROUTER..."
 
 ssh "$ROUTER" "while uci -q delete dhcp.@dnsmasq[0].address; do :; done"

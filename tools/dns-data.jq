@@ -16,15 +16,24 @@ $svcs | to_entries
     domain: domain,
     ddnsSubdomain: ddns_sub,
     routerIp: router_ip,
-    homelab: [
-      .[]
-      | select(is_cloud(.value.host) | not)
-      | {
-          subdomain: (.value.subdomain // .key),
-          ip:    $pii.hosts[.value.host].localIp,
-          cname: "\($pii.hosts[.value.host].name).\(domain)"
-        }
-    ],
+    homelab: (
+      [
+        .[]
+        | select(is_cloud(.value.host) | not)
+        | {
+            subdomain: (.value.subdomain // .key),
+            ip:    $pii.hosts[.value.host].localIp,
+            cname: "\($pii.hosts[.value.host].name).\(domain)"
+          }
+      ] + [
+        $pii.hosts[]
+        | select((has("publicIp") | not) and has("localIp"))
+        | {
+            subdomain: .name,
+            ip: .localIp
+          }
+      ]
+    ),
     cloud: (
       [
         .[]
