@@ -1,8 +1,11 @@
 {
-	"folders":
-	[
+	"folders": [
 		{
 			"path": ".",
+			"binary_file_patterns": [
+				"*.vhd",
+				"result",
+			],
 		},
 	],
 	"settings": {
@@ -11,7 +14,11 @@
 	"build_systems": [
 		{
 			"name": "Build homelab",
-			"cmd": ["mise", "run", "rebuild-homelab"],
+			"cmd": [
+				"mise",
+				"run",
+				"rebuild-homelab"
+			],
 			"file_regex": "-source/(?<filename>modules/.*[.]nix)': (.*)",
 		},
 	],
