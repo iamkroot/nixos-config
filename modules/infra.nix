@@ -67,13 +67,13 @@
   );
 
   config.infra.services.hostnames = lib.mapAttrs (
-    name: s: "${s.subdomain or name}.${config.infra.domain}"
+    name: s: "${s.subdomain}.${config.infra.domain}"
   ) services;
 
   config.infra.services.catalog = lib.mapAttrs (
     name: s:
     let
-      hostname = "${s.subdomain or name}.${config.infra.domain}";
+      hostname = "${s.subdomain}.${config.infra.domain}";
     in
     {
       enable = lib.mkDefault (
@@ -90,8 +90,8 @@
     lib.mapAttrsToList (
       name: s:
       let
-        oldHost = "${s.subdomain or name}.${pii.oldDomain}";
-        newHost = "${s.subdomain or name}.${config.infra.domain}";
+        oldHost = "${s.subdomain}.${pii.oldDomain}";
+        newHost = "${s.subdomain}.${config.infra.domain}";
       in
       lib.mkIf (s.host == hostKey) {
         "${oldHost}" = {

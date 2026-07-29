@@ -54,8 +54,9 @@
     }@inputs:
     let
       pii = import ./secrets/pii.nix;
-      rawServices = import ./secrets/services.nix;
-      services = nixpkgs.lib.filterAttrs (_: s: s.enable or true) rawServices;
+      rawServices =
+        (nixpkgs.lib.evalModules { modules = [ ./modules/services-schema.nix ]; }).config.myServices;
+      services = nixpkgs.lib.filterAttrs (_: s: s.enable) rawServices;
       myUtils = import ./modules/utils.nix {
         inherit (nixpkgs) lib;
       };
@@ -63,7 +64,7 @@
         hostKey:
         let
           hostServices = nixpkgs.lib.filterAttrs (_: s: s.host == hostKey) services;
-          moduleNames = nixpkgs.lib.mapAttrsToList (name: s: s.module or name) hostServices;
+          moduleNames = nixpkgs.lib.mapAttrsToList (name: s: s.module) hostServices;
           uniqueModules = nixpkgs.lib.unique (nixpkgs.lib.filter (m: m != null) moduleNames);
         in
         map (m: ./modules/services/${m}.nix) uniqueModules;
