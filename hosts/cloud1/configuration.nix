@@ -15,7 +15,7 @@ in
     ../../modules/services/caddy.nix
   ];
   nixpkgs.hostPlatform = "x86_64-linux";
-  virtualisation.diskSize = 8192;
+  virtualisation.diskSize = 12288;
   time.timeZone = "America/Los_Angeles";
 
   nix.settings.experimental-features = [

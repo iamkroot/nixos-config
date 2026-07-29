@@ -77,6 +77,8 @@ run = [
 vars._.file = "secrets/mise_vars.txt"
 description = "Build configuration to a VHD image using nixos-rebuild"
 run = [
+	'rm -rf result',
+	# TODO: Pass --print-store-paths and directly get that path instead of going through result
 	'''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- build-image --image-variant {{vars.cloud1_variant}} --flake .?submodules=1#{{vars.cloud1_name}}''',
 	'ln -sf $(readlink ./result | sed "s|^/nix|$HOME/.nix|") ./result',
 	'cd secrets && mise run decrypt-secrets',
@@ -87,7 +89,7 @@ run = [
 [tasks.deploy-cloud-vm]
 vars._.file = "secrets/mise_vars.txt"
 description = "Deploy Cloud VM from generated VHD"
-run = '''./tools/deploy-{{vars.cloud1_variant}}-vm.sh {{vars.cloud1_rg}} {{vars.cloud1_name}} ./{{vars.cloud1_name}}.vhd {{vars.cloud1_storage_account}} vhds'''
+run = '''DISK_SIZE_GB=64 ./tools/deploy-{{vars.cloud1_variant}}-vm.sh {{vars.cloud1_rg}} {{vars.cloud1_name}} ./{{vars.cloud1_name}}.vhd {{vars.cloud1_storage_account}} vhds'''
 
 [tasks.rebuild-homelab]
 vars._.file = "secrets/mise_vars.txt"

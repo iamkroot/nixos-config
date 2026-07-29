@@ -13,8 +13,8 @@ VHD=$3
 SA=$4
 CONTAINER=${5:-vhds}
 
-echo "Computing MD5 hash of $VHD to check for changes..."
-HASH=$(md5sum "$VHD" | awk '{print $1}')
+echo "Computing xxHash of $VHD to check for changes..."
+HASH=$(xxhsum "$VHD" | awk '{print $1}')
 BLOB_NAME="${VM}-${HASH}.vhd"
 NEW_DISK_NAME="${VM}-osdisk-${HASH}"
 
@@ -37,20 +37,31 @@ fi
 
 BLOB_URL="https://${SA}.blob.core.windows.net/${CONTAINER}/${BLOB_NAME}"
 
+VM_EXISTS=$(az vm show -g "$RG" -n "$VM" --query "name" -o tsv 2>/dev/null || echo "")
+ZONE=""
+if [ -n "$VM_EXISTS" ]; then
+    # Fetch the zone if the VM is deployed in an Availability Zone
+    ZONE=$(az vm show -g "$RG" -n "$VM" --query "zones[0]" -o tsv 2>/dev/null || echo "")
+fi
+
 DISK_EXISTS=$(az disk show -g "$RG" -n "$NEW_DISK_NAME" --query "name" -o tsv 2>/dev/null || echo "")
 
 if [ -n "$DISK_EXISTS" ]; then
     echo "Managed Disk $NEW_DISK_NAME already exists."
+    if [ -z "$VM_EXISTS" ]; then
+        # If VM doesn't exist but disk does, inherit the zone from the disk
+        ZONE=$(az disk show -g "$RG" -n "$NEW_DISK_NAME" --query "zones[0]" -o tsv 2>/dev/null || echo "")
+    fi
 else
     echo "Creating Managed Disk ($NEW_DISK_NAME) from Blob..."
     az disk create \
         --resource-group "$RG" \
         --name "$NEW_DISK_NAME" \
         --source "$BLOB_URL" \
+        ${DISK_SIZE_GB:+--size-gb} ${DISK_SIZE_GB:+"$DISK_SIZE_GB"} \
+        ${ZONE:+--zone} ${ZONE:+"$ZONE"} \
         --os-type Linux
 fi
-
-VM_EXISTS=$(az vm show -g "$RG" -n "$VM" --query "name" -o tsv 2>/dev/null || echo "")
 
 if [ -n "$VM_EXISTS" ]; then
     OLD_DISK_ID=$(az vm show -g "$RG" -n "$VM" --query "storageProfile.osDisk.managedDisk.id" -o tsv || echo "")
@@ -95,8 +106,9 @@ if [ -n "$VM_EXISTS" ]; then
         az vm create \
             --resource-group "$RG" \
             --name "$VM" \
-            --size "${VM_SIZE:-Standard_B2s}" \
+            --size "${VM_SIZE:-Standard_B2as_v2}" \
             --attach-os-disk "$NEW_DISK_NAME" \
+            ${ZONE:+--zone} ${ZONE:+"$ZONE"} \
             --nics "$NIC_ID" \
             --os-type Linux
     else
@@ -110,12 +122,23 @@ if [ -n "$VM_EXISTS" ]; then
     fi
 else
     echo "VM $VM does not exist. Creating new VM..."
+    
+    # Try to find an orphaned NIC from a previous deployment if NIC_ID is not provided
+    if [ -z "${NIC_ID:-}" ]; then
+        EXISTING_NIC=$(az network nic show -g "$RG" -n "${VM}VMNic" --query "id" -o tsv 2>/dev/null || echo "")
+        if [ -n "$EXISTING_NIC" ]; then
+            echo "Found existing NIC (${VM}VMNic), reusing it..."
+            NIC_ID="$EXISTING_NIC"
+        fi
+    fi
     az vm create \
         --resource-group "$RG" \
         --name "$VM" \
+        --size "${VM_SIZE:-Standard_B2as_v2}" \
         --attach-os-disk "$NEW_DISK_NAME" \
-        --os-type Linux \
-        --public-ip-sku Standard
+        ${ZONE:+--zone} ${ZONE:+"$ZONE"} \
+        ${NIC_ID:+--nics} ${NIC_ID:+"$NIC_ID"} \
+        --os-type Linux
 fi
 
 echo "Done! $VM has been deployed with the latest image."
