@@ -201,6 +201,24 @@ in
           userinfo_signed_response_alg = "none";
           token_endpoint_auth_method = "client_secret_post";
         }
+        {
+          client_id = pii.secrets.authelia-forgejo-client-id;
+          client_secret = pii.secrets.authelia-forgejo-client-secret;
+          client_name = "Forgejo";
+          public = false;
+          authorization_policy = "one_factor";
+          scopes = [
+            "openid"
+            "profile"
+            "email"
+            "groups"
+          ];
+          redirect_uris = [
+            "https://${config.infra.services.hostnames.forgejo}/user/oauth2/Authelia/callback"
+          ];
+          userinfo_signed_response_alg = "none";
+          token_endpoint_auth_method = "client_secret_basic";
+        }
       ];
     };
   };
