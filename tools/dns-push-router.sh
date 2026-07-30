@@ -18,29 +18,41 @@ PII=$($NIX_BIN eval -f secrets/pii.nix --json)
 SVCS=$($NIX_BIN eval --json --impure --expr 'let flake = builtins.getFlake (toString ./.); in (flake.inputs.nixpkgs.lib.evalModules { modules = [ ./modules/services-schema.nix ]; }).config.myServices')
 DATA=$(jq -n --argjson pii "$PII" --argjson svcs "$SVCS" -f tools/dns-data.jq)
 
-# Build address lines: router.local + all homelab services
-ENTRIES=$(echo "$DATA" | jq -r '
+# Build hosts file entries: router.local + all homelab services
+HOSTS_ENTRIES=$(echo "$DATA" | jq -r '
   .domain as $d | .routerIp as $r |
-  ["/router.local/\($r)"]
-  + [.homelab[] | "/\(.subdomain).\($d)/\(.ip)"]
+  ["\($r) router.local"]
+  + [.homelab[] | "\(.ip) \(.subdomain).\($d)"]
   | .[]')
 
-COUNT=$(echo "$ENTRIES" | wc -l)
+COUNT=$(echo "$HOSTS_ENTRIES" | wc -l)
 
 if [ "$DRY_RUN" -eq 1 ]; then
-  echo "Dry run: would push $COUNT dnsmasq entries to $ROUTER:"
-  echo "$ENTRIES" | sed 's/^/  /'
+  echo "Dry run: would push $COUNT hosts entries to $ROUTER in /etc/kroot.hosts:"
+  echo "$HOSTS_ENTRIES" | sed 's/^/  /'
   exit 0
 fi
 
-echo "Pushing $COUNT dnsmasq entries to $ROUTER..."
+echo "Pushing $COUNT dnsmasq entries to $ROUTER via /etc/kroot.hosts..."
 
-ssh "$ROUTER" "while uci -q delete dhcp.@dnsmasq[0].address; do :; done"
-
-UCI_CMDS=$(echo "$ENTRIES" | while IFS= read -r entry; do
-  printf "uci add_list dhcp.@dnsmasq[0].address='%s' && " "$entry"
-done)
-
-ssh "$ROUTER" "${UCI_CMDS}uci commit dhcp && /etc/init.d/dnsmasq restart"
+ssh "$ROUTER" '
+  cat > /tmp/kroot.hosts.new
+  if cmp -s /etc/kroot.hosts /tmp/kroot.hosts.new 2>/dev/null; then
+    rm /tmp/kroot.hosts.new
+    echo "No changes needed."
+    exit 0
+  fi
+  mv /tmp/kroot.hosts.new /etc/kroot.hosts
+  
+  # Ensure the configuration is hooked into dnsmasq
+  if ! uci -q show dhcp.@dnsmasq[0].addnhosts 2>/dev/null | grep -q "/etc/kroot.hosts"; then
+    uci add_list dhcp.@dnsmasq[0].addnhosts="/etc/kroot.hosts"
+    uci commit dhcp
+    /etc/init.d/dnsmasq restart
+  else
+    # Soft reload is much faster and clears cache without dropping queries
+    killall -q -HUP dnsmasq || /etc/init.d/dnsmasq reload
+  fi
+' <<< "$HOSTS_ENTRIES"
 
 echo "Done. $COUNT entries pushed to $ROUTER."
