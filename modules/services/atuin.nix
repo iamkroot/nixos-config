@@ -3,15 +3,18 @@
   pkgs,
   lib,
   pii,
+  myUtils,
   ...
 }:
 
 {
-  networking.firewall.allowedTCPPorts = [ config.infra.services.ports.atuin ];
+  imports = [
+    (myUtils.mkCaddyModule "atuin" { authelia = false; })
+  ];
 
   services.atuin = {
     enable = true;
-    host = "0.0.0.0";
+    host = "127.0.0.1";
     port = config.infra.services.ports.atuin;
     openRegistration = false;
 

@@ -48,9 +48,7 @@
     enableZshIntegration = true;
 
     settings = {
-      sync_address = "http://${
-        pii.hosts.${services.atuin.host}.localIp
-      }:${toString osConfig.infra.services.ports.atuin}";
+      sync_address = "https://${osConfig.infra.services.hostnames.atuin}";
 
       search_mode = "fuzzy";
       style = "compact";
