@@ -23,6 +23,10 @@
 
     powerdevil = {
       AC = {
+        turnOffDisplay = {
+          idleTimeout = 300;
+          idleTimeoutWhenLocked = "immediately";
+        };
         autoSuspend = {
           action = "nothing";
           idleTimeout = null;
