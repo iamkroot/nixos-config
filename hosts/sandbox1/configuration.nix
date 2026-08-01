@@ -104,7 +104,7 @@ in
     zsh
   ];
   # FIXME: Should ensure the derived sub-domains for services are correct
-  infra.domain = "localhost";
+  infra.domain = lib.mkForce "localhost";
   # atuin is hosted on this machine
   infra.services.hostnames.atuin = hostPII.localIp;
 
