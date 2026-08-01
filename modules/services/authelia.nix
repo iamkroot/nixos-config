@@ -112,12 +112,20 @@ in
             domain = [ config.infra.services.hostnames.seerr ];
             policy = "one_factor";
           }
-          # Require lldap_admin for Profilarr
+          # Require jellyfin_admins for Profilarr
           {
             domain = config.infra.services.hostnames.profilarr;
             policy = "one_factor";
             subject = [
-              "group:lldap_admin"
+              "group:jellyfin_admins"
+            ];
+          }
+          # Require jellyfin_admins for SuggestArr
+          {
+            domain = config.infra.services.hostnames.suggestarr;
+            policy = "one_factor";
+            subject = [
+              "group:jellyfin_admins"
             ];
           }
           # TODO: Require 2FA for everything else by default

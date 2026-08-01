@@ -243,8 +243,25 @@
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "plasma-manager": "plasma-manager",
+        "suggestarr": "suggestarr",
         "vaultix": "vaultix",
         "zsh-patina": "zsh-patina"
+      }
+    },
+    "suggestarr": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784532832,
+        "narHash": "sha256-em2/DzkmxA0LkKkO+decu+KBKjYsGy5PZPInkz9d3xA=",
+        "owner": "giuseppe99barchetta",
+        "repo": "suggestarr",
+        "rev": "e0bfb5921b8a99e563f6ef5c8c8f7c484ed29b69",
+        "type": "github"
+      },
+      "original": {
+        "owner": "giuseppe99barchetta",
+        "repo": "suggestarr",
+        "type": "github"
       }
     },
     "vaultix": {

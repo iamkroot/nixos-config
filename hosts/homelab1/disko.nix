@@ -11,9 +11,17 @@ let
     (inputs.self + /modules/datasets/authelia.nix)
     (inputs.self + /modules/datasets/immich.nix)
     (inputs.self + /modules/datasets/seerr.nix)
+    (inputs.self + /modules/datasets/suggestarr.nix)
   ];
 
-  customDatasets = lib.foldl' (acc: path: acc // (import path { })) { } serviceFiles;
+  customDatasetsRaw = lib.foldl' (acc: path: acc // (import path { })) { } serviceFiles;
+  customDatasets = lib.mapAttrs (
+    name: value:
+    value
+    // {
+      mountOptions = (value.mountOptions or [ ]) ++ [ "x-systemd.after=disko-zfs.service" ];
+    }
+  ) customDatasetsRaw;
 
   externalDisks = lib.subtractLists [ null "zroot" ] (
     lib.unique (lib.mapAttrsToList (name: value: lib.attrByPath [ "name" ] null value) pii.storage)

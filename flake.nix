@@ -39,6 +39,11 @@
       url = "github:homarr-labs/dashboard-icons";
       flake = false;
     };
+
+    suggestarr = {
+      url = "github:giuseppe99barchetta/suggestarr";
+      flake = false;
+    };
   };
 
   outputs =
