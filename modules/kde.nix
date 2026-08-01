@@ -2,6 +2,7 @@
   config,
   pkgs,
   pii,
+  lib,
   ...
 }:
 
@@ -43,6 +44,14 @@
   ];
 
   # KDE bug - getting recursive stack traces
+  systemd.services."drkonqi-coredump-launcher@" = {
+    enable = false;
+    wantedBy = lib.mkForce [ ];
+  };
+  systemd.services."drkonqi-coredump-processor@" = {
+    enable = false;
+    wantedBy = lib.mkForce [ ];
+  };
   systemd.user.services."drkonqi-coredump-launcher@" = {
     enable = false;
   };
