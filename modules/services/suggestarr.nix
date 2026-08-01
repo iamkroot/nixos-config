@@ -12,6 +12,16 @@
     (myUtils.mkCaddyModule "suggestarr" { authelia = true; })
   ];
 
+  myAuthelia.accessRules = [
+    {
+      domain = config.infra.services.hostnames.suggestarr;
+      policy = "one_factor";
+      subject = [
+        "group:jellyfin_admins"
+      ];
+    }
+  ];
+
   systemd.tmpfiles.rules = [
     "d /var/lib/suggestarr 0755 root root - -"
     "d /var/lib/suggestarr/config_files 0755 root root - -"

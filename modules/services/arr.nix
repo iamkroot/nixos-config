@@ -49,6 +49,32 @@ in
     ../../modules/services/byparr.nix
   ];
 
+  myAuthelia.accessRules = [
+    # Bypass API so *arr apps and external tools can talk to each other
+    {
+      domain = [
+        config.infra.services.hostnames.seerr
+        config.infra.services.hostnames.radarr
+        config.infra.services.hostnames.sonarr
+      ];
+      resources = [ "^/api.*" ];
+      policy = "bypass";
+    }
+    # Require auth for the human-facing web UI
+    {
+      domain = [ config.infra.services.hostnames.seerr ];
+      policy = "one_factor";
+    }
+    # Require jellyfin_admins for Profilarr
+    {
+      domain = config.infra.services.hostnames.profilarr;
+      policy = "one_factor";
+      subject = [
+        "group:jellyfin_admins"
+      ];
+    }
+  ];
+
   services.sonarr = {
     enable = true;
     group = "media";

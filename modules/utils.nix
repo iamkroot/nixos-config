@@ -44,4 +44,32 @@
         (builtins.removeAttrs extraHostConfig [ "extraConfig" ])
       ];
     };
+
+  # Build an Authelia OIDC client attrset with sensible defaults.
+  # Auto-derives client_id, client_secret, client_name from pii.authelia."${name}"
+  # Defaults: public=false, authorization_policy="one_factor", userinfo_signed_response_alg="none", token_endpoint_auth_method="client_secret_post"
+  # Set any default to null to remove it.
+  # use via `myAuthelia.oidcClients = [(myUtils.mkAutheliaOIDC pii "forgejo" { redirect_uris = [...]; })]`
+  mkAutheliaOIDC =
+    pii: name: overrides:
+    let
+      capitalize =
+        s:
+        let
+          len = builtins.stringLength s;
+        in
+        lib.toUpper (builtins.substring 0 1 s) + builtins.substring 1 (len - 1) s;
+
+      defaults = {
+        client_id = pii.authelia.${name}.client-id;
+        client_secret = pii.authelia.${name}.client-secret;
+        client_name = capitalize name;
+        public = false;
+        authorization_policy = "one_factor";
+        userinfo_signed_response_alg = "none";
+        token_endpoint_auth_method = "client_secret_post";
+      };
+      raw = defaults // overrides;
+    in
+    lib.filterAttrs (_: v: v != null) raw;
 }

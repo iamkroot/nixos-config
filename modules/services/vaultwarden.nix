@@ -12,6 +12,24 @@ in
   imports = [
     (myUtils.mkCaddyModule "vaultwarden" { authelia = false; })
   ];
+
+  myAuthelia.accessRules = [
+    {
+      domain = config.infra.services.hostnames.vaultwarden;
+      policy = "one_factor";
+      subject = [
+        "group:vaultwarden_users"
+      ];
+    }
+  ];
+
+  myAuthelia.oidcClients = [
+    (myUtils.mkAutheliaOIDC pii "vaultwarden" {
+      redirect_uris = [
+        "https://${config.infra.services.hostnames.vaultwarden}/identity/connect/oidc-signin"
+      ];
+    })
+  ];
   infra.services.catalog.vaultwarden.icon =
     "https://${config.infra.services.hostnames.icons}/vaultwarden-light.svg";
   services.vaultwarden = {
@@ -46,7 +64,7 @@ in
 
       SSO_ENABLED=true
       SSO_AUTHORITY=https://${config.infra.services.hostnames.auth}
-      SSO_CLIENT_ID=${pii.secrets.authelia-vaultwarden-client-id}
+      SSO_CLIENT_ID=${pii.authelia.vaultwarden.client-id}
       SSO_CLIENT_SECRET=${config.vaultix.placeholder."vaultwarden/sso_secret"}
       SSO_SIGNUPS_MATCH_EMAIL=true
     '';

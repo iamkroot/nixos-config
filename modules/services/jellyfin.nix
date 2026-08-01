@@ -12,6 +12,15 @@
     (myUtils.mkCaddyModule "jellyfin" { authelia = false; })
   ];
 
+  myAuthelia.oidcClients = [
+    (myUtils.mkAutheliaOIDC pii "jellyfin" {
+      redirect_uris = [
+        "https://${config.infra.services.hostnames.jellyfin}/sso/OID/redirect/authelia"
+      ];
+      userinfo_signed_response_alg = null;
+    })
+  ];
+
   services.jellyfin = {
     enable = true;
     openFirewall = true;

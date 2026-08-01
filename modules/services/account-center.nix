@@ -32,11 +32,27 @@ in
     (myUtils.mkCaddyModule "account-center" { authelia = false; })
   ];
 
+  myAuthelia.oidcClients = [
+    (myUtils.mkAutheliaOIDC pii "account-center" {
+      client_name = "Account Center";
+      scopes = [
+        "openid"
+        "profile"
+        "groups"
+        "email"
+        "offline_access"
+      ];
+      redirect_uris = [
+        "https://${config.infra.services.hostnames."account-center"}/oidc-callback"
+      ];
+    })
+  ];
+
   vaultix.secrets."account-center/sso_secret" = { };
   vaultix.templates."account-center.env" = {
     content = ''
       AC_OIDC_PROVIDER_URL=https://${config.infra.services.hostnames.auth}
-      AC_OIDC_CLIENT_ID=${pii.secrets.authelia-account-center-client-id}
+      AC_OIDC_CLIENT_ID=${pii.authelia.account-center.client-id}
       AC_OIDC_CLIENT_SECRET=${config.vaultix.placeholder."account-center/sso_secret"}
       AC_INSTANCE_BASE_URL=https://${config.infra.services.hostnames."account-center"}
     '';

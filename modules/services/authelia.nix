@@ -11,24 +11,42 @@ in
 {
   imports = [
     (myUtils.mkCaddyModule "auth" { portKey = "authelia"; })
+    # Inline anonymous module to avoid wrapping the configs later
+    ({ lib, ... }: {
+      options.myAuthelia = {
+        accessRules = lib.mkOption {
+          type = lib.types.listOf lib.types.attrs;
+          default = [ ];
+          description = "Authelia access control rules, ususally collected from service modules via mkAutheliaAccess.";
+        };
+        oidcClients = lib.mkOption {
+          type = lib.types.listOf lib.types.attrs;
+          default = [ ];
+          description = "Authelia OIDC client registrations, ususally collected from service modules via mkAutheliaOIDC.";
+        };
+      };
+    })
   ];
 
-  vaultix.secrets =
-    lib.genAttrs
-      [
-        "authelia-jwt"
-        "authelia-ldap"
-        "authelia-session"
-        "authelia-storage"
-        "authelia-oidc-cert"
-        "authelia-oidc-hmac"
-      ]
+  vaultix.secrets = builtins.listToAttrs (
+    map
       (name: {
-        file = pii.secrets.${name};
-        owner = "authelia-main";
-        group = "authelia-main";
-      });
-
+        name = "authelia-${name}";
+        value = {
+          file = pii.authelia.${name};
+          owner = "authelia-main";
+          group = "authelia-main";
+        };
+      })
+      [
+        "jwt"
+        "ldap"
+        "session"
+        "storage"
+        "oidc-cert"
+        "oidc-hmac"
+      ]
+  );
   systemd.services."authelia-main" = {
     serviceConfig = {
       LoadCredential = [
@@ -84,49 +102,11 @@ in
 
       access_control = {
         default_policy = "deny";
-        rules = [
+        rules = config.myAuthelia.accessRules ++ [
           # Bypass auth for Authelia itself
           {
             domain = config.infra.services.hostnames.auth;
             policy = "bypass";
-          }
-          {
-            domain = config.infra.services.hostnames.vaultwarden;
-            policy = "one_factor";
-            subject = [
-              "group:vaultwarden_users"
-            ];
-          }
-          # Bypass API so *arr apps and external tools can talk to each other
-          {
-            domain = [
-              config.infra.services.hostnames.seerr
-              config.infra.services.hostnames.radarr
-              config.infra.services.hostnames.sonarr
-            ];
-            resources = [ "^/api.*" ];
-            policy = "bypass";
-          }
-          # Require auth for the human-facing web UI
-          {
-            domain = [ config.infra.services.hostnames.seerr ];
-            policy = "one_factor";
-          }
-          # Require jellyfin_admins for Profilarr
-          {
-            domain = config.infra.services.hostnames.profilarr;
-            policy = "one_factor";
-            subject = [
-              "group:jellyfin_admins"
-            ];
-          }
-          # Require jellyfin_admins for SuggestArr
-          {
-            domain = config.infra.services.hostnames.suggestarr;
-            policy = "one_factor";
-            subject = [
-              "group:jellyfin_admins"
-            ];
           }
           # TODO: Require 2FA for everything else by default
           {
@@ -136,98 +116,7 @@ in
         ];
       };
 
-      identity_providers.oidc.clients = [
-        {
-          client_id = pii.secrets.authelia-jellyfin-client-id;
-          client_secret = pii.secrets.authelia-jellyfin-client-secret;
-          client_name = "Jellyfin";
-          public = false;
-          token_endpoint_auth_method = "client_secret_post";
-          authorization_policy = "one_factor";
-          redirect_uris = [
-            "https://${config.infra.services.hostnames.jellyfin}/sso/OID/redirect/authelia"
-          ];
-        }
-        {
-          client_id = pii.secrets.authelia-vaultwarden-client-id;
-          client_secret = pii.secrets.authelia-vaultwarden-client-secret;
-          client_name = "Vaultwarden";
-          public = false;
-          authorization_policy = "one_factor";
-          redirect_uris = [
-            "https://${config.infra.services.hostnames.vaultwarden}/identity/connect/oidc-signin"
-          ];
-          userinfo_signed_response_alg = "none";
-        }
-        {
-          client_id = pii.secrets.authelia-immich-client-id;
-          client_secret = pii.secrets.authelia-immich-client-secret;
-          client_name = "Immich";
-          public = false;
-          authorization_policy = "one_factor";
-          redirect_uris = [
-            "https://${config.infra.services.hostnames.immich}/auth/login"
-            "https://${config.infra.services.hostnames.immich}/user-settings"
-            "app.immich:///oauth-callback"
-          ];
-          userinfo_signed_response_alg = "none";
-          token_endpoint_auth_method = "client_secret_post";
-        }
-        {
-          client_id = pii.secrets.authelia-account-center-client-id;
-          client_secret = pii.secrets.authelia-account-center-client-secret;
-          client_name = "Account Center";
-          public = false;
-          authorization_policy = "one_factor";
-          scopes = [
-            "openid"
-            "profile"
-            "groups"
-            "email"
-            "offline_access"
-          ];
-          redirect_uris = [
-            "https://${config.infra.services.hostnames."account-center"}/oidc-callback"
-          ];
-          userinfo_signed_response_alg = "none";
-          token_endpoint_auth_method = "client_secret_post";
-        }
-        {
-          client_id = pii.secrets.authelia-wallos-client-id;
-          client_secret = pii.secrets.authelia-wallos-client-secret;
-          client_name = "Wallos";
-          public = false;
-          authorization_policy = "one_factor";
-          redirect_uris = [
-            "https://${config.infra.services.hostnames.wallos}/index.php"
-          ];
-          scopes = [
-            "openid"
-            "profile"
-            "email"
-          ];
-          userinfo_signed_response_alg = "none";
-          token_endpoint_auth_method = "client_secret_post";
-        }
-        {
-          client_id = pii.secrets.authelia-forgejo-client-id;
-          client_secret = pii.secrets.authelia-forgejo-client-secret;
-          client_name = "Forgejo";
-          public = false;
-          authorization_policy = "one_factor";
-          scopes = [
-            "openid"
-            "profile"
-            "email"
-            "groups"
-          ];
-          redirect_uris = [
-            "https://${config.infra.services.hostnames.forgejo}/user/oauth2/Authelia/callback"
-          ];
-          userinfo_signed_response_alg = "none";
-          token_endpoint_auth_method = "client_secret_basic";
-        }
-      ];
+      identity_providers.oidc.clients = config.myAuthelia.oidcClients;
     };
   };
 }

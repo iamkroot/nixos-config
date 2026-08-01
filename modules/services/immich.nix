@@ -1,6 +1,7 @@
 {
   config,
   myUtils,
+  pii,
   pkgs,
   ...
 }:
@@ -11,6 +12,16 @@ in
 {
   imports = [
     (myUtils.mkCaddyModule "immich" { authelia = true; })
+  ];
+
+  myAuthelia.oidcClients = [
+    (myUtils.mkAutheliaOIDC pii "immich" {
+      redirect_uris = [
+        "https://${config.infra.services.hostnames.immich}/auth/login"
+        "https://${config.infra.services.hostnames.immich}/user-settings"
+        "app.immich:///oauth-callback"
+      ];
+    })
   ];
   vaultix.secrets."immich/db_pwd" = { };
   vaultix.templates."immich.env" = {

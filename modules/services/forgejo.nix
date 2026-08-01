@@ -14,6 +14,21 @@ in
     (myUtils.mkCaddyModule "forgejo" { authelia = false; })
   ];
 
+  myAuthelia.oidcClients = [
+    (myUtils.mkAutheliaOIDC pii "forgejo" {
+      scopes = [
+        "openid"
+        "profile"
+        "email"
+        "groups"
+      ];
+      redirect_uris = [
+        "https://${config.infra.services.hostnames.forgejo}/user/oauth2/Authelia/callback"
+      ];
+      token_endpoint_auth_method = "client_secret_basic";
+    })
+  ];
+
   vaultix.secrets."forgejo_sso_secret" = {
     file = pii.secrets.forgejo-sso-secret;
     owner = "forgejo";
@@ -58,7 +73,7 @@ in
       adminPwd = config.vaultix.secrets."forgejo_admin_pwd".path;
       oidcName = "Authelia";
       ssoSecretFile = config.vaultix.secrets."forgejo_sso_secret".path;
-      clientId = pii.secrets.authelia-forgejo-client-id;
+      clientId = pii.authelia.forgejo.client-id;
       autoDiscoverUrl = "https://${config.infra.services.hostnames.auth}/.well-known/openid-configuration";
     in
     ''

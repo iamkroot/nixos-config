@@ -9,6 +9,19 @@
     (myUtils.mkCaddyModule "wallos" { authelia = false; })
   ];
 
+  myAuthelia.oidcClients = [
+    (myUtils.mkAutheliaOIDC pii "wallos" {
+      redirect_uris = [
+        "https://${config.infra.services.hostnames.wallos}/index.php"
+      ];
+      scopes = [
+        "openid"
+        "profile"
+        "email"
+      ];
+    })
+  ];
+
   vaultix.secrets.wallos_sso_secret = {
     file = pii.secrets.wallos-sso-secret;
   };
@@ -18,7 +31,7 @@
       TZ=America/Los_Angeles
       OIDC_ENABLED=true
       OIDC_PROVIDER_NAME=Authelia
-      OIDC_CLIENT_ID=${pii.secrets.authelia-wallos-client-id}
+      OIDC_CLIENT_ID=${pii.authelia.wallos.client-id}
       OIDC_CLIENT_SECRET=${config.vaultix.placeholder.wallos_sso_secret}
       OIDC_ISSUER=https://${config.infra.services.hostnames.auth}
       OIDC_USER_IDENTIFIER=preferred_username
