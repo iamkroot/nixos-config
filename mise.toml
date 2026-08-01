@@ -95,13 +95,13 @@ run = '''DISK_SIZE_GB=64 ./tools/deploy-{{vars.cloud1_variant}}-vm.sh {{vars.clo
 vars._.file = "secrets/mise_vars.txt"
 description = "Invoke nixos-rebuild remotely to homelab"
 interactive = true
-run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}} --build-host root@{{vars.homelab1_name}}'''
+run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- switch --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}} --build-host root@{{vars.homelab1_name}} --max-jobs auto'''
 
 [tasks.check-homelab]
 vars._.file = "secrets/mise_vars.txt"
 description = "Dry-activate nixos-rebuild remotely for homelab"
 interactive = true
-run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- dry-activate --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}}'''
+run = '''{{vars.nix_bin}} run nixpkgs#nixos-rebuild -- dry-activate --flake '.?submodules=1#{{vars.homelab1_name}}' --target-host root@{{vars.homelab1_name}} --build-host root@{{vars.homelab1_name}} --max-jobs auto'''
 
 [tasks."flake:update"]
 alias = "up"
@@ -109,7 +109,8 @@ run = "{{vars.nix_bin}} flake update"
 
 [tasks."nix:bare"]
 alias = "nix"
-run = "{{vars.nix_bin}} "
+run = "{{vars.nix_bin}} {{usage.all|join(sep=' ')}}"
+usage = '''arg <all...>'''
 
 [tasks."nix:bin"]
 alias = "nixbin"
