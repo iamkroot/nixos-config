@@ -2,6 +2,8 @@
   config,
   pkgs,
   pii,
+  lib,
+  hostKey ? null,
   ...
 }:
 
@@ -12,7 +14,7 @@
   boot.initrd.systemd.network = {
     enable = true;
 
-    networks."10-initrd-dhcp" = {
+    networks."10-initrd-dhcp" = lib.mkIf (hostKey != "homelab1") {
       # Match any ethernet interface name (enp3s0, eno1, etc.)
       matchConfig.Name = "en*";
 
@@ -20,6 +22,15 @@
       networkConfig.DHCP = "ipv4";
 
       # Don't halt the boot process if the cable is unplugged
+      linkConfig.RequiredForOnline = "no";
+    };
+
+    networks."10-initrd-static" = lib.mkIf (hostKey == "homelab1") {
+      matchConfig.Name = "en*";
+
+      networkConfig.Address = "${pii.hosts.homelab1.localIp}/24";
+      networkConfig.Gateway = "${pii.router.localIp}";
+
       linkConfig.RequiredForOnline = "no";
     };
   };
