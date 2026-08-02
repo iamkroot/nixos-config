@@ -26,6 +26,11 @@ in
   };
 
   systemd.services.lldap = {
+    path = [
+      pkgs.lldap-cli
+      pkgs.curl
+    ];
+
     serviceConfig = {
       # This 'pushes' the secret into the service's private space
       LoadCredential = [
@@ -33,6 +38,21 @@ in
         "lldap_admin_pass:${config.vaultix.secrets.lldap-admin-pass.path}"
       ];
     };
+
+    postStart = ''
+      export LLDAP_URL="http://127.0.0.1:${toString config.infra.services.ports.lldap_http}"
+      export LLDAP_USERNAME="admin"
+      export LLDAP_PASSWORD=$(cat /run/credentials/lldap.service/lldap_admin_pass)
+
+      until curl -s "$LLDAP_URL" > /dev/null; do
+        sleep 1
+      done
+
+      ${lib.concatMapStrings (group: ''
+        echo "Ensuring group: ${group}"
+        lldap-cli group add "${group}" || true
+      '') pii.lldapGroups}
+    '';
   };
 
   services.lldap = {
