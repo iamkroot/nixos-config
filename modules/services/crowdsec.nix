@@ -60,9 +60,11 @@
   # rather than default strict permissions (0600)
   systemd.services.caddy.serviceConfig.UMask = "0027";
 
-  # Ensure existing log files are assigned group-readable permissions (0640)
+  # Ensure log and data directories are assigned correct group-readable permissions
   systemd.tmpfiles.rules = [
     "d /var/log/caddy 0750 caddy caddy -"
     "z /var/log/caddy/*.log 0640 caddy caddy -"
+    "d /var/lib/crowdsec 0750 crowdsec crowdsec -"
+    "Z /var/lib/crowdsec 0750 crowdsec crowdsec -"
   ];
 }
