@@ -109,8 +109,7 @@ run = "{{vars.nix_bin}} flake update"
 
 [tasks."nix:bare"]
 alias = "nix"
-run = "{{vars.nix_bin}} {{usage.all|join(sep=' ')}}"
-usage = '''arg <all...>'''
+run = "{{vars.nix_bin}}"
 
 [tasks."nix:bin"]
 alias = "nixbin"
