@@ -111,7 +111,11 @@ in
       source = "zroot";
       target = "${primary_pool.name}/backup-homelab";
       recursive = true;
-      extraArgs = [ "--sendoptions=w" ] ++ syncoidExclusions;
+      extraArgs = [
+        "--sendoptions=w"
+        "--no-sync-snap"
+      ]
+      ++ syncoidExclusions;
     };
   };
 
