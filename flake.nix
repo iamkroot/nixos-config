@@ -44,6 +44,10 @@
       url = "github:giuseppe99barchetta/suggestarr";
       flake = false;
     };
+
+    crowdsec = {
+      url = "github:NixOS/nixpkgs/pull/535319/head";
+    };
   };
 
   outputs =

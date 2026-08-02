@@ -15,6 +15,22 @@
         "type": "github"
       }
     },
+    "crowdsec": {
+      "locked": {
+        "lastModified": 1782976172,
+        "narHash": "sha256-+Sk4XRytasMKJj+fICF0ltUIr4HW5Ezq9Pg2bktCWzo=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "09000fdbccf06b47705e95935b289d3e98680623",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "pull/535319/head",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "dashboard-icons": {
       "flake": false,
       "locked": {
@@ -237,6 +253,7 @@
     },
     "root": {
       "inputs": {
+        "crowdsec": "crowdsec",
         "dashboard-icons": "dashboard-icons",
         "disko": "disko",
         "disko-zfs": "disko-zfs",
