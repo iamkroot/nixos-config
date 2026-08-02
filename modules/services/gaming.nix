@@ -5,6 +5,13 @@
   pii,
   ...
 }:
+let
+  user = pii.primaryUser;
+  gamingDatasets = import ../datasets/gaming.nix { inherit pii; };
+  datasetMountpoints = lib.filter (m: m != "none") (
+    lib.mapAttrsToList (name: ds: ds.mountpoint or "none") gamingDatasets
+  );
+in
 {
   programs.steam = {
     enable = true;
@@ -37,10 +44,12 @@
     mangohud
   ];
 
-  users.users."${pii.primaryUser}".extraGroups = [
+  users.users."${user}".extraGroups = [
     "input"
     "video"
     "render"
     "gamemode"
   ];
+
+  systemd.tmpfiles.rules = map (dir: "d ${dir} 0755 ${user} users - -") datasetMountpoints;
 }

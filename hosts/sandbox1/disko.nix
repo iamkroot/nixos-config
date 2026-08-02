@@ -1,10 +1,15 @@
-{ inputs, lib, ... }:
+{
+  inputs,
+  lib,
+  pii,
+  ...
+}:
 let
   serviceFiles = [
     (inputs.self + /modules/datasets/jellyfin.nix)
   ];
 
-  customDatasets = lib.foldl' (acc: path: acc // (import path { })) { } serviceFiles;
+  customDatasets = lib.foldl' (acc: path: acc // (import path { inherit pii; })) { } serviceFiles;
 in
 {
   disko.devices = {

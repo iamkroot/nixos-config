@@ -12,9 +12,10 @@ let
     (inputs.self + /modules/datasets/immich.nix)
     (inputs.self + /modules/datasets/seerr.nix)
     (inputs.self + /modules/datasets/suggestarr.nix)
+    (inputs.self + /modules/datasets/gaming.nix)
   ];
 
-  customDatasetsRaw = lib.foldl' (acc: path: acc // (import path { })) { } serviceFiles;
+  customDatasetsRaw = lib.foldl' (acc: path: acc // (import path { inherit pii; })) { } serviceFiles;
   customDatasets = lib.mapAttrs (
     name: value:
     value
