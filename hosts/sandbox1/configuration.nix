@@ -16,6 +16,7 @@ in
     ../../modules/infra.nix
     ../../modules/services/atuin.nix
     ../../modules/services/jellyfin.nix
+    ../../modules/services/authelia.nix
   ];
   nix.settings.experimental-features = [
     "nix-command"
