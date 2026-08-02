@@ -45,12 +45,14 @@ in
         "storage"
         "oidc-cert"
         "oidc-hmac"
+        "smtp"
       ]
   );
   systemd.services."authelia-main" = {
     serviceConfig = {
       LoadCredential = [
         "ldap_password:${config.vaultix.secrets.authelia-ldap.path}"
+        "smtp_password:${config.vaultix.secrets.authelia-smtp.path}"
       ];
     };
   };
@@ -68,6 +70,7 @@ in
 
     environmentVariables = {
       AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE = "/run/credentials/authelia-main.service/ldap_password";
+      AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = "/run/credentials/authelia-main.service/smtp_password";
     };
 
     settings = {
@@ -87,8 +90,11 @@ in
       storage.local.path = "/var/lib/authelia-main/db.sqlite3";
 
       notifier = {
-        filesystem = {
-          filename = "/var/lib/authelia-main/emails.txt";
+        smtp = {
+          host = pii.smtpHost;
+          port = 587;
+          username = pii.smtpEmail;
+          sender = "Authelia <${pii.smtpEmail}>";
         };
       };
 
