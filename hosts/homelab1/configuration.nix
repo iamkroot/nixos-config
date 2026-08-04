@@ -91,6 +91,7 @@ in
     isNormalUser = true;
     shell = pkgs.zsh;
     extraGroups = [
+      "i2c"
       "networkmanager"
       "wheel"
     ];
@@ -111,12 +112,15 @@ in
 
   services.userborn.enable = true;
 
+  hardware.i2c.enable = true;
+
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
     aria2
     bat
     btop
+    ddcutil
     dust
     dysk
     eza
@@ -124,6 +128,7 @@ in
     git
     hdparm
     helix
+    i2c-tools
     inetutils
     ripgrep
     tmux
