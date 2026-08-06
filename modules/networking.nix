@@ -52,6 +52,7 @@ lib.mkMerge [
           autoconnect = true;
         };
         bridge = {
+          stp = false;
           mac-address = pii.hosts.homelab1.mac;
         };
         ipv4 = {
@@ -71,6 +72,7 @@ lib.mkMerge [
           master = "br0";
           slave-type = "bridge";
           autoconnect = true;
+          autoconnect-priority = 100;
         };
       };
       "br0-enp4s0" = {
@@ -81,6 +83,7 @@ lib.mkMerge [
           master = "br0";
           slave-type = "bridge";
           autoconnect = true;
+          autoconnect-priority = 100;
         };
       };
     };
