@@ -10,7 +10,7 @@
 
 {
   home.packages = [
-    inputs.zsh-patina.packages.${pkgs.stdenv.hostPlatform.system}.default
+    pkgs.zsh-patina
   ];
   programs.zsh = {
     enable = true;
