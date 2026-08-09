@@ -76,7 +76,7 @@ in
   };
 
   systemd.services."podman-account-center" = {
-    requires = [ "authelia-main.service" ];
+    wants = [ "authelia-main.service" ];
     after = [ "authelia-main.service" ];
 
     serviceConfig = {
