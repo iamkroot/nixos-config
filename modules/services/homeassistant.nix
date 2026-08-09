@@ -26,6 +26,8 @@ in
     extraOptions = [
       "--health-interval=5m"
       "--health-retries=3"
+      "--add-host=host.containers.internal:host-gateway"
+      "--add-host=${config.infra.services.hostnames.dawarich}:host-gateway"
     ];
   };
 
