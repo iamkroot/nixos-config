@@ -67,20 +67,22 @@
   );
 
   config.infra.services.hostnames = lib.mapAttrs (
-    name: s: "${s.subdomain}.${config.infra.domain}"
+    name: s: if s.subdomain != null then "${s.subdomain}.${config.infra.domain}" else null
   ) services;
 
   config.infra.services.catalog = lib.mapAttrs (
     name: s:
     let
-      hostname = "${s.subdomain}.${config.infra.domain}";
+      hostname = if s.subdomain != null then "${s.subdomain}.${config.infra.domain}" else null;
     in
     {
       enable = lib.mkDefault (
-        (s.catalog.enable or true) && (config.services.caddy.virtualHosts ? "${hostname}")
+        (s.catalog.enable or true)
+        && hostname != null
+        && (config.services.caddy.virtualHosts ? "${hostname}")
       );
       name = lib.mkDefault (lib.toUpper (lib.substring 0 1 name) + lib.substring 1 (-1) name);
-      url = lib.mkDefault "https://${hostname}";
+      url = lib.mkDefault (if hostname != null then "https://${hostname}" else "");
       icon = lib.mkDefault "https://${config.infra.services.hostnames.icons}/${name}.svg";
       roles = lib.mkDefault (s.catalog.roles or { lldap_admin = "system_administrator"; });
     }
@@ -93,7 +95,7 @@
         oldHost = "${s.subdomain}.${pii.oldDomain}";
         newHost = "${s.subdomain}.${config.infra.domain}";
       in
-      lib.mkIf (s.host == hostKey) {
+      lib.mkIf (s.host == hostKey && s.subdomain != null) {
         "${oldHost}" = {
           extraConfig = "redir https://${newHost}{uri}";
         };
