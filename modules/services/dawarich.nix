@@ -6,7 +6,11 @@
   ...
 }:
 let
-  dawarichPkg = pkgs.callPackage ../../pkgs/dawarich { };
+  dawarichPkg = myUtils.selfExpiringOverride {
+    inherit pkgs;
+    name = "dawarich";
+    localPkg = pkgs.callPackage ../../pkgs/dawarich { };
+  };
 in
 {
   imports = [

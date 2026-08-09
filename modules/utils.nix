@@ -72,4 +72,36 @@
       raw = defaults // overrides;
     in
     lib.filterAttrs (_: v: v != null) raw;
+
+  # Self-expiring package override helper.
+  # Emits a Nix evaluation warning when nixpkgs catches up to or exceeds the local package version,
+  # automatically switching to the nixpkgs version.
+  selfExpiringOverride =
+    {
+      pkgs,
+      name,
+      localPkg,
+      minVersion ? (localPkg.version or "0.0.0"),
+      strictlyNewer ? false,
+      message ? null,
+    }:
+    let
+      upstreamPkg = pkgs.${name} or null;
+      upstreamVersion = if upstreamPkg != null then (upstreamPkg.version or "0.0.0") else "0.0.0";
+      hasUpstream =
+        if upstreamPkg == null then
+          false
+        else if strictlyNewer then
+          lib.versionOlder minVersion upstreamVersion
+        else
+          lib.versionAtLeast upstreamVersion minVersion;
+      defaultMessage = ''
+        Package '${name}' (version ${upstreamVersion}) in nixpkgs is now ${
+          if strictlyNewer then "newer than" else ">= required version"
+        } ${minVersion}.
+        The local override can now be safely removed in favor of pkgs.${name}.
+      '';
+      msg = if message != null then message else defaultMessage;
+    in
+    lib.warnIf hasUpstream msg (if hasUpstream then upstreamPkg else localPkg);
 }

@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  myUtils,
   ...
 }:
 
@@ -35,12 +36,17 @@ let
       "--skip=oauth::tests::test_mobile_spoof_backend"
     ];
   });
+  redlibPkg = myUtils.selfExpiringOverride {
+    inherit pkgs;
+    name = "redlib";
+    localPkg = redlib-latest;
+  };
   domain = config.infra.services.hostnames.redlib;
 in
 {
   services.redlib = {
     enable = true;
-    package = redlib-latest;
+    package = redlibPkg;
     port = config.infra.services.ports.redlib;
     # Expose to local network
     openFirewall = true;
