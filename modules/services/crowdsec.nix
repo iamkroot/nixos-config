@@ -25,14 +25,26 @@
       "crowdsecurity/caddy"
       "crowdsecurity/linux"
       "crowdsecurity/base-http-scenarios"
+      "crowdsecurity/http-cve"
+      "crowdsecurity/http-dos"
+      "crowdsecurity/sshd"
       "Dominic-Wagner/vaultwarden"
       "LePresidente/gitea"
+      "LePresidente/authelia"
+      "LePresidente/jellyfin"
+      "gauth-fr/immich"
+      "crowdsecurity/home-assistant"
     ];
 
     settings.acquisitions = [
       {
         filenames = [ "/var/log/caddy/*.log" ];
         labels.type = "caddy";
+      }
+      {
+        source = "journalctl";
+        journalctl_filter = [ "_SYSTEMD_UNIT=sshd.service" ];
+        labels.type = "syslog";
       }
       {
         source = "journalctl";
@@ -43,6 +55,26 @@
         source = "journalctl";
         journalctl_filter = [ "_SYSTEMD_UNIT=forgejo.service" ];
         labels.type = "gitea";
+      }
+      {
+        source = "journalctl";
+        journalctl_filter = [ "_SYSTEMD_UNIT=authelia-main.service" ];
+        labels.type = "authelia";
+      }
+      {
+        source = "journalctl";
+        journalctl_filter = [ "_SYSTEMD_UNIT=jellyfin.service" ];
+        labels.type = "jellyfin";
+      }
+      {
+        source = "journalctl";
+        journalctl_filter = [ "_SYSTEMD_UNIT=podman-immich-server.service" ];
+        labels.type = "immich";
+      }
+      {
+        source = "journalctl";
+        journalctl_filter = [ "_SYSTEMD_UNIT=podman-homeassistant.service" ];
+        labels.type = "home-assistant";
       }
     ];
   };
@@ -60,6 +92,12 @@
   # Drops the connections at the kernel/firewall level
   services.crowdsec-firewall-bouncer = {
     enable = true;
+  };
+
+  # Auto-restart bouncer if CrowdSec LAPI is still initializing on boot
+  systemd.services.crowdsec-firewall-bouncer.serviceConfig = {
+    Restart = "always";
+    RestartSec = "5s";
   };
 
   # Ensure Caddy creates new log files with group-read permissions (0640)
