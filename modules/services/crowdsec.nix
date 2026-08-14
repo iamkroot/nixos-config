@@ -1,4 +1,9 @@
-{ inputs, pii, ... }:
+{
+  inputs,
+  pii,
+  config,
+  ...
+}:
 {
   disabledModules = [
     "services/security/crowdsec.nix"
@@ -12,6 +17,7 @@
 
   services.crowdsec = {
     enable = true;
+    settings.config.api.server.listen_uri = "0.0.0.0:${toString config.infra.services.ports.crowdsec}";
 
     extraGroups = [ "caddy" ];
 
