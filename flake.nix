@@ -15,7 +15,7 @@
     };
 
     vaultix = {
-      url = "github:milieuim/vaultix";
+      url = "github:iamkroot/vaultix/fix-nested";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

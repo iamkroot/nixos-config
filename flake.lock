@@ -290,15 +290,16 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1784033318,
-        "narHash": "sha256-67+m+CbQf5q73BoP6KwOhwPfIgpm8p64qdN74eRUHxo=",
-        "owner": "milieuim",
+        "lastModified": 1786673907,
+        "narHash": "sha256-v6W+Vyvn4oA1v0/38m9FWP4rc9z68gEIguAmhEXrqlo=",
+        "owner": "iamkroot",
         "repo": "vaultix",
-        "rev": "ea2b13afe5ea5ef72f0829b97141c4757334b4ec",
+        "rev": "b5e141e225228a1ad94fef67911d148ca19222a3",
         "type": "github"
       },
       "original": {
-        "owner": "milieuim",
+        "owner": "iamkroot",
+        "ref": "fix-nested",
         "repo": "vaultix",
         "type": "github"
       }
