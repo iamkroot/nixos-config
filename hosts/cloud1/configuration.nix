@@ -25,6 +25,18 @@ in
 
   networking.hostName = "${hostPII.name}";
 
+  networking.nameservers = [
+    "1.1.1.1"
+    "8.8.8.8"
+  ];
+
+  services.resolved = {
+    enable = true;
+    # VPS doesn't like EDNS
+    dnssec = "false";
+    domains = [ "~." ];
+  };
+
   vaultix = {
     settings.hostPubkey = "${hostPII.pubkey}";
     secrets = {
