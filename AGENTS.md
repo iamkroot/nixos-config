@@ -26,14 +26,17 @@ This repository manages NixOS workstation and homelab infrastructure using Nix F
 The repository uses `mise` (`mise.toml`) for task execution and development workflows:
 
 - **Nix Commands**: Always use `mise run nix ...` (or `mise run nixbin ...`) instead of direct `nix` commands to ensure execution within the proper environment (`nix-user-chroot`).
+  - If using `nix eval .#`, remember to use `?submodules=1`
 - **Formatting**: `mise run fmt` (runs `treefmt` / `nixfmt-tree`). Formatting is enforced via pre-commit hooks.
 - **Dry-run / Check**:
   - Homelab: `mise run check-homelab`
   - Cloud: `mise run check-cloud`
+  - Avoid staging changes to existing files to git before the dry-run. Only stage new files (nix works just fine with dirty files.)
 - Note: System rebuilds, deployments, and secret edits are performed manually by the user.
 
 ## 4. Coding & Verification Guidelines
 
 - **Nix Formatting**: Format code using `mise run fmt` before committing.
 - **Service Modules**: Services are declared via `myServices` in `secrets/services.nix`, matching modules in `modules/services/`.
+- **Machine Ports**: Define host ports in `secrets/services.nix` (`myServices`). Never hardcode machine ports in modules (container-internal ports excepted).
 - **Validation**: Ensure Nix syntax and flake outputs remain valid when making changes.
