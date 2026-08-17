@@ -1,5 +1,6 @@
 {
   config,
+  pii,
   myUtils,
   ...
 }:
@@ -24,10 +25,10 @@
       };
       # Keep metrics strictly on localhost
       metrics_listen_addr = "127.0.0.1:${toString config.infra.services.ports.headscaleMetrics}";
-      # Define the IP pool for your mesh
+      # Define the IP pool for the mesh
       ip_prefixes = [
-        "100.64.0.0/10"
-        "fd7a:115c:a1e0::/48"
+        pii.networks.mesh.subnet
+        pii.networks.mesh.subnetV6
       ];
     };
   };

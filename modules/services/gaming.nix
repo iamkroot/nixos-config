@@ -3,6 +3,7 @@
   pkgs,
   lib,
   pii,
+  myUtils,
   ...
 }:
 let
@@ -13,6 +14,20 @@ let
   );
 in
 {
+  imports = [
+    (myUtils.mkCaddyModule "sunshine" {
+      authelia = false;
+      meshOnly = true;
+      extraHostConfig.extraConfig = ''
+        reverse_proxy https://127.0.0.1:${toString config.infra.services.ports.sunshine} {
+          transport http {
+            tls_insecure_skip_verify
+          }
+        }
+      '';
+    })
+  ];
+
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
