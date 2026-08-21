@@ -12,6 +12,8 @@ This repository manages NixOS workstation and homelab infrastructure using Nix F
   - System modules (`infra.nix`, `networking.nix`, `storage/`, `kde.nix`, etc.).
 - **`home/`**: Home Manager configurations (`user1.nix`, `root.nix`).
 - **`secrets/`**: Encrypted secrets (`vaultix` / `age`) and PII specifications (`pii.nix`).
+  - `secrets/services.nix` contains the actual data for `services-schema.nix`.
+  - note that all the ports should be specified here instead of hardcoding in tmodule
 - **`tools/`**: Helper shell scripts.
 - **`pkgs/`**: Custom package declarations.
 
@@ -26,12 +28,13 @@ This repository manages NixOS workstation and homelab infrastructure using Nix F
 The repository uses `mise` (`mise.toml`) for task execution and development workflows:
 
 - **Nix Commands**: Always use `mise run nix ...` (or `mise run nixbin ...`) instead of direct `nix` commands to ensure execution within the proper environment (`nix-user-chroot`).
-  - If using `nix eval .#`, remember to use `?submodules=1`
+  - When evaluating direct nix exprs, remember to use `?submodules=1` -- `mise run nix eval ".?submodules=1#nixosConfigurations.foo.bar.baz"`
 - **Formatting**: `mise run fmt` (runs `treefmt` / `nixfmt-tree`). Formatting is enforced via pre-commit hooks.
 - **Dry-run / Check**:
   - Homelab: `mise run check-homelab`
   - Cloud: `mise run check-cloud`
   - Avoid staging changes to existing files to git before the dry-run. Only stage new files (nix works just fine with dirty files.)
+- Prefer to create new mise tasks for repetitive actions, especially those that will extend beyond one session.
 - Note: System rebuilds, deployments, and secret edits are performed manually by the user.
 
 ## 4. Coding & Verification Guidelines
