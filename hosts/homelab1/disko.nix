@@ -14,6 +14,7 @@ let
     (inputs.self + /modules/datasets/suggestarr.nix)
     (inputs.self + /modules/datasets/gaming.nix)
     (inputs.self + /modules/datasets/postgres.nix)
+    (inputs.self + /modules/datasets/nats.nix)
     (inputs.self + /modules/datasets/waha.nix)
   ];
 
