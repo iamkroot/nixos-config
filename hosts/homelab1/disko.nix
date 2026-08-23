@@ -22,7 +22,10 @@ let
     name: value:
     value
     // {
-      mountOptions = (value.mountOptions or [ ]) ++ [ "x-systemd.after=disko-zfs.service" ];
+      mountOptions = (value.mountOptions or [ ]) ++ [
+        "nofail"
+        "x-systemd.after=disko-zfs.service"
+      ];
     }
   ) customDatasetsRaw;
 
