@@ -28,7 +28,7 @@ This repository manages NixOS workstation and homelab infrastructure using Nix F
 The repository uses `mise` (`mise.toml`) for task execution and development workflows:
 
 - **Nix Commands**: Always use `mise run nix ...` (or `mise run nixbin ...`) instead of direct `nix` commands to ensure execution within the proper environment (`nix-user-chroot`).
-  - When evaluating direct nix exprs, remember to use `?submodules=1` -- `mise run nix eval ".?submodules=1#nixosConfigurations.foo.bar.baz"`
+  - When evaluating direct nix exprs, remember to use `?submodules=1` -- `mise run nix eval ".?submodules=1#nixosConfigurations.foo.bar.baz"` BUT PREFER using more specific/direct mise tasks if available
 - **Formatting**: `mise run fmt` (runs `treefmt` / `nixfmt-tree`). Formatting is enforced via pre-commit hooks.
 - **Dry-run / Check**:
   - Homelab: `mise run check-homelab`
@@ -41,5 +41,6 @@ The repository uses `mise` (`mise.toml`) for task execution and development work
 
 - **Nix Formatting**: Format code using `mise run fmt` before committing.
 - **Service Modules**: Services are declared via `myServices` in `secrets/services.nix`, matching modules in `modules/services/`.
+  - if adding new storage paths (like `/var/lib/foobar/`), consider adding a dataset to `modules/datasets/foobar.nix`
 - **Machine Ports**: Define host ports in `secrets/services.nix` (`myServices`). Never hardcode machine ports in modules (container-internal ports excepted).
 - **Validation**: Ensure Nix syntax and flake outputs remain valid when making changes.
