@@ -44,6 +44,9 @@ ssh "$ROUTER" '
   fi
   mv /tmp/kroot.hosts.new /etc/kroot.hosts
   
+  # Ensure /etc/kroot.hosts is preserved across OpenWrt sysupgrades
+  grep -q "^/etc/kroot.hosts" /etc/sysupgrade.conf 2>/dev/null || echo "/etc/kroot.hosts" >> /etc/sysupgrade.conf
+
   # Ensure the configuration is hooked into dnsmasq
   if ! uci -q show dhcp.@dnsmasq[0].addnhosts 2>/dev/null | grep -q "/etc/kroot.hosts"; then
     uci add_list dhcp.@dnsmasq[0].addnhosts="/etc/kroot.hosts"
