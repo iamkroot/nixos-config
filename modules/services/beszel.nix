@@ -16,9 +16,9 @@ in
 
   vaultix.secrets."beszel/hub_private_key" = {
     path = "/var/lib/private/beszel-hub/beszel_data/id_ed25519";
-    mode = "0600";
-    owner = "beszel-hub";
-    group = "beszel-hub";
+    # Open up perms to let the beszel dynamic user read the file
+    # This is safe because /var/lib/private/beszel-hub itself is 0700 accessible only by sandbox
+    mode = "0444";
   };
   vaultix.secrets."beszel/admin_password" = { };
 
