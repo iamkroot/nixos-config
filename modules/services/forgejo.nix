@@ -64,6 +64,17 @@ in
     };
   };
 
+  systemd.services.forgejo = {
+    after = [
+      "authelia-main.service"
+      "caddy.service"
+    ];
+    wants = [
+      "authelia-main.service"
+      "caddy.service"
+    ];
+  };
+
   networking.firewall.allowedTCPPorts = [ sshPort ];
   systemd.services.forgejo.preStart =
     let
@@ -96,6 +107,6 @@ in
       fi
 
       # create admin user
-      ${adminCmd} user create --admin --email "${adminEmail}" --username ${adminUser} --must-change-password false --password "$(${pkgs.coreutils}/bin/tr -d '\n' < ${adminPwd})" || true
+      ${adminCmd} user create --admin --email "${adminEmail}" --username ${adminUser} --must-change-password=false --password "$(${pkgs.coreutils}/bin/tr -d '\n' < ${adminPwd})" || true
     '';
 }
