@@ -20,40 +20,12 @@ let
     FPS="''${SUNSHINE_CLIENT_FPS:-60}"
     FPS="''${FPS%.*}"
 
-    # 1. Clean up any stale virtual monitor
-    if [ -f /tmp/sunshine-krfb.pid ]; then
-      kill "$(cat /tmp/sunshine-krfb.pid)" 2>/dev/null || true
-      rm -f /tmp/sunshine-krfb.pid
-    fi
-
-    # 2. Spawn virtual display via KRFB
-    ${pkgs.kdePackages.krfb}/bin/krfb-virtualmonitor --name "1" --password dummy --port ${toString config.infra.services.ports.krfb} --resolution "''${WIDTH}x''${HEIGHT}" &
-    echo $! > /tmp/sunshine-krfb.pid
-
-    # 3. Wait for KWin to register the new output
-    sleep 2
-
-    # 4. Set refresh rate and resolution via kscreen-doctor if needed
+    # Set refresh rate and resolution on the virtual display to match client request
     ${pkgs.kdePackages.libkscreen}/bin/kscreen-doctor "output.Virtual-1.mode.''${WIDTH}x''${HEIGHT}@''${FPS}" 2>/dev/null || true
-
-    # 5. Disable physical displays so Sunshine captures only the virtual output
-    ${pkgs.kdePackages.libkscreen}/bin/kscreen-doctor --json 2>/dev/null | ${pkgs.jq}/bin/jq -r '.outputs[] | select(.name != "Virtual-1" and .connected == true) | .name' | while read -r out; do
-      [ -n "$out" ] && ${pkgs.kdePackages.libkscreen}/bin/kscreen-doctor "output.''${out}.disable" 2>/dev/null || true
-    done
   '';
 
   sunshineVirtualStop = pkgs.writeShellScriptBin "sunshine-virtual-stop" ''
-    # 1. Re-enable physical displays
-    ${pkgs.kdePackages.libkscreen}/bin/kscreen-doctor --json 2>/dev/null | ${pkgs.jq}/bin/jq -r '.outputs[] | select(.name != "Virtual-1" and .connected == true) | .name' | while read -r out; do
-      [ -n "$out" ] && ${pkgs.kdePackages.libkscreen}/bin/kscreen-doctor "output.''${out}.enable" 2>/dev/null || true
-    done
-
-    # 2. Kill virtual display
-    if [ -f /tmp/sunshine-krfb.pid ]; then
-      kill "$(cat /tmp/sunshine-krfb.pid)" 2>/dev/null || true
-      rm -f /tmp/sunshine-krfb.pid
-    fi
-    ${pkgs.procps}/bin/pkill -f krfb-virtualmonitor 2>/dev/null || true
+    true
   '';
 in
 {
@@ -125,6 +97,23 @@ in
         }
       ];
     };
+  };
+
+  systemd.user.services.krfb-virtualmonitor = {
+    description = "KRFB Headless Virtual Display";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.kdePackages.krfb}/bin/krfb-virtualmonitor --name 1 --password dummy --port ${toString config.infra.services.ports.krfb} --resolution 1920x1080";
+      Restart = "always";
+      RestartSec = "2s";
+    };
+  };
+
+  systemd.user.services.sunshine = {
+    after = [ "krfb-virtualmonitor.service" ];
+    wants = [ "krfb-virtualmonitor.service" ];
   };
 
   services.resolved = {
