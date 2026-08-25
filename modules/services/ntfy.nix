@@ -1,20 +1,53 @@
 {
   config,
+  lib,
   pii,
   myUtils,
   ...
 }:
+let
+  ntfySecretsDir = ../../secrets/ntfy;
+  secretFiles =
+    if builtins.pathExists ntfySecretsDir then
+      builtins.attrNames (builtins.readDir ntfySecretsDir)
+    else
+      [ ];
+  tokenFiles = builtins.filter (
+    f: lib.hasPrefix "auth_token_" f && lib.hasSuffix ".age" f
+  ) secretFiles;
+
+  tokenSecrets = builtins.listToAttrs (
+    map (f: {
+      name = "ntfy/${lib.removeSuffix ".age" f}";
+      value = { };
+    }) tokenFiles
+  );
+
+  tokenEntries = map (
+    f:
+    let
+      base = lib.removeSuffix ".age" f;
+      label = lib.removePrefix "auth_token_" base;
+    in
+    "${pii.primaryUser}:${config.vaultix.placeholder."ntfy/${base}"}:${label}"
+  ) tokenFiles;
+  ntfyAuthTokensEnv = lib.concatStringsSep "," tokenEntries;
+in
 {
   imports = [
     (myUtils.mkCaddyModule "ntfy" { authelia = false; })
   ];
 
-  vaultix.secrets."ntfy/admin_password_hash" = { };
+  vaultix.secrets = {
+    "ntfy/admin_password_hash" = { };
+  }
+  // tokenSecrets;
 
   vaultix.templates."ntfy.env" = {
     mode = "0444";
     content = ''
       NTFY_AUTH_USERS=${pii.primaryUser}:${config.vaultix.placeholder."ntfy/admin_password_hash"}:admin
+      ${lib.optionalString (tokenEntries != [ ]) "NTFY_AUTH_TOKENS=${ntfyAuthTokensEnv}"}
     '';
   };
 
