@@ -72,4 +72,9 @@ in
       '';
     };
   };
+
+  systemd.services.ntfy-sh = {
+    wants = [ "vaultix-activate.service" ];
+    after = [ "vaultix-activate.service" ];
+  };
 }

@@ -196,6 +196,8 @@ in
     };
   };
 
+  vaultix.secrets."ntfy/auth_token_system" = { };
+
   # The Unified Backup Service
   systemd.services."zfs-backup-das" = {
     description = "Sequential ZFS Backup to Secondary Pool";
