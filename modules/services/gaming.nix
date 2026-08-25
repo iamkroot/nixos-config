@@ -27,6 +27,19 @@ let
   sunshineVirtualStop = pkgs.writeShellScriptBin "sunshine-virtual-stop" ''
     true
   '';
+
+  steamGamepadUI = pkgs.writeShellScriptBin "steam-gamepadui" ''
+    export DISPLAY="''${DISPLAY:-:0}"
+    export WAYLAND_DISPLAY="''${WAYLAND_DISPLAY:-wayland-0}"
+    export XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/1000}"
+    export XDG_CURRENT_DESKTOP="''${XDG_CURRENT_DESKTOP:-KDE}"
+    export XDG_SESSION_TYPE="''${XDG_SESSION_TYPE:-wayland}"
+    if [ -z "''${XAUTHORITY:-}" ]; then
+      XAUTH_FILE="$(ls -t "$XDG_RUNTIME_DIR"/xauth_* 2>/dev/null | head -n1)"
+      [ -n "$XAUTH_FILE" ] && export XAUTHORITY="$XAUTH_FILE"
+    fi
+    exec ${pkgs.steam}/bin/steam -gamepadui "$@"
+  '';
 in
 {
   imports = [
@@ -55,17 +68,22 @@ in
     enable = true;
     autoStart = true;
     openFirewall = true; # Automatically opens TCP 47984-47990 & UDP 47998-48010
-    capSysAdmin = true; # Enables security wrapper generation; capabilities are scoped below
+    capSysAdmin = false; # No security wrapper; prevents capability leakage to bubblewrap/Steam/Proton
     settings = {
       capture = "kwin";
       csrf_allowed_origins = "https://${config.infra.services.hostnames.sunshine},https://localhost:47990,https://127.0.0.1:47990";
     };
     applications = {
       env = {
+        DISPLAY = ":0";
+        WAYLAND_DISPLAY = "wayland-0";
+        XDG_CURRENT_DESKTOP = "KDE";
+        XDG_SESSION_TYPE = "wayland";
         PATH = "$(PATH):${
           lib.makeBinPath [
             sunshineVirtualStart
             sunshineVirtualStop
+            steamGamepadUI
             pkgs.kdePackages.krfb
             pkgs.kdePackages.libkscreen
             pkgs.jq
@@ -86,7 +104,7 @@ in
         }
         {
           name = "Steam Big Picture";
-          cmd = "${pkgs.steam}/bin/steam -gamepadui";
+          cmd = "${steamGamepadUI}/bin/steam-gamepadui";
           image-path = "steam.png";
           prep-cmd = [
             {
@@ -115,9 +133,6 @@ in
     after = [ "krfb-virtualmonitor.service" ];
     wants = [ "krfb-virtualmonitor.service" ];
   };
-
-  # Restrict wrapper capabilities strictly to cap_sys_nice (removing CAP_SYS_ADMIN)
-  security.wrappers.sunshine.capabilities = lib.mkForce "cap_sys_nice+p";
 
   services.resolved = {
     enable = true;
