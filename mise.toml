@@ -27,7 +27,10 @@ NIX_BIN="{{vars.nix_bin}}" ./tools/dns-sync-porkbun.sh
 dir = "{{ config_root }}"
 alias = "renc"
 description = "Run vaultix renc"
-run = "{{vars.nix_bin}} run $'.?submodules=1#vaultix.app.x86_64-linux.renc'"
+run = [
+	"{{vars.nix_bin}} run $'.?submodules=1#vaultix.app.x86_64-linux.renc'",
+	"git -C secrets add cache",
+]
 
 [tasks."secret:edit"]
 dir = "{{ config_root }}"
