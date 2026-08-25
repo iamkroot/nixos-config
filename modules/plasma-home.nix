@@ -21,6 +21,12 @@
       lookAndFeel = "org.kde.breezedark.desktop";
     };
 
+    kscreenlocker = {
+      autoLock = false;
+      lockOnResume = false;
+      passwordRequired = false;
+    };
+
     powerdevil = {
       AC = {
         turnOffDisplay = {
