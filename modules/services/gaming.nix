@@ -55,7 +55,7 @@ in
     enable = true;
     autoStart = true;
     openFirewall = true; # Automatically opens TCP 47984-47990 & UDP 47998-48010
-    capSysAdmin = true; # Grants Wayland KMS framebuffer capture permissions
+    capSysAdmin = true; # Enables security wrapper generation; capabilities are scoped below
     settings = {
       capture = "kwin";
       csrf_allowed_origins = "https://${config.infra.services.hostnames.sunshine},https://localhost:47990,https://127.0.0.1:47990";
@@ -115,6 +115,9 @@ in
     after = [ "krfb-virtualmonitor.service" ];
     wants = [ "krfb-virtualmonitor.service" ];
   };
+
+  # Restrict wrapper capabilities strictly to cap_sys_nice (removing CAP_SYS_ADMIN)
+  security.wrappers.sunshine.capabilities = lib.mkForce "cap_sys_nice+p";
 
   services.resolved = {
     enable = true;
