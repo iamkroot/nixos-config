@@ -56,6 +56,8 @@ in
       OIDC_CLIENT_SECRET=${config.vaultix.placeholder.dawarich_sso_secret}
       OIDC_ISSUER=https://${config.infra.services.hostnames.auth}
       OIDC_REDIRECT_URI=https://${config.infra.services.hostnames.dawarich}/users/auth/openid_connect/callback
+      LOG_LEVEL=info
+      RAILS_LOG_LEVEL=info
     '';
   };
 
