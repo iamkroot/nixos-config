@@ -116,6 +116,10 @@ in
   services.userborn.enable = true;
 
   hardware.i2c.enable = true;
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
 
   nixpkgs.config.allowUnfree = true;
 
