@@ -67,7 +67,7 @@ for ds_path in "${ALL_DATASETS[@]}"; do
   fi
 
   echo "Syncing $ds_path to backup pool..."
-  if $SYNCOID_BIN --sendoptions=w --no-sync-snap "$ds_path" "$target_ds" -o canmount=noauto; then
+  if $SYNCOID_BIN --sendoptions=w --no-sync-snap --create-bookmark "$ds_path" "$target_ds" -o canmount=noauto; then
     echo "Saving state for $ds_path..."
     echo "$LATEST_SNAP" > "$STATE_FILE"
 
@@ -97,7 +97,7 @@ for ds_path in "${ALL_DATASETS[@]}"; do
             "Auto-resolved divergence on $target_ds. Old data renamed to $diverged_name. Fresh sync in progress." \
             "default" "warning,recycle"
           # Retry syncoid — this time it'll do a fresh initial send
-          if $SYNCOID_BIN --sendoptions=w --no-sync-snap "$ds_path" "$target_ds" -o canmount=noauto; then
+          if $SYNCOID_BIN --sendoptions=w --no-sync-snap --create-bookmark "$ds_path" "$target_ds" -o canmount=noauto; then
             echo "Saving state for $ds_path after fresh sync..."
             echo "$LATEST_SNAP" > "$STATE_FILE"
 

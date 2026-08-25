@@ -114,6 +114,7 @@ in
       extraArgs = [
         "--sendoptions=w"
         "--no-sync-snap"
+        "--create-bookmark"
       ]
       ++ syncoidExclusions;
     };
