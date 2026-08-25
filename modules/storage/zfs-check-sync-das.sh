@@ -41,8 +41,13 @@ for ds_path in "${ALL_DATASETS[@]}"; do
   # Extract just the snapshot name (e.g., autosnap_2023...)
   SNAP_NAME="${LAST_SYNCED_SNAP#*@}"
   # If there is a new snapshot, check if any data was actually written to it
-  WRITTEN=$($ZFS_BIN get -H -p -o value "written@$SNAP_NAME" "$ds_path")
-  if [ "$WRITTEN" -ne 0 ]; then
+  WRITTEN=$($ZFS_BIN get -H -p -o value "written@$SNAP_NAME" "$ds_path" 2>/dev/null)
+  # If snapshot was pruned, 'written' returns '-' — we need to sync
+  if [ "$WRITTEN" = "-" ] || [ -z "$WRITTEN" ]; then
+    echo "Dataset $ds_path: reference snapshot $SNAP_NAME no longer exists. Wake sequence initiated."
+    exit 0
+  fi
+  if [ "$WRITTEN" -ne 0 ] 2>/dev/null; then
     echo "Dataset $ds_path has new data ($WRITTEN bytes written). Wake sequence initiated."
     exit 0 # Exits with success, telling systemd to proceed with ExecStartPre
   fi

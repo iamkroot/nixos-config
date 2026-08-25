@@ -204,6 +204,7 @@ in
       zfs-prune-snapshots
       hdparm
       coreutils
+      curl
     ];
 
     after = [ "sanoid.service" ];
@@ -217,6 +218,8 @@ in
       PRIMARY_POOL = primary_pool.name;
       SECONDARY_POOL = secondary_pool.name;
       TARGET_DATASETS = builtins.concatStringsSep " " (builtins.attrNames targetDatasets);
+      NTFY_URL = "https://${config.infra.services.hostnames.ntfy}/zfs-backup";
+      NTFY_TOKEN_FILE = config.vaultix.secrets."ntfy/auth_token_system".path;
       # silence mbuffer error
       HOME = "/var/empty";
     };
