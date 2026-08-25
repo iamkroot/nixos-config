@@ -42,6 +42,10 @@ lib.mkMerge [
     vaultix.templates.network-secrets.content = "wifi1=${config.vaultix.placeholder."wifi1-pwd"}";
   }
   (lib.mkIf (hostKey == "homelab1") {
+    # Prevent NetworkManager from automatically generating default DHCP connections (e.g. "Wired connection 1")
+    # on physical interfaces, which hijacks bridge member ports (eno1/enp4s0) before br0 profiles load.
+    networking.networkmanager.settings.main.no-auto-default = "*";
+
     # Create a bridge between two eth ports
     networking.networkmanager.ensureProfiles.profiles = {
       "br0" = {
