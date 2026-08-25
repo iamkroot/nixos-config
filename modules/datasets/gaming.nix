@@ -42,7 +42,7 @@ in
       mountpoint = "legacy";
       recordsize = "128K";
       "sanoid:autosnap" = "true";
-      "syncoid:sync" = "yes";
+      "syncoid:sync" = "true";
     };
   };
 
@@ -83,7 +83,7 @@ in
       mountpoint = "legacy";
       recordsize = "16K";
       "sanoid:autosnap" = "true";
-      "syncoid:sync" = "yes";
+      "syncoid:sync" = "true";
     };
   };
 
@@ -127,7 +127,7 @@ in
       mountpoint = "legacy";
       recordsize = "16K";
       "sanoid:autosnap" = "true";
-      "syncoid:sync" = "yes";
+      "syncoid:sync" = "true";
     };
   };
 
