@@ -81,4 +81,8 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/crowdsec-web-ui 0755 1000 1000 -"
   ];
+
+  networking.firewall.interfaces."podman0".allowedTCPPorts = [
+    config.infra.services.ports.crowdsec
+  ];
 }
