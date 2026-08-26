@@ -9,7 +9,30 @@
 		},
 	],
 	"settings": {
-		"lsp_format_on_save": true
+		"lsp_format_on_save": true,
+		"LSP": {
+			"nixd": {
+				"settings": {
+					"lsp_format_on_save": true,
+					"LSP": {
+						"nixd": {
+							"settings": {
+								"nixd": {
+									"nixpkgs": {
+										"expr": "import (builtins.getFlake (\"git+file://\" + toString ./. +\"?submodules=1\")).inputs.nixpkgs {}"
+									},
+									"options": {
+										"nixos": {
+											"expr": "(builtins.getFlake (\"git+file://\" + toString ./. +\"?submodules=1\")).nixosConfigurations.iserlohn.options"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	},
 	"build_systems": [
 		{
