@@ -8,16 +8,9 @@
 }:
 {
   imports = [
-    (myUtils.mkCaddyModule "aria2" {
-      # authelia = false; doesn't work due to mkForce below
-      extraHostConfig.extraConfig = ''
-        @denied not remote_ip private_ranges
-        abort @denied
-        reverse_proxy 127.0.0.1:${toString config.infra.services.ports.aria2}
-      '';
-    })
+    (myUtils.mkCaddyModule "aria2" { meshOnly = true; })
     (myUtils.mkCaddyModule "ariang" {
-      # authelia = true; doesn't work due to mkForce below
+      # authelia = true; not needed
       extraHostConfig.extraConfig = ''
         root * ${pkgs.ariang}/share/ariang
         file_server
