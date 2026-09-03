@@ -51,10 +51,10 @@ in
     extraOptionOverrides = {
       StrictHostKeyChecking = "accept-new";
     };
-    matchBlocks."github.com" = {
-      hostname = "github.com";
-      user = "git";
-      identityFile = osConfig.vaultix.secrets."github-ssh-key".path;
+    settings."github.com" = {
+      HostName = "github.com";
+      User = "git";
+      IdentityFile = osConfig.vaultix.secrets."github-ssh-key".path;
     };
   };
   programs.home-manager.enable = true;

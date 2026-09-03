@@ -33,8 +33,10 @@ in
   services.resolved = {
     enable = true;
     # VPS doesn't like EDNS
-    dnssec = "false";
-    domains = [ "~." ];
+    settings.Resolve = {
+      DNSSEC = "false";
+      Domains = [ "~." ];
+    };
   };
 
   vaultix = {
