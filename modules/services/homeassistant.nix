@@ -1,4 +1,10 @@
-{ config, myUtils, ... }:
+{
+  config,
+  lib,
+  services,
+  myUtils,
+  ...
+}:
 let
   port = config.infra.services.ports.homeassistant;
 in
@@ -27,8 +33,10 @@ in
       "--health-interval=5m"
       "--health-retries=3"
       "--add-host=host.containers.internal:host-gateway"
-      "--add-host=${config.infra.services.hostnames.dawarich}:host-gateway"
-    ];
+    ]
+    ++ lib.optional (
+      services ? dawarich
+    ) "--add-host=${config.infra.services.hostnames.dawarich}:host-gateway";
   };
 
   systemd.tmpfiles.rules = [
