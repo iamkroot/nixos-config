@@ -73,6 +73,9 @@ in
       "authelia-main.service"
       "caddy.service"
     ];
+    serviceConfig = {
+      RestartSec = "5s";
+    };
   };
 
   networking.firewall.allowedTCPPorts = [ sshPort ];
@@ -88,6 +91,17 @@ in
       autoDiscoverUrl = "https://${config.infra.services.hostnames.auth}/.well-known/openid-configuration";
     in
     ''
+      # Wait for Authelia discovery endpoint to become reachable before configuring OAuth
+      echo "Waiting for Authelia discovery endpoint ($autoDiscoverUrl)..."
+      for i in $(${pkgs.coreutils}/bin/seq 1 30); do
+        if ${pkgs.curl}/bin/curl -fsSL "${autoDiscoverUrl}" >/dev/null 2>&1; then
+          echo "Authelia discovery endpoint is reachable."
+          break
+        fi
+        echo "Authelia discovery endpoint not ready yet (attempt $i/30)... waiting 2s"
+        ${pkgs.coreutils}/bin/sleep 2
+      done
+
       # Get the ID of the existing auth source, if any
       OAUTH_ID=$(${adminCmd} auth list | ${pkgs.gnugrep}/bin/grep -E "[[:space:]]${oidcName}[[:space:]]" | ${pkgs.gawk}/bin/awk '{print $1}' || true)
 

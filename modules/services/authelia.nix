@@ -49,8 +49,14 @@ in
       ]
   );
   systemd.services."authelia-main" = {
-    after = [ "lldap.service" ];
-    wants = [ "lldap.service" ];
+    after = [
+      "lldap.service"
+      "time-sync.target"
+    ];
+    wants = [
+      "lldap.service"
+      "time-sync.target"
+    ];
 
     serviceConfig = {
       LoadCredential = [
