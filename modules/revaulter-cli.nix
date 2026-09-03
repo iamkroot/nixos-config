@@ -10,11 +10,11 @@
 let
   revaulterPkg = pkgs.stdenv.mkDerivation rec {
     pname = "revaulter";
-    version = "2.2.0";
+    version = "2.4.1";
 
     src = pkgs.fetchurl {
       url = "https://github.com/ItalyPaleAle/revaulter/releases/download/v${version}/revaulter-${version}-linux-amd64.tar.gz";
-      hash = "sha256-WthFEpBRbTiDz6wI8s4Mb1oQoAWCNVCMwPHU5+AesJQ=";
+      hash = "sha256-qYv/eKi6KhdGlxrSGGR8Ti8PH3htJjYi5Ga3i/J9AnU=";
     };
 
     installPhase = ''

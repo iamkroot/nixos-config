@@ -20,7 +20,7 @@ in
   ];
 
   virtualisation.oci-containers.containers."revaulter" = {
-    image = "ghcr.io/italypaleale/revaulter:2.2.0";
+    image = "ghcr.io/italypaleale/revaulter:2.4.1";
     ports = [ "127.0.0.1:${toString config.infra.services.ports.revaulter}:8080" ];
     volumes = [
       "revaulter-data:/data"
