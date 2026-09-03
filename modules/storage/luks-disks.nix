@@ -15,7 +15,7 @@ in
     in
     ''
       # <target name>  <source device>       <key file>    <options>
-      ${disk1.name}     UUID=${disk1.uuid}   ${disk1-key}  nofail,x-systemd.device-timeout=5s
+      ${disk1.name}     UUID=${disk1.uuid}   ${disk1-key}  nofail,noauto,x-systemd.device-timeout=5s
     '';
 
   fileSystems."/mnt/${disk1.name}" = {
@@ -23,11 +23,21 @@ in
     fsType = "ext4";
     options = [
       "nofail"
+      "noauto"
+      # makes it easy to just "systemctl start mnt-disk.mount"
+      "x-systemd.requires=systemd-cryptsetup@${disk1.name}.service"
     ];
   };
 
-  # When the LUKS volume is unlocked and the device mapper block device appears, trigger the systemd mount unit.
+  # Automatically unlock when the physical drive is plugged in, and mount when the mapper block device appears.
   services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_UUID}=="${disk1.uuid}", TAG+="systemd", ENV{SYSTEMD_WANTS}+="systemd-cryptsetup@${disk1.name}.service"
     ACTION=="add", SUBSYSTEM=="block", ENV{DM_NAME}=="${disk1.name}", TAG+="systemd", ENV{SYSTEMD_WANTS}+="mnt-${disk1.name}.mount"
   '';
+
+  # Propagate stop from the mount unit to cryptsetup so "systemctl stop mnt-${disk1.name}.mount" also closes LUKS.
+  systemd.services."systemd-cryptsetup@${disk1.name}" = {
+    overrideStrategy = "asDropin";
+    partOf = [ "mnt-${disk1.name}.mount" ];
+  };
 }
