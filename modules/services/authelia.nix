@@ -49,6 +49,9 @@ in
       ]
   );
   systemd.services."authelia-main" = {
+    after = [ "lldap.service" ];
+    wants = [ "lldap.service" ];
+
     serviceConfig = {
       LoadCredential = [
         "ldap_password:${config.vaultix.secrets.authelia-ldap.path}"
