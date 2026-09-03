@@ -29,6 +29,12 @@ dir = "{{ config_root }}"
 alias = "sedit"
 run = "mise -C secrets secret:edit"
 
+[tasks."secret:decrypt"]
+alias = "decrypt"
+quiet = true
+raw = true
+run = "mise -C secrets decrypt-secret"
+
 [tasks.commit-secrets]
 dir = "secrets"
 run = ["git add .", "git commit -m {{usage.message | quote}}"]
