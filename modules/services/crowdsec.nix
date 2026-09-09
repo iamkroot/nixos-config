@@ -109,6 +109,6 @@
     "d /var/log/caddy 0750 caddy caddy -"
     "z /var/log/caddy/*.log 0640 caddy caddy -"
     "d /var/lib/crowdsec 0750 crowdsec crowdsec -"
-    "Z /var/lib/crowdsec 0750 crowdsec crowdsec -"
+    "z /var/lib/crowdsec 0750 crowdsec crowdsec -"
   ];
 }

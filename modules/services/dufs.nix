@@ -39,8 +39,8 @@ in
     "d /var/lib/dufs 0750 dufs dufs - -"
     "d ${pii.davDir} 0775 dufs media - -"
     "z ${pii.davDir} 0775 dufs media - -"
-    "A ${pii.davDir} - - - - group:media:rwx"
-    "A ${pii.davDir} - - - - default:group:media:rwx"
+    "a ${pii.davDir} - - - - group:media:rwx"
+    "a ${pii.davDir} - - - - default:group:media:rwx"
   ];
 
   systemd.services.dufs = {

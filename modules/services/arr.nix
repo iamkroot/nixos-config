@@ -110,7 +110,7 @@ in
     "d /var/lib/decypharr 0770 root media - -"
     "d /var/lib/profilarr 0770 root media - -"
     "d ${downloadsDir} 2775 root media - -"
-    "A ${downloadsDir} - - - - default:group:media:rwx"
+    "a ${downloadsDir} - - - - default:group:media:rwx"
   ];
 
   virtualisation.oci-containers.containers.decypharr = {
