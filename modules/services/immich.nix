@@ -106,14 +106,34 @@ in
         IMMICH_MACHINE_LEARNING_URL = "http://immich-machine-learning:3003";
       };
       volumes = [
-        "/mnt/immich_ssd:/data"
+        "/media/photos:/data"
+        "/var/lib/immich/thumbs:/data/thumbs"
         "/etc/localtime:/etc/localtime:ro"
       ];
     };
   };
 
+  systemd.tmpfiles.rules = [
+    "d /var/lib/immich/thumbs 0755 root root - -"
+  ];
+
   systemd.services."podman-immich-postgres".after = [ "create-immich-network.service" ];
   systemd.services."podman-immich-redis".after = [ "create-immich-network.service" ];
   systemd.services."podman-immich-machine-learning".after = [ "create-immich-network.service" ];
-  systemd.services."podman-immich-server".after = [ "create-immich-network.service" ];
+  systemd.services."podman-immich-server" =
+    let
+      ssd2 = pii.storage.ssd2;
+    in
+    {
+      after = [
+        "create-immich-network.service"
+        "load-${ssd2.name}-keys.service"
+      ];
+      requires = [
+        "load-${ssd2.name}-keys.service"
+      ];
+      bindsTo = [
+        "load-${ssd2.name}-keys.service"
+      ];
+    };
 }

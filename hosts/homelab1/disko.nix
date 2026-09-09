@@ -16,7 +16,6 @@ let
     (inputs.self + /modules/datasets/postgres.nix)
     (inputs.self + /modules/datasets/nats.nix)
     (inputs.self + /modules/datasets/waha.nix)
-    (inputs.self + /modules/datasets/dav.nix)
   ];
 
   customDatasetsRaw = lib.foldl' (acc: path: acc // (import path { inherit pii; })) { } serviceFiles;
@@ -165,21 +164,6 @@ in
               "sanoid:autosnap" = "false";
               "syncoid:sync" = "no";
               relatime = "on";
-            };
-          };
-          "media" = {
-            type = "zfs_fs";
-            mountpoint = "/media";
-            mountOptions = [
-              "nofail"
-              "x-systemd.after=disko-zfs.service"
-            ];
-            options = {
-              mountpoint = "legacy";
-              quota = "400G";
-              recordsize = "1M";
-              compression = "off";
-              "sanoid:autosnap" = "false";
             };
           };
         }

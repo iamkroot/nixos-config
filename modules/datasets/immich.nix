@@ -35,15 +35,14 @@
     };
   };
 
-  # 3. SSD Media "Landing Zone" / Storage
-  "services/immich/media_ssd" = {
+  # 3. Fast Thumbnail Storage (Micro, Thumb, Preview)
+  "services/immich/thumbs" = {
     type = "zfs_fs";
-    mountpoint = "/mnt/immich_ssd";
+    mountpoint = "/var/lib/immich/thumbs";
     options = {
       mountpoint = "legacy";
-      # CRITICAL: 1M is best for large continuous files like photos and videos
-      recordsize = "1M";
-      quota = "500G";
+      recordsize = "128K";
+      quota = "100G";
       acltype = "posixacl";
       xattr = "sa";
     };

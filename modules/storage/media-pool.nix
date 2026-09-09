@@ -7,94 +7,117 @@
 }:
 
 let
+  loadZfsScript = pkgs.writeShellScript "load-zfs-pool" (builtins.readFile ./load-zfs-pool.sh);
+  ssd2 = pii.storage.ssd2;
   media_main = pii.storage.media_main;
   data_main = pii.storage.data_main;
-  poolName = media_main.name;
-  mediaMount = "mnt-${poolName}-media.mount";
+
+  pools = [
+    {
+      name = ssd2.name;
+      keys = {
+        "${ssd2.name}-zfs-key" = ssd2.key;
+      };
+      autoBoot = true;
+      hotplug = false;
+    }
+    {
+      name = media_main.name;
+      keys = {
+        "${media_main.name}-zfs-key" = media_main.key;
+        "${data_main.name}-data-zfs-key" = data_main.key;
+      };
+      autoBoot = false;
+      hotplug = true;
+      wantsTargets = [ "media-apps.target" ];
+    }
+  ];
+
   mediaServiceAttrs = {
     # Bind to the target so the app dies if the drive is exported
     bindsTo = [ "media-apps.target" ];
-    after = [ "load-${poolName}-keys.service" ];
+    after = [ "media-apps.target" ];
     wantedBy = [ "media-apps.target" ];
   };
 in
 {
-  vaultix.secrets."${poolName}-zfs-key" = {
-    file = media_main.key;
-    owner = "root";
-    group = "root";
-  };
+  vaultix.secrets = lib.mkMerge (
+    map (
+      p:
+      lib.mapAttrs (_: keyFile: {
+        file = keyFile;
+        owner = "root";
+        group = "root";
+      }) p.keys
+    ) pools
+  );
 
-  vaultix.secrets."${data_main.name}-data-zfs-key" = {
-    file = data_main.key;
-    owner = "root";
-    group = "root";
-  };
-
-  boot.zfs.extraPools = [ poolName ];
+  boot.zfs.extraPools = map (p: p.name) pools;
 
   # This listens for any block device being added that is formatted
-  # as a ZFS member and belongs to the "poolName" pool.
-  services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_TYPE}=="zfs_member", ENV{ID_FS_LABEL}=="${poolName}", TAG+="systemd", ENV{SYSTEMD_WANTS}+="load-${poolName}-keys.service"
-  '';
+  # as a ZFS member and belongs to the pool.
+  services.udev.extraRules = lib.concatMapStrings (
+    p:
+    lib.optionalString (p.hotplug or false) ''
+      ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_TYPE}=="zfs_member", ENV{ID_FS_LABEL}=="${p.name}", TAG+="systemd", ENV{SYSTEMD_WANTS}+="load-${p.name}-keys.service"
+    ''
+  ) pools;
 
-  # Override the native NixOS import service to handle safe exports
-  systemd.services."zfs-import-${poolName}" = {
-    serviceConfig = {
-      # The minus sign (-) ignores the error if the pool is already gone
-      ExecStop = "-${pkgs.zfs}/bin/zpool export ${poolName}";
-    };
-  };
+  systemd.services = lib.mkMerge (
+    (map (p: {
+      "zfs-import-${p.name}" = {
+        serviceConfig = {
+          ExecStop = "-${pkgs.zfs}/bin/zpool export ${p.name}";
+        };
+      };
 
-  # Key loading and mounting (Self-contained)
-  systemd.services."load-${poolName}-keys" = {
-    description = "Load encryption keys and mount datasets for ${poolName}";
-    unitConfig.DefaultDependencies = false;
+      "load-${p.name}-keys" = {
+        description = "Load encryption keys and mount datasets for ${p.name}";
+        unitConfig.DefaultDependencies = false;
 
-    requires = [ "zfs-import-${poolName}.service" ];
-    after = [ "zfs-import-${poolName}.service" ];
+        requires = [
+          "zfs-import-${p.name}.service"
+          "vaultix-activate.service"
+        ];
+        after = [
+          "zfs-import-${p.name}.service"
+          "vaultix-activate.service"
+        ];
 
-    # BindsTo ensures that if the import service stops, this state resets too
-    bindsTo = [ "zfs-import-${poolName}.service" ];
-    before = [ "local-fs.target" ];
-    # Auto start the media apps
-    wants = [ "media-apps.target" ];
+        bindsTo = [ "zfs-import-${p.name}.service" ];
+        before = [ "local-fs.target" ];
+        wantedBy = lib.optional (p.autoBoot or false) "local-fs.target";
+        wants = p.wantsTargets or [ ];
 
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = pkgs.writeShellScript "load-zfs-keys-and-mount" ''
-        ${pkgs.zfs}/bin/zfs get -H -o name,value keylocation -r "${poolName}" | \
-        while IFS=$'\t' read -r name value; do
-          if [[ "$value" == file://* ]]; then
-            # Check if the key is actually needed
-            keystatus=$(${pkgs.zfs}/bin/zfs get -H -o value keystatus "$name")
-            
-            if [ "$keystatus" = "unavailable" ]; then
-              echo "Loading key for $name from $value..."
-              ${pkgs.zfs}/bin/zfs load-key "$name" || true
-            else
-              echo "Key for $name is already loaded. Skipping..."
-            fi
-          fi
-        done
+        path = [
+          pkgs.zfs
+          pkgs.coreutils
+        ];
 
-        # Mount the datasets natively
-        ${pkgs.zfs}/bin/zfs mount -a || true
-      '';
-    };
-  };
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${loadZfsScript} ${p.name}";
+        };
+      };
+    }) pools)
+    ++ [
+      {
+        jellyfin = lib.mkIf config.services.jellyfin.enable mediaServiceAttrs;
+        podman-shoko-server = lib.mkIf (builtins.hasAttr "shoko-server" config.virtualisation.oci-containers.containers) mediaServiceAttrs;
+      }
+    ]
+  );
 
   systemd.targets.media-apps = {
-    description = "Target for all media-related services tied to the DAS";
-    # BindsTo means: If load-keys stops (drive exported), drop this target.
-    # After means: Do not let apps start until load-keys has successfully finished mounting.
-    bindsTo = [ "load-${poolName}-keys.service" ];
-    after = [ "load-${poolName}-keys.service" ];
+    description = "Target for all media-related services tied to media storage";
+    bindsTo = [
+      "load-${media_main.name}-keys.service"
+      "load-${ssd2.name}-keys.service"
+    ];
+    after = [
+      "load-${media_main.name}-keys.service"
+      "load-${ssd2.name}-keys.service"
+    ];
   };
-
-  systemd.services.jellyfin = lib.mkIf config.services.jellyfin.enable mediaServiceAttrs;
-
-  systemd.services.podman-shoko-server = lib.mkIf (builtins.hasAttr "shoko-server" config.virtualisation.oci-containers.containers) mediaServiceAttrs;
 }
