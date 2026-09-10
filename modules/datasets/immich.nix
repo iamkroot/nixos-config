@@ -45,6 +45,8 @@
       quota = "100G";
       acltype = "posixacl";
       xattr = "sa";
+      "sanoid:autosnap" = "false";
+      "syncoid:sync" = "no";
       "kopia:backup" = "false";
     };
   };

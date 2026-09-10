@@ -8,6 +8,7 @@
       quota = "10G";
       recordsize = "64K";
       "sanoid:autosnap" = "false";
+      "syncoid:sync" = "no";
       "kopia:backup" = "false";
     };
   };
