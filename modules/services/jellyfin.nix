@@ -77,6 +77,5 @@
     "d /var/lib/jellyfin/data/trickplay 0770 jellyfin media - -"
     "d /var/lib/jellyfin/data/subtitles 0770 jellyfin media - -"
     "d /var/lib/jellyfin/metadata 0770 jellyfin media - -"
-    "d /var/lib/jellyfin/transcodes 0770 jellyfin media - -"
   ];
 }

@@ -45,6 +45,7 @@
       quota = "100G";
       acltype = "posixacl";
       xattr = "sa";
+      "kopia:backup" = "false";
     };
   };
 }

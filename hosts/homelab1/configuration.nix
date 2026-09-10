@@ -23,6 +23,7 @@ in
     ../../modules/initrd.nix
     ../../modules/kde.nix
     ../../modules/revaulter-cli.nix
+    ../../modules/kopia
   ];
 
   nix.settings.experimental-features = [

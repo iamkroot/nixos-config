@@ -7,6 +7,7 @@
     ./luks-disks.nix
     ./media-pool.nix
     ./zfs-backup.nix
+    ./cloud-backup.nix
   ];
 
   # something for local media

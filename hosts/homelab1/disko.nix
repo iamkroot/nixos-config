@@ -16,6 +16,7 @@ let
     (inputs.self + /modules/datasets/postgres.nix)
     (inputs.self + /modules/datasets/nats.nix)
     (inputs.self + /modules/datasets/waha.nix)
+    (inputs.self + /modules/datasets/adguard.nix)
   ];
 
   customDatasetsRaw = lib.foldl' (acc: path: acc // (import path { inherit pii; })) { } serviceFiles;
