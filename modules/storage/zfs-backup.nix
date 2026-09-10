@@ -8,6 +8,7 @@
 let
   primary_pool = pii.storage.media_main;
   secondary_pool = pii.storage.media_bak;
+  ssd2 = pii.storage.ssd2;
 
   # Define all the datasets on primary that need to be backed up to secondary
   targetDatasets = {
@@ -16,6 +17,11 @@ let
     };
     "media" = { };
     "backup-homelab" = {
+      recursive = true;
+      autosnap = false;
+      autoprune = true;
+    };
+    "backup-${ssd2.name}" = {
       recursive = true;
       autosnap = false;
       autoprune = true;
@@ -30,6 +36,13 @@ let
     }
     // conf;
   }) targetDatasets;
+
+  sanoidSSD2Datasets = {
+    "${ssd2.name}" = {
+      useTemplate = [ "defaultDASPolicy" ];
+      recursive = true;
+    };
+  };
 
   sanoidTemplateOverrides = { };
 
@@ -71,6 +84,68 @@ let
       };
     }) (lib.filter (ds: ds.isIncluded) allZrootDatasets)
   );
+
+  mkSyncoidServiceConfig =
+    { commandName, keyPath }:
+    {
+      User = lib.mkForce "root";
+      Group = lib.mkForce "root";
+
+      # Turn off the seccomp filters that cause the SIGSYS core dump
+      SystemCallFilter = lib.mkForce [ ];
+      SystemCallArchitectures = lib.mkForce "";
+
+      # Give ZFS the raw capabilities it needs to mount and chown
+      CapabilityBoundingSet = lib.mkForce "~";
+
+      # Turn off namespaces so ZFS can see block devices (zvols)
+      PrivateDevices = lib.mkForce false;
+      PrivateMounts = lib.mkForce false;
+      PrivateTmp = lib.mkForce false;
+      PrivateUsers = lib.mkForce false;
+
+      # Disable filesystem protections so it can actually write the datasets
+      ProtectSystem = lib.mkForce false;
+      ProtectHome = lib.mkForce false;
+      ProtectControlGroups = lib.mkForce false;
+
+      # Disable privilege escalation limits
+      NoNewPrivileges = lib.mkForce false;
+      RestrictNamespaces = lib.mkForce false;
+      RestrictAddressFamilies = lib.mkForce "~";
+
+      ExecStartPre = [
+        "+${pkgs.writeShellScript "syncoid-bootstrap-${commandName}" ''
+          TARGET="${config.services.syncoid.commands.${commandName}.target}"
+          SOURCE="${config.services.syncoid.commands.${commandName}.source}"
+
+          KEYFILE="${keyPath}" 
+
+          # 1. If target exists, the foundation is already laid. Exit silently.
+          if ${pkgs.zfs}/bin/zfs list -H -o name "$TARGET" >/dev/null 2>&1; then
+            exit 0
+          fi
+
+          echo "Target missing. Bootstrapping raw encrypted foundation..."
+
+          # 2. Snapshot only the parent dataset
+          SNAP="bootstrap-$(date +%s)"
+          ${pkgs.zfs}/bin/zfs snapshot "$SOURCE@$SNAP"
+
+          # 3. Raw send the parent to lock in the Master Key and Wrapper Key
+          ${pkgs.zfs}/bin/zfs send -w "$SOURCE@$SNAP" | ${pkgs.zfs}/bin/zfs receive "$TARGET"
+
+          # 4. Unlock the new backup dataset using your stored passphrase file
+          ${pkgs.zfs}/bin/zfs load-key -L "file://$KEYFILE" "$TARGET"
+
+          # 5. Point the backup dataset's keylocation to this file permanently
+          # so it auto-unlocks on future reboots without you typing anything.
+          ${pkgs.zfs}/bin/zfs change-key -o keylocation="file://$KEYFILE" "$TARGET"
+
+          echo "Bootstrap complete. Target unlocked. Handing off to Syncoid..."
+        ''}"
+      ];
+    };
 in
 {
   # Dynamically generate Sanoid snapshot policies for all target datasets
@@ -101,22 +176,34 @@ in
       };
     };
 
-    datasets = sanoidDASDatasets // sanoidZrootDatasets;
+    datasets = sanoidDASDatasets // sanoidZrootDatasets // sanoidSSD2Datasets;
   };
 
   services.syncoid = {
     enable = true;
     interval = "*-*-* 07:30:00";
-    commands."backup-zroot" = {
-      source = "zroot";
-      target = "${primary_pool.name}/backup-homelab";
-      recursive = true;
-      extraArgs = [
-        "--sendoptions=w"
-        "--no-sync-snap"
-        "--create-bookmark"
-      ]
-      ++ syncoidExclusions;
+    commands = {
+      "backup-zroot" = {
+        source = "zroot";
+        target = "${primary_pool.name}/backup-homelab";
+        recursive = true;
+        extraArgs = [
+          "--sendoptions=w"
+          "--no-sync-snap"
+          "--create-bookmark"
+        ]
+        ++ syncoidExclusions;
+      };
+      "backup-${ssd2.name}" = {
+        source = ssd2.name;
+        target = "${primary_pool.name}/backup-${ssd2.name}";
+        recursive = true;
+        extraArgs = [
+          "--sendoptions=w"
+          "--no-sync-snap"
+          "--create-bookmark"
+        ];
+      };
     };
   };
 
@@ -126,64 +213,29 @@ in
     group = "root";
   };
 
-  systemd.services."syncoid-backup-zroot".serviceConfig = {
-    User = lib.mkForce "root";
-    Group = lib.mkForce "root";
+  systemd.services = {
+    "syncoid-backup-zroot" = {
+      after = [
+        "vaultix-activate.service"
+        "load-${primary_pool.name}-keys.service"
+      ];
+      serviceConfig = mkSyncoidServiceConfig {
+        commandName = "backup-zroot";
+        keyPath = config.vaultix.secrets.zroot-zfs-key.path;
+      };
+    };
 
-    # Turn off the seccomp filters that cause the SIGSYS core dump
-    SystemCallFilter = lib.mkForce [ ];
-    SystemCallArchitectures = lib.mkForce "";
-
-    # Give ZFS the raw capabilities it needs to mount and chown
-    CapabilityBoundingSet = lib.mkForce "~";
-
-    # Turn off namespaces so ZFS can see block devices (zvols)
-    PrivateDevices = lib.mkForce false;
-    PrivateMounts = lib.mkForce false;
-    PrivateTmp = lib.mkForce false;
-    PrivateUsers = lib.mkForce false;
-
-    # Disable filesystem protections so it can actually write the datasets
-    ProtectSystem = lib.mkForce false;
-    ProtectHome = lib.mkForce false;
-    ProtectControlGroups = lib.mkForce false;
-
-    # Disable privilege escalation limits
-    NoNewPrivileges = lib.mkForce false;
-    RestrictNamespaces = lib.mkForce false;
-    RestrictAddressFamilies = lib.mkForce "~";
-
-    ExecStartPre = [
-      "+${pkgs.writeShellScript "syncoid-bootstrap" ''
-        TARGET="${config.services.syncoid.commands."backup-zroot".target}"
-        SOURCE="${config.services.syncoid.commands."backup-zroot".source}"
-
-        KEYFILE="${config.vaultix.secrets.zroot-zfs-key.path}" 
-
-        # 1. If target exists, the foundation is already laid. Exit silently.
-        if ${pkgs.zfs}/bin/zfs list -H -o name "$TARGET" >/dev/null 2>&1; then
-          exit 0
-        fi
-
-        echo "Target missing. Bootstrapping raw encrypted foundation..."
-
-        # 2. Snapshot only the parent dataset
-        SNAP="bootstrap-$(date +%s)"
-        ${pkgs.zfs}/bin/zfs snapshot "$SOURCE@$SNAP"
-
-        # 3. Raw send the parent to lock in the Master Key and Wrapper Key
-        ${pkgs.zfs}/bin/zfs send -w "$SOURCE@$SNAP" | ${pkgs.zfs}/bin/zfs receive "$TARGET"
-
-        # 4. Unlock the new backup dataset using your stored passphrase file
-        ${pkgs.zfs}/bin/zfs load-key -L "file://$KEYFILE" "$TARGET"
-
-        # 5. Point the backup dataset's keylocation to this file permanently
-        # so it auto-unlocks on future reboots without you typing anything.
-        ${pkgs.zfs}/bin/zfs change-key -o keylocation="file://$KEYFILE" "$TARGET"
-
-        echo "Bootstrap complete. Target unlocked. Handing off to Syncoid..."
-      ''}"
-    ];
+    "syncoid-backup-${ssd2.name}" = {
+      after = [
+        "vaultix-activate.service"
+        "load-${ssd2.name}-keys.service"
+        "load-${primary_pool.name}-keys.service"
+      ];
+      serviceConfig = mkSyncoidServiceConfig {
+        commandName = "backup-${ssd2.name}";
+        keyPath = config.vaultix.secrets."${ssd2.name}-zfs-key".path;
+      };
+    };
   };
 
   # Define a unified timer directly instead of using syncoid module
