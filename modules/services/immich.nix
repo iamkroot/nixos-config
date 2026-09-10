@@ -6,7 +6,7 @@
   ...
 }:
 let
-  immichVersion = "v3.0.1";
+  immichVersion = "v3.2.0-rc.3";
   envFile = config.vaultix.templates."immich.env".path;
 in
 {

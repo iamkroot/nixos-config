@@ -1,6 +1,6 @@
 --- a/Gemfile.lock
 +++ b/Gemfile.lock
-@@ -206,12 +206,7 @@
+@@ -204,12 +204,7 @@
      faraday-net_http (3.4.3)
        net-http (~> 0.5)
      ffaker (2.25.0)
