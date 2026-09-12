@@ -130,3 +130,26 @@ vars._.file = "secrets/mise_vars.txt"
 description = "Dry-activate nixos-rebuild remotely for cloud1"
 interactive = true
 run = '''nix run nixpkgs#nixos-rebuild -- dry-activate --flake '.?submodules=1#{{vars.cloud1_name}}' --target-host root@{{vars.cloud1_name}} --build-host ssh-ng://root@{{vars.homelab1_name}} -s --max-jobs auto'''
+
+[tasks.get-pkgver]
+vars._.file = "secrets/mise_vars.txt"
+description = "Print the version of a package for a given flake machine"
+quiet = true
+usage = '''
+arg "<package>" help="Package attribute or name (e.g. git, caddy, crowdsec, linuxPackages.kernel)"
+arg "<host>" default="{{vars.homelab1_name}}" help="Flake machine / nixosConfiguration name"
+'''
+run = '''
+nix eval ".?submodules=1#nixosConfigurations.{{usage.host}}" --raw --apply 'host:
+  let
+    lib = host.pkgs.lib;
+    target = "{{usage.package}}";
+    fromSys = builtins.filter (p: (p.pname or p.name or "") == target) host.config.environment.systemPackages;
+    fromPkgs = lib.attrByPath (lib.splitString "." target) null host.pkgs;
+    pkg = if fromSys != [] then builtins.head fromSys else fromPkgs;
+  in
+    if pkg != null && pkg ? version then "${pkg.version}\n"
+    else if pkg != null && pkg ? name then "${pkg.name}\n"
+    else throw "Package '\''${target}'\'' not found on host '\''{{usage.host}}'\''"
+'
+'''
