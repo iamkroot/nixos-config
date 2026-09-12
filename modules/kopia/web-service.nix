@@ -133,6 +133,9 @@ in
         wantedBy = [ "multi-user.target" ];
         environment = {
           KOPIA_CONFIG_PATH = "/var/lib/kopia/${name}/repository.config";
+          KOPIA_CACHE_DIRECTORY = "/var/lib/kopia/${name}/cache";
+          KOPIA_LOG_DIR = "/var/lib/kopia/${name}/logs";
+          KOPIA_CHECK_FOR_UPDATES = "false";
         };
         serviceConfig = {
           Type = "simple";

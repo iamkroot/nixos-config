@@ -3,6 +3,7 @@
   lib,
   pkgs,
   pii,
+  myUtils,
   ...
 }:
 let
@@ -104,14 +105,29 @@ let
     ];
 in
 {
+  imports = [
+    (myUtils.mkCaddyModule "kopia" {
+      authelia = false;
+      meshOnly = true;
+    })
+  ];
+
   vaultix.secrets = {
     "cloud1-storage-key".file = pii.kopia.cloud1StorageKey;
     "kopia-password".file = pii.kopia.password;
+    "kopia-web-password".file = pii.kopia.webPassword;
   };
 
   services.kopia.backups.azure-cloud = {
     user = "root";
     passwordFile = config.vaultix.secrets."kopia-password".path;
+
+    web = {
+      enable = true;
+      address = "127.0.0.1:${toString config.infra.services.ports.kopia}";
+      serverUsername = pii.primaryUser;
+      serverPasswordFile = config.vaultix.secrets."kopia-web-password".path;
+    };
 
     # Azure Blob Storage backend
     repository.azure = {
