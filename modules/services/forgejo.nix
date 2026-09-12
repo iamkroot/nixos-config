@@ -11,7 +11,10 @@ let
 in
 {
   imports = [
-    (myUtils.mkCaddyModule "forgejo" { authelia = false; })
+    (myUtils.mkCaddyModule "forgejo" {
+      authelia = false;
+      meshOnly = true;
+    })
   ];
 
   myAuthelia.oidcClients = [
