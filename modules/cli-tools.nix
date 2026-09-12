@@ -67,4 +67,19 @@
       continue = "true";
     };
   };
+
+  programs.btop = {
+    enable = true;
+    settings = {
+      show_disks = true;
+      only_physical = false;
+      use_fstab = false;
+      swap_disk = false;
+      zfs_hide_datasets = false;
+      disks_filter = "/ ${pii.storage.ssd2.mountpoint} ${pii.storage.media_main.mountpoint}";
+      save_config_on_exit = false;
+    };
+  };
+
+  xdg.configFile."btop/btop.conf".force = true;
 }
