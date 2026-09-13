@@ -286,34 +286,59 @@ in
       ExecCondition = "+${pkgs.writeShellScript "check-any-sync-needed" (builtins.readFile ./zfs-check-sync-das.sh)}";
 
       ExecStartPre = "+${pkgs.writeShellScript "import-pool" ''
-        zpool status ${secondary_pool.name} >/dev/null 2>&1 || zpool import ${secondary_pool.name}
+        zpool status ${secondary_pool.name} >/dev/null 2>&1 || zpool import -N ${secondary_pool.name}
+        ${pkgs.zfs}/bin/zfs set mountpoint=none canmount=off ${secondary_pool.name} || true
       ''}";
 
       ExecStart = "+${pkgs.writeShellScript "run-backups" (builtins.readFile ./zfs-backup-das.sh)}";
 
       ExecStopPost = "+${pkgs.writeShellScript "export-and-sleep" ''
-        DEVICES=$(${pkgs.zfs}/bin/zpool list -v -H -P ${secondary_pool.name} | ${pkgs.gawk}/bin/awk '{print $1}' | ${pkgs.gnugrep}/bin/grep '^/')
+        DEVICES=$(${pkgs.zfs}/bin/zpool list -v -H -P ${secondary_pool.name} 2>/dev/null | ${pkgs.gawk}/bin/awk '{print $1}' | ${pkgs.gnugrep}/bin/grep '^/' || true)
 
-        sleep 2
-
-        ${pkgs.zfs}/bin/zpool export ${secondary_pool.name} || true
-
-        for dev in $DEVICES; do
-          PKNAME=$(${pkgs.util-linux}/bin/lsblk -no pkname "$dev")
-          if [ -n "$PKNAME" ]; then
-            PARENT_DEV="/dev/$PKNAME"
-          else
-            PARENT_DEV="$dev" # Fallback if it's already a whole disk
-          fi
-          ${pkgs.smartmontools}/bin/smartctl -A "$PARENT_DEV" | ${pkgs.gnugrep}/bin/grep Start_Stop_Count
-          ${pkgs.hdparm}/bin/hdparm -Y "$PARENT_DEV" || true
+        sync
+        for ds in $(${pkgs.zfs}/bin/zfs list -H -o name -r ${secondary_pool.name} 2>/dev/null | ${pkgs.coreutils}/bin/tac); do
+          ${pkgs.zfs}/bin/zfs unmount "$ds" 2>/dev/null || true
         done
+        sleep 1
+
+        EXPORTED=false
+        for i in 1 2 3; do
+          if ${pkgs.zfs}/bin/zpool export ${secondary_pool.name}; then
+            EXPORTED=true
+            break
+          fi
+          sleep 2
+        done
+
+        if [ "$EXPORTED" = "true" ]; then
+          for dev in $DEVICES; do
+            PKNAME=$(${pkgs.util-linux}/bin/lsblk -no pkname "$dev" 2>/dev/null || true)
+            if [ -n "$PKNAME" ]; then
+              PARENT_DEV="/dev/$PKNAME"
+            else
+              PARENT_DEV="$dev" # Fallback if it's already a whole disk
+            fi
+            ${pkgs.smartmontools}/bin/smartctl -A "$PARENT_DEV" | ${pkgs.gnugrep}/bin/grep Start_Stop_Count || true
+            # Use -y (STANDBY) instead of -Y (SLEEP) to prevent USB/UAS timeout resets
+            ${pkgs.hdparm}/bin/hdparm -y "$PARENT_DEV" || true
+          done
+        else
+          echo "ERROR: Failed to export ${secondary_pool.name}. Leaving drive awake to prevent hung I/O."
+        fi
       ''}";
     };
   };
 
   services.smartd = {
     enable = true;
+    devices = [
+      {
+        device = "/dev/disk/by-id/${secondary_pool.id}";
+        # Exclude scheduled self-tests (-s) for the backup disk to prevent
+        # smartd from triggering catch-up Long tests while awake for backups.
+        options = "-d sat -n standby,q -a -o on -S on";
+      }
+    ];
     # '-n standby,q' ensures it skips asleep drives quietly
     defaults.autodetected = "-a -o on -S on -n standby,q -s (S/../.././02|L/../../6/03)";
   };
