@@ -11,7 +11,7 @@ let
 in
 {
   imports = [
-    (myUtils.mkCaddyModule "immich" { authelia = true; })
+    (myUtils.mkCaddyModule "immich" { authelia = false; })
   ];
 
   myAuthelia.oidcClients = [
@@ -19,6 +19,7 @@ in
       redirect_uris = [
         "https://${config.infra.services.hostnames.immich}/auth/login"
         "https://${config.infra.services.hostnames.immich}/user-settings"
+        "https://${config.infra.services.hostnames.immich}/api/oauth/mobile-redirect"
         "app.immich:///oauth-callback"
       ];
     })
