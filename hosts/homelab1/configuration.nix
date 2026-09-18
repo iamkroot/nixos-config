@@ -50,6 +50,7 @@ in
   ];
 
   # zfs
+  boot.zfs.forceImportRoot = true;
   boot.supportedFilesystems = [ "zfs" ];
   boot.zfs.devNodes = "/dev/disk/by-id";
   services.zfs.trim.enable = true;
