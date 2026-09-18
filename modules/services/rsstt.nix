@@ -15,7 +15,7 @@
   virtualisation.oci-containers = {
     backend = "podman";
     containers."rsstt" = {
-      image = "docker.io/rongronggg9/rss-to-telegram:dev";
+      image = "docker.io/rongronggg9/rss-to-telegram:dev@sha256:75d000bdadf8f9934a4467e2e9a03f0d5671fa6d2e7f8299064ae82ecf64f90f";
       autoStart = true;
 
       volumes = [

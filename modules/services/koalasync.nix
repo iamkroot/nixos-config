@@ -39,7 +39,7 @@ in
   };
 
   virtualisation.oci-containers.containers."koalasync" = {
-    image = "ghcr.io/shik3i/koalasync:latest";
+    image = "ghcr.io/shik3i/koalasync:v3.2.0@sha256:b2222d391a56909a6696bddd9a31bd12140455e79675b1611fb9ef912d47c6e1";
     ports = [ "127.0.0.1:${toString port}:3000" ];
     environment = {
       PORT = "3000";

@@ -42,7 +42,7 @@
   };
 
   virtualisation.oci-containers.containers."wallos" = {
-    image = "docker.io/bellamy/wallos:latest";
+    image = "docker.io/bellamy/wallos:v5.8.1@sha256:0f049dbab45b9f8e8d43b84fd1b77ef9e55909bd1a384a0f4fe8597ab68a1d5d";
     ports = [ "127.0.0.1:${toString config.infra.services.ports.wallos}:80" ];
     volumes = [
       "/var/lib/wallos/db:/var/www/html/db"

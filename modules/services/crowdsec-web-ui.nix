@@ -65,7 +65,7 @@ in
   };
 
   virtualisation.oci-containers.containers."crowdsec-web-ui" = {
-    image = "ghcr.io/theduffman85/crowdsec-web-ui:latest";
+    image = "ghcr.io/theduffman85/crowdsec-web-ui:latest@sha256:bfadbab9a72c21bf906eca0bb9bfb894c28ab31d1aed5bc25d9d9c153903ef89";
     ports = [ "127.0.0.1:${webUiPort}:3000" ];
     volumes = [
       "/var/lib/crowdsec-web-ui:/app/data"

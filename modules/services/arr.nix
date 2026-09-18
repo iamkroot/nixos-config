@@ -114,7 +114,7 @@ in
   ];
 
   virtualisation.oci-containers.containers.decypharr = {
-    image = "cy01/blackhole:latest";
+    image = "docker.io/cy01/blackhole:v2.5@sha256:a65c62a18843ca3dfa73cdee5eecccd3732d98f3ff845ae8338a1caf7060dd1a";
     ports = [ "${toString config.infra.services.ports.decypharr}:8282" ];
 
     # Tell Decypharr to run as host's user/group IDs
@@ -137,7 +137,7 @@ in
   };
 
   virtualisation.oci-containers.containers.profilarr = {
-    image = "ghcr.io/dictionarry-hub/profilarr:latest";
+    image = "ghcr.io/dictionarry-hub/profilarr:2.2.0@sha256:ddcdd0f340043c2ec0a85ca74b9a6be9be42b1c0288c75fc36a26a43f695860b";
     ports = [ "${toString config.infra.services.ports.profilarr}:6868" ];
 
     environment = {

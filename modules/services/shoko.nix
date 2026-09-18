@@ -25,7 +25,7 @@ in
   virtualisation.oci-containers = {
     backend = "podman";
     containers."shoko-server" = {
-      image = "ghcr.io/shokoanime/server:latest";
+      image = "ghcr.io/shokoanime/server:v5.3.3@sha256:b841f8249c9edfba102e4072e2b2a3eae4179e5dd553f29e11b9898a44f1e836";
       autoStart = true;
       ports = [ "${toString config.infra.services.ports.shoko}:8111" ];
 

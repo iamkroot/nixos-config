@@ -60,7 +60,7 @@ in
 
   virtualisation.oci-containers.containers = {
     account-center = {
-      image = "ghcr.io/icikowski/account-center:dev";
+      image = "ghcr.io/icikowski/account-center:dev@sha256:5696673b223025e7c496dd466eefe0097145ded1a62980406e5a89f70f78beba";
       ports = [ "127.0.0.1:${toString port}:8080" ];
       volumes = [
         "/var/lib/account-center:/data"

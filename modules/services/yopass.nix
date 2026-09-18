@@ -25,7 +25,7 @@ in
 
   virtualisation.oci-containers.containers = {
     yopass-memcached = {
-      image = "memcached:alpine";
+      image = "docker.io/library/memcached:alpine@sha256:69ecd3c5701cebbe51f9fca15c1f9bd3b8773fd57cdb215adb6e1fa844bb0ea2";
       # Assign a specific static IP within our custom subnet
       extraOptions = [
         "--network=yopass-net"
@@ -33,7 +33,7 @@ in
       ];
     };
     yopass = {
-      image = "jhaals/yopass:latest";
+      image = "docker.io/jhaals/yopass:latest@sha256:f9505341f8c729805cbba0dfbb0473b77074640f27d51dd6e4bf863b014bac20";
       ports = [ "127.0.0.1:${toString port}:${toString port}" ];
       environment = {
         MEMCACHED = "10.99.99.10:11211";

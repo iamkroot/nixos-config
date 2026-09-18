@@ -34,7 +34,7 @@ in
   };
 
   virtualisation.oci-containers.containers."waha" = {
-    image = "docker.io/devlikeapro/waha:gows";
+    image = "docker.io/devlikeapro/waha:gows@sha256:23f2d002d262b54c711af02b5fe79b1948bbf31e6b64cf7776cd6bd2f7477b47";
     ports = [ "127.0.0.1:${toString port}:3000" ];
     environment = {
       WHATSAPP_DEFAULT_ENGINE = "GOWS";
