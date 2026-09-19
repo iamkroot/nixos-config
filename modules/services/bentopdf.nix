@@ -7,7 +7,7 @@
 {
   imports = [
     (myUtils.mkCaddyModule "bentopdf" {
-      authelia = true;
+      authelia = false;
       extraHostConfig.extraConfig = ''
         root * ${pkgs.bentopdf}
         try_files {path} /index.html
