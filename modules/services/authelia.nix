@@ -3,6 +3,7 @@
   config,
   pii,
   myUtils,
+  pkgs,
   ...
 }:
 let
@@ -48,17 +49,26 @@ in
         "smtp"
       ]
   );
+  services.redis.package = pkgs.valkey;
+  services.redis.servers.authelia = {
+    enable = true;
+    port = 0;
+  };
+
   systemd.services."authelia-main" = {
     after = [
       "lldap.service"
       "time-sync.target"
+      "redis-authelia.service"
     ];
     wants = [
       "lldap.service"
       "time-sync.target"
+      "redis-authelia.service"
     ];
 
     serviceConfig = {
+      SupplementaryGroups = [ "redis-authelia" ];
       LoadCredential = [
         "ldap_password:${config.vaultix.secrets.authelia-ldap.path}"
         "smtp_password:${config.vaultix.secrets.authelia-smtp.path}"
@@ -88,6 +98,10 @@ in
       server.address = "tcp://127.0.0.1:${toString config.infra.services.ports.authelia}";
 
       session = {
+        redis = {
+          host = config.services.redis.servers.authelia.unixSocket;
+        };
+
         cookies = [
           {
             domain = config.infra.domain;
