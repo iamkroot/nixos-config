@@ -11,9 +11,13 @@
   ];
 
   imports = [
-    "${inputs.crowdsec}/nixos/modules/services/security/crowdsec.nix"
+    "${inputs.crowdsec}/nixos/modules/services/security/crowdsec"
     "${inputs.crowdsec}/nixos/modules/services/security/crowdsec-firewall-bouncer.nix"
   ];
+
+  # Upstream PR 535319 includes a doc.md with missing heading IDs, which breaks
+  # nixos-render-docs when building the HTML NixOS manual.
+  documentation.nixos.enable = false;
 
   services.crowdsec = {
     enable = true;
