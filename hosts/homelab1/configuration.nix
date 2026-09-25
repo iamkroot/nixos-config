@@ -57,12 +57,6 @@ in
   networking.hostId = "${hostPII.netId}";
   networking.hostName = "${hostPII.name}";
 
-  networking.trafficControl = {
-    enable = true;
-    interface = "br0";
-    uploadBandwidth = "100mbit";
-  };
-
   services.zfs.autoScrub = {
     enable = true;
     interval = "monthly";
