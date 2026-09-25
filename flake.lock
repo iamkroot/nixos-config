@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "chatlume": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790310823,
+        "narHash": "sha256-k79GuAJbJx63CoQFQm9CIF1jHGVNPBT75efaYN1oYSU=",
+        "owner": "iamkroot",
+        "repo": "chatlume",
+        "rev": "09d395188adcfb8d566adef2cf8c6b6efdce5b26",
+        "type": "github"
+      },
+      "original": {
+        "owner": "iamkroot",
+        "repo": "chatlume",
+        "type": "github"
+      }
+    },
     "crane": {
       "locked": {
         "lastModified": 1787326676,
@@ -230,6 +246,7 @@
     },
     "root": {
       "inputs": {
+        "chatlume": "chatlume",
         "crowdsec": "crowdsec",
         "dashboard-icons": "dashboard-icons",
         "disko": "disko",
