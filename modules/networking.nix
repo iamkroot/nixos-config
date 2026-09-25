@@ -30,6 +30,10 @@ lib.mkMerge [
             route-metric = 3000;
             dhcp-client-id = "mac";
           };
+          ipv6 = {
+            method = "auto";
+            route-metric = 3000;
+          };
         };
       };
       ensureProfiles.environmentFiles = [
@@ -65,7 +69,7 @@ lib.mkMerge [
           dns = "${pii.router.localIp};1.0.0.1;";
         };
         ipv6 = {
-          method = "disabled";
+          method = "auto";
         };
       };
       "br0-eno1" = {
