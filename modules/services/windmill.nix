@@ -26,6 +26,12 @@ let
     "podman-windmill-worker-native"
     "podman-windmill-extra"
   ];
+
+  extraHosts = [
+    "--add-host=${config.infra.services.hostnames.auth}:host-gateway"
+    "--add-host=${config.infra.services.hostnames.forgejo}:host-gateway"
+    "--add-host=${config.infra.services.hostnames.windmill}:host-gateway"
+  ];
 in
 {
   imports = [
@@ -205,8 +211,8 @@ in
       ports = [ "127.0.0.1:${toString serverPort}:8000" ];
       extraOptions = [
         "--network=windmill"
-        "--add-host=${config.infra.services.hostnames.auth}:host-gateway"
-      ];
+      ]
+      ++ extraHosts;
       dependsOn = [ "windmill-postgres" ];
       environmentFiles = [ envFile ];
       environment = {
@@ -226,7 +232,8 @@ in
         "--network=windmill"
         "--privileged" # Required for nsjail PID namespace isolation
         "--memory=4g"
-      ];
+      ]
+      ++ extraHosts;
       dependsOn = [ "windmill-postgres" ];
       environmentFiles = [ envFile ];
       environment = {
@@ -249,7 +256,8 @@ in
       extraOptions = [
         "--network=windmill"
         "--memory=2g"
-      ];
+      ]
+      ++ extraHosts;
       dependsOn = [ "windmill-postgres" ];
       environmentFiles = [ envFile ];
       environment = {
