@@ -66,7 +66,7 @@ lib.mkMerge [
         ipv4 = {
           method = "manual";
           address1 = "${pii.hosts.homelab1.localIp}/24,${pii.router.localIp}";
-          dns = "${pii.router2.localIp};1.1.1.1;";
+          dns = "${pii.router2.localIp};";
         };
         ipv6 = {
           method = "auto";
