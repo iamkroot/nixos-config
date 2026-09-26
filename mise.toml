@@ -5,7 +5,7 @@ run = "nix-shell -p nixfmt-tree --run \"treefmt ${@:-.}\""
 [tasks."dns:push-router"]
 vars._.file = "secrets/mise_vars.txt"
 description = "Push dnsmasq address entries to OpenWrt (derived from Nix)"
-run = './tools/dns-push-router.sh "${@:-router}"'
+run = './tools/dns-push-router.sh "${@:-router2}"'
 
 [tasks."dns:sync-porkbun"]
 vars._.file = "secrets/mise_vars.txt"

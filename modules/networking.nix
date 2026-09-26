@@ -66,10 +66,11 @@ lib.mkMerge [
         ipv4 = {
           method = "manual";
           address1 = "${pii.hosts.homelab1.localIp}/24,${pii.router.localIp}";
-          dns = "${pii.router.localIp};1.0.0.1;";
+          dns = "${pii.router2.localIp};1.1.1.1;";
         };
         ipv6 = {
           method = "auto";
+          ignore-auto-dns = true;
         };
       };
       "br0-eno1" = {
