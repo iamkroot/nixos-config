@@ -32,6 +32,12 @@ $svcs | to_entries
             subdomain: .name,
             ip: .localIp
           }
+      ] + [
+        {
+          subdomain: "dns",
+          ip: $pii.router2.localIp,
+          cname: "\($pii.hosts.homelab1.name).\(domain)"
+        }
       ]
     ),
     cloud: (

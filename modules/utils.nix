@@ -23,6 +23,8 @@
       # FIXME: Better additive design; needs to become a config like `mkAutheliaOIDC`
       extraHostConfig ? { },
       portKey ? name,
+      targetHost ? "127.0.0.1",
+      bypassAuthPaths ? [ ],
     }:
     { config, pii, ... }:
     let
@@ -34,15 +36,40 @@
         @denied not remote_ip ${meshNet.subnet} ${meshNet.subnetV6} 127.0.0.1 ::1 private_ranges
         abort @denied
       '';
+      defaultProxy = "reverse_proxy ${targetHost}:${toString port}";
+      authBlock =
+        if bypassAuthPaths != [ ] then
+          ''
+            ${lib.concatMapStrings (path: ''
+              handle ${path} {
+                ${defaultProxy}
+              }
+            '') bypassAuthPaths}
+            handle {
+              import authelia
+              ${defaultProxy}
+            }
+          ''
+        else
+          ''
+            import authelia
+            ${defaultProxy}
+          '';
     in
     {
       services.caddy.virtualHosts."${hostname}" = lib.mkMerge [
         {
-          useACMEHost = config.infra.domain;
+          useACMEHost = lib.mkDefault config.infra.domain;
           extraConfig = ''
             ${if meshOnly then meshSnippet else ""}
-            ${if authelia then "import authelia" else ""}
-            ${if userExtraConfig != null then userExtraConfig else "reverse_proxy 127.0.0.1:${toString port}"}
+            ${
+              if userExtraConfig != null then
+                userExtraConfig
+              else if authelia then
+                authBlock
+              else
+                defaultProxy
+            }
           '';
 
           logFormat = lib.mkDefault ''

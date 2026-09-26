@@ -56,6 +56,31 @@
     description = "Account Center catalog entries.";
   };
 
+  options.infra.dns = {
+    adguard = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether AdGuard Home DNS integration is active.";
+      };
+      location = lib.mkOption {
+        type = lib.types.str;
+        default = "router2";
+        description = "Location of AdGuard Home: 'homelab1' or 'local' to run locally on homelab1, or a host/appliance key in pii (e.g. 'router2') to proxy and sync certs.";
+      };
+      dotSubdomain = lib.mkOption {
+        type = lib.types.str;
+        default = "dns";
+        description = "Subdomain used for DNS-over-TLS (DoT).";
+      };
+      syncCerts = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether to automatically sync renewed wildcard TLS certs via ACME postRun.";
+      };
+    };
+  };
+
   config.infra.hostKey = hostKey;
   config.infra.domain = pii.primaryDomain;
 
