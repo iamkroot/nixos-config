@@ -18,6 +18,7 @@ let
     (inputs.self + /modules/datasets/waha.nix)
     (inputs.self + /modules/datasets/adguard.nix)
     (inputs.self + /modules/datasets/mindwtr.nix)
+    (inputs.self + /modules/datasets/windmill.nix)
   ];
 
   customDatasetsRaw = lib.foldl' (acc: path: acc // (import path { inherit pii; })) { } serviceFiles;
