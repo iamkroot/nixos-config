@@ -155,6 +155,7 @@ in
           "bun"
           "go"
           "bash"
+          "postgresql"
         ];
       };
       native = {
