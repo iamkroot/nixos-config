@@ -120,11 +120,16 @@
         oldHost = "${s.subdomain}.${pii.oldDomain}";
         newHost = "${s.subdomain}.${config.infra.domain}";
       in
-      lib.mkIf (s.host == hostKey && s.subdomain != null) {
+      lib.mkIf ((s.host == hostKey || hostKey == "homelab1") && s.subdomain != null) {
         "${oldHost}" = {
-          extraConfig = "redir https://${newHost}{uri}";
+          extraConfig = "redir https://${newHost}{uri} 308";
         };
       }
     ) services
+    ++ lib.optional (hostKey == "homelab1") {
+      "${pii.oldDomain}" = {
+        extraConfig = "redir https://${config.infra.domain}{uri} 308";
+      };
+    }
   );
 }
