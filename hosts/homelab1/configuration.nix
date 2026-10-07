@@ -155,7 +155,6 @@ in
     ];
   };
 
-  # DNS-01 ACME is handled by Caddy globally via Porkbun plugin
   security.acme = {
     acceptTerms = true;
     defaults.email = pii.primaryEmail;

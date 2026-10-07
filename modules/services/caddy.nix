@@ -29,12 +29,6 @@
     enable = true;
     email = pii.primaryEmail;
 
-    # Custom Caddy build with Porkbun DNS plugin for DNS-01 ACME
-    package = pkgs.caddy.withPlugins {
-      plugins = [ "github.com/caddy-dns/porkbun@v0.3.1" ];
-      hash = "sha256-CjL8dMdnsiawaPiQGRvL3he4Ydd3nIbQs6tBWMwUbaw=";
-    };
-
     extraConfig = ''
       # ----------------------------------------------------
       # Authelia Forward Auth Snippet
