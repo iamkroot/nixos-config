@@ -81,6 +81,12 @@
     };
   };
 
+  options.infra.keepGenerations = lib.mkOption {
+    type = lib.types.int;
+    default = 10;
+    description = "Number of recent Nix profile generations to keep during garbage collection.";
+  };
+
   config.infra.hostKey = hostKey;
   config.infra.domain = pii.primaryDomain;
 
@@ -144,4 +150,26 @@
       };
     }
   );
+
+  config.nix = {
+    settings = {
+      auto-optimise-store = lib.mkDefault true;
+    };
+    optimise.automatic = lib.mkDefault true;
+    gc = {
+      automatic = lib.mkDefault true;
+      dates = lib.mkDefault "weekly";
+    };
+  };
+
+  config.systemd.services.nix-gc = {
+    script = lib.mkForce ''
+      for profile in /nix/var/nix/profiles/system /nix/var/nix/profiles/per-user/*/profile /nix/var/nix/profiles/per-user/*/home-manager; do
+        if [ -e "$profile" ]; then
+          ${config.nix.package}/bin/nix-env --delete-generations +${toString config.infra.keepGenerations} --profile "$profile"
+        fi
+      done
+      ${config.nix.package}/bin/nix-collect-garbage
+    '';
+  };
 }
