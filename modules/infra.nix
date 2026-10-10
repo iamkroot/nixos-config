@@ -99,6 +99,29 @@
             --replace-fail "set(CMAKE_CXX_STANDARD 17)" "set(CMAKE_CXX_STANDARD 20)"
         '';
       });
+
+      # Workaround for nixpkgs: authelia-web 4.39.28 has pnpmDepsHash mismatch on Linux
+      authelia = myUtils.selfExpiringOverride {
+        pkgs = prev;
+        name = "authelia";
+        strictlyNewer = true;
+        minVersion = "4.39.28";
+        localPkg = prev.authelia.override {
+          authelia-web = prev.authelia.passthru.web.overrideAttrs (old: {
+            pnpmDeps = prev.fetchPnpmDeps {
+              inherit (old)
+                pname
+                version
+                src
+                sourceRoot
+                ;
+              pnpm = prev.pnpm_12;
+              fetcherVersion = 4;
+              hash = "sha256-zIaVEjbh/LIQMqnryrgVm+46GP+9gM91WCMyAqeDnaA=";
+            };
+          });
+        };
+      };
     })
   ];
 
