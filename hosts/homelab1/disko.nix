@@ -1,26 +1,43 @@
 {
-  inputs,
+  config,
   lib,
   pii,
   ...
 }:
 let
-  serviceFiles = [
-    (inputs.self + /modules/datasets/jellyfin.nix)
-    (inputs.self + /modules/datasets/shoko.nix)
-    (inputs.self + /modules/datasets/authelia.nix)
-    (inputs.self + /modules/datasets/immich.nix)
-    (inputs.self + /modules/datasets/seerr.nix)
-    (inputs.self + /modules/datasets/gaming.nix)
-    (inputs.self + /modules/datasets/postgres.nix)
-    (inputs.self + /modules/datasets/nats.nix)
-    (inputs.self + /modules/datasets/waha.nix)
-    (inputs.self + /modules/datasets/adguard.nix)
-    (inputs.self + /modules/datasets/mindwtr.nix)
-    (inputs.self + /modules/datasets/windmill.nix)
-  ];
+  myServices = config.myServices;
 
-  customDatasetsRaw = lib.foldl' (acc: path: acc // (import path { inherit pii; })) { } serviceFiles;
+  datasetsDir = ../../modules/datasets;
+  dirContents = builtins.readDir datasetsDir;
+
+  isDatasetEnabled =
+    fileName:
+    let
+      stem = lib.removeSuffix ".nix" fileName;
+      directService = myServices.${stem} or null;
+      moduleServices = lib.filterAttrs (_: s: s.module == stem) myServices;
+    in
+    if directService != null then
+      directService.enable && directService.host == "homelab1"
+    else if moduleServices != { } then
+      lib.any (s: s.enable && s.host == "homelab1") (builtins.attrValues moduleServices)
+    else
+      true;
+
+  enabledDatasetFiles = lib.filterAttrs (
+    file: type:
+    (type == "regular" || type == "symlink")
+    && lib.hasSuffix ".nix" file
+    && !lib.hasPrefix "." file
+    && file != "default.nix"
+    && isDatasetEnabled file
+  ) dirContents;
+
+  serviceFiles = map (file: datasetsDir + "/${file}") (builtins.attrNames enabledDatasetFiles);
+
+  customDatasetsRaw = lib.foldl' (
+    acc: path: acc // (import path { inherit pii lib; })
+  ) { } serviceFiles;
   customDatasets = lib.mapAttrs (
     name: value:
     value
@@ -37,6 +54,10 @@ let
   );
 in
 {
+  imports = [
+    ../../modules/services-schema.nix
+  ];
+
   disko.zfs = {
     enable = true;
     settings = {
