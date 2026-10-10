@@ -18,6 +18,9 @@ NIX_BIN="${NIX_BIN:-nix}"
 PII=$($NIX_BIN eval -f secrets/pii.nix --json)
 SVCS=$($NIX_BIN eval --json --impure --expr 'let flake = builtins.getFlake (toString ./.); in (flake.inputs.nixpkgs.lib.evalModules { modules = [ ./modules/services-schema.nix ]; }).config.myServices')
 DATA=$(jq -n --argjson pii "$PII" --argjson svcs "$SVCS" -f tools/dns-data.jq)
+CLIENT_IDS=$(echo "$PII" | jq -c '["192.168.1.0/24", .networks.mesh.subnet, .networks.mesh.subnetV6]')
+ADGUARD_CLIENT_ADD_JSON=$(echo "$PII" | jq -c '{name: "LAN", ids: ["192.168.1.0/24", .networks.mesh.subnet, .networks.mesh.subnetV6], filtering_enabled: true, use_global_settings: true}')
+ADGUARD_CLIENT_UPDATE_JSON=$(echo "$PII" | jq -c '{name: "LAN", data: {name: "LAN", ids: ["192.168.1.0/24", .networks.mesh.subnet, .networks.mesh.subnetV6], filtering_enabled: true, use_global_settings: true}}')
 
 # Build hosts file entries: router.local + all homelab services
 HOSTS_ENTRIES=$(echo "$DATA" | jq -r '
@@ -69,9 +72,9 @@ ssh "$ROUTER" "
     echo 'Syncing AdGuard Home client=LAN split-DNS rewrite rules...'
     # Ensure persistent client 'LAN' exists for the local subnet
     curl -sf -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/control/clients/add \
-      -d '{\"name\":\"LAN\",\"ids\":[\"192.168.1.0/24\"],\"filtering_enabled\":true,\"use_global_settings\":true}' >/dev/null 2>&1 || \
+      -d '$ADGUARD_CLIENT_ADD_JSON' >/dev/null 2>&1 || \
     curl -sf -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/control/clients/update \
-      -d '{\"name\":\"LAN\",\"data\":{\"name\":\"LAN\",\"ids\":[\"192.168.1.0/24\"],\"filtering_enabled\":true,\"use_global_settings\":true}}' >/dev/null 2>&1
+      -d '$ADGUARD_CLIENT_UPDATE_JSON' >/dev/null 2>&1
 
     # Remove [/kroot.dev/] from upstream_dns if present so WAN queries fall through to public DNS
     if grep -q '\[/kroot.dev/\]' /etc/adguardhome/adguardhome.yaml 2>/dev/null; then
