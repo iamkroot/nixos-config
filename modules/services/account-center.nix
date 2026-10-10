@@ -70,6 +70,7 @@ in
         config.vaultix.templates."account-center.env".path
       ];
       extraOptions = [
+        "--no-healthcheck"
         "--add-host=${config.infra.services.hostnames.auth}:host-gateway"
       ];
     };
