@@ -254,24 +254,7 @@
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "plasma-manager": "plasma-manager",
-        "suggestarr": "suggestarr",
         "vaultix": "vaultix"
-      }
-    },
-    "suggestarr": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1791447928,
-        "narHash": "sha256-lCoN86LuV0XwnGRtY9yigL6B/wDdOlbCoP7vgy+gbsE=",
-        "owner": "giuseppe99barchetta",
-        "repo": "suggestarr",
-        "rev": "50f350b8b41724a4d6605782d9d5c14fca3e770b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "giuseppe99barchetta",
-        "repo": "suggestarr",
-        "type": "github"
       }
     },
     "vaultix": {

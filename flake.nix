@@ -35,11 +35,6 @@
       flake = false;
     };
 
-    suggestarr = {
-      url = "github:giuseppe99barchetta/suggestarr";
-      flake = false;
-    };
-
     chatlume = {
       url = "github:iamkroot/chatlume";
       flake = false;

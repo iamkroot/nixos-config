@@ -11,7 +11,6 @@ let
     (inputs.self + /modules/datasets/authelia.nix)
     (inputs.self + /modules/datasets/immich.nix)
     (inputs.self + /modules/datasets/seerr.nix)
-    (inputs.self + /modules/datasets/suggestarr.nix)
     (inputs.self + /modules/datasets/gaming.nix)
     (inputs.self + /modules/datasets/postgres.nix)
     (inputs.self + /modules/datasets/nats.nix)
