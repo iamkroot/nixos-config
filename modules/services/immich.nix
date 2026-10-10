@@ -6,7 +6,7 @@
   ...
 }:
 let
-  immichVersion = "v3.2.0";
+  immichVersion = "v3.3.1";
   envFile = config.vaultix.templates."immich.env".path;
 in
 {
@@ -83,6 +83,9 @@ in
       image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}";
       extraOptions = [ "--network=immich" ];
       environmentFiles = [ envFile ];
+      environment = {
+        MACHINE_LEARNING_MODEL_REVISION = "v2";
+      };
       volumes = [
         "/var/lib/immich/model-cache:/cache"
       ];
