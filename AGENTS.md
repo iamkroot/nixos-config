@@ -41,5 +41,6 @@ The repository uses `mise` (`mise.toml`) for task execution and development work
 - **Nix Formatting**: Format code using `mise run fmt` before committing.
 - **Service Modules**: Services are declared via `myServices` in `secrets/services.nix`, matching modules in `modules/services/`.
   - if adding new storage paths (like `/var/lib/foobar/`), consider adding a dataset to `modules/datasets/foobar.nix`
+  - remember to sync DNS after adding a service: `mise run dns:push-router` (router/LAN) and `mise run dns:sync-porkbun` (public)
 - **Machine Ports**: Define host ports in `secrets/services.nix` (`myServices`). Never hardcode machine ports in modules (container-internal ports excepted).
 - **Validation**: Ensure Nix syntax and flake outputs remain valid when making changes.
