@@ -149,7 +149,21 @@
       );
       name = lib.mkDefault (lib.toUpper (lib.substring 0 1 name) + lib.substring 1 (-1) name);
       url = lib.mkDefault (if hostname != null then "https://${hostname}" else "");
-      icon = lib.mkDefault "https://${config.infra.services.hostnames.icons}/${name}.svg";
+      icon = lib.mkDefault (
+        let
+          rawIcon = s.catalog.icon or null;
+          iconVal = if rawIcon != null then rawIcon else name;
+        in
+        if lib.hasPrefix "http://" iconVal || lib.hasPrefix "https://" iconVal then
+          iconVal
+        else
+          let
+            hasExt =
+              lib.hasSuffix ".svg" iconVal || lib.hasSuffix ".png" iconVal || lib.hasSuffix ".webp" iconVal;
+            fileName = if hasExt then iconVal else "${iconVal}.svg";
+          in
+          "https://${config.infra.services.hostnames.icons}/${fileName}"
+      );
       roles = lib.mkDefault (s.catalog.roles or { lldap_admin = "system_administrator"; });
     }
   ) services;

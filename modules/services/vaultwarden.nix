@@ -30,8 +30,6 @@ in
       ];
     })
   ];
-  infra.services.catalog.vaultwarden.icon =
-    "https://${config.infra.services.hostnames.icons}/vaultwarden-light.svg";
   services.vaultwarden = {
     enable = true;
     environmentFile = config.vaultix.templates."vaultwarden.env".path;

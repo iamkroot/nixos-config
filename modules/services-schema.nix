@@ -49,6 +49,11 @@ in
                 default = true;
                 description = "If true, adds the service to the Account Center (dashboard) catalog.";
               };
+              icon = lib.mkOption {
+                type = t.nullOr t.str;
+                default = null;
+                description = "Icon name (e.g. 'adguard-home', 'wallos.png') or full URL. If null, defaults to service name.";
+              };
               roles = lib.mkOption {
                 type = t.attrsOf t.str;
                 default = { };

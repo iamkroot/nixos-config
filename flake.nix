@@ -30,11 +30,6 @@
       inputs.disko.follows = "disko";
     };
 
-    dashboard-icons = {
-      url = "github:homarr-labs/dashboard-icons";
-      flake = false;
-    };
-
     chatlume = {
       url = "github:iamkroot/chatlume";
       flake = false;
