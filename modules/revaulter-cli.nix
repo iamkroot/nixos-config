@@ -8,13 +8,14 @@
 }:
 
 let
+  v = config.infra.versions.revaulter.cli;
   revaulterPkg = pkgs.stdenv.mkDerivation rec {
     pname = "revaulter";
-    version = "2.5.0";
+    inherit (v) version;
 
     src = pkgs.fetchurl {
       url = "https://github.com/ItalyPaleAle/revaulter/releases/download/v${version}/revaulter-${version}-linux-amd64.tar.gz";
-      hash = "sha256-uqgpA1l4ai98avadIvckl5NwSVvrQLVmgj1DFiFcqF0=";
+      inherit (v) hash;
     };
 
     installPhase = ''

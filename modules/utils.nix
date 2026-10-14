@@ -1,5 +1,5 @@
 { lib, ... }:
-{
+rec {
   mkPortOption =
     defaultPort: description:
     lib.mkOption {
@@ -142,4 +142,30 @@
       msg = if message != null then message else defaultMessage;
     in
     lib.warnIf hasUpstream msg (if hasUpstream then upstreamPkg else localPkg);
+
+  # Construct a container image string from decomposed fields:
+  # { repository, tag ? (spec.version or null), digest ? null, ... }
+  mkImage =
+    {
+      repository ? throw "myUtils.mkImage: missing required 'repository' attribute",
+      tag ? null,
+      digest ? null,
+      ...
+    }@spec:
+    let
+      resolvedTag = if tag != null && tag != "" then tag else (spec.version or null);
+      cleanDigest =
+        if digest != null && digest != "" then
+          (if lib.hasPrefix "@" digest then digest else "@${digest}")
+        else
+          "";
+    in
+    assert lib.assertMsg (resolvedTag != null || (digest != null && digest != ""))
+      "myUtils.mkImage: image specification for '${repository}' must define at least 'tag', 'version', or 'digest'.";
+    repository + (if resolvedTag != null then ":${resolvedTag}" else "") + cleanDigest;
+
+  # Construct an image string by merging a parent suite specification (e.g. providing `version` or `tag`)
+  # with a component specification (providing `repository`). Only non-null attributes from imgSpec override defaultSpec.
+  mkImageWithDefault =
+    defaultSpec: imgSpec: mkImage (defaultSpec // (lib.filterAttrs (_: val: val != null) imgSpec));
 }

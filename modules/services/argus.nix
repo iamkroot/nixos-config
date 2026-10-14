@@ -39,7 +39,7 @@ in
   ];
 
   virtualisation.oci-containers.containers."argus" = {
-    image = "ghcr.io/release-argus/argus:0.39.0";
+    image = myUtils.mkImage config.infra.versions.argus;
     ports = [ "127.0.0.1:${toString port}:8080" ];
     volumes = [
       "/var/lib/argus/config.yml:/app/config.yml"

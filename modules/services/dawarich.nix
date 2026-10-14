@@ -9,7 +9,9 @@ let
   dawarichPkg = myUtils.selfExpiringOverride {
     inherit pkgs;
     name = "dawarich";
-    localPkg = pkgs.callPackage ../../pkgs/dawarich { };
+    localPkg = pkgs.callPackage ../../pkgs/dawarich {
+      sources = config.infra.versions.dawarich;
+    };
   };
 in
 {

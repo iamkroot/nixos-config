@@ -6,20 +6,21 @@
   ...
 }:
 let
+  v = config.infra.versions.mindwtr;
   cloudPort = config.infra.services.ports.mindwtr;
   hostname = config.infra.services.hostnames.mindwtr;
 
   mindwtr-web-image = pkgs.dockerTools.pullImage {
-    imageName = "ghcr.io/dongdongbh/mindwtr-app";
-    imageDigest = "sha256:f6993a18e5f547a4df3ec941f94e10a74cf1287598ad7b21dca4a8478c950998";
-    hash = "sha256-ANxGmUqu58E4zn/ecu+SIFSdr0+/zpWh0MFR/zsYT8A=";
+    imageName = v.web.repository;
+    imageDigest = v.web.digest;
+    hash = v.web.hash;
     finalImageName = "mindwtr-app";
-    finalImageTag = "1.3.1";
+    finalImageTag = v.version;
   };
 
   # extract the static files from docker image
   mindwtr-web =
-    pkgs.runCommand "mindwtr-web-1.3.1"
+    pkgs.runCommand "mindwtr-web-${v.version}"
       {
         nativeBuildInputs = [
           pkgs.gnutar
@@ -83,7 +84,7 @@ in
     backend = "podman";
     containers = {
       "mindwtr-cloud" = {
-        image = "ghcr.io/dongdongbh/mindwtr-cloud:1.3.1";
+        image = myUtils.mkImageWithDefault v v.cloud;
         ports = [ "127.0.0.1:${toString cloudPort}:8787" ];
         volumes = [
           "/var/lib/mindwtr:/app/cloud_data"

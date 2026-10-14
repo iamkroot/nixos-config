@@ -9,8 +9,8 @@
   ruby_3_4,
   stdenv,
   tailwindcss_3,
+  sources ? (builtins.fromTOML (builtins.readFile ../../versions.toml)).dawarich,
   gemset ? import ./gemset.nix,
-  sources ? lib.importJSON ./sources.json,
   unpatchedSource ? fetchFromGitHub {
     owner = "Freika";
     repo = "dawarich";

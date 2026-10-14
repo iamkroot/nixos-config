@@ -7,10 +7,11 @@
   ...
 }:
 let
-  wmVersion = "1.818.0";
-  wmImage = "ghcr.io/windmill-labs/windmill:${wmVersion}";
-  extraImage = "ghcr.io/windmill-labs/windmill-extra:${wmVersion}";
-  postgresImage = "docker.io/library/postgres:18";
+  v = config.infra.versions.windmill;
+  wmVersion = v.version;
+  wmImage = myUtils.mkImageWithDefault v v.server;
+  extraImage = myUtils.mkImageWithDefault v v.extra;
+  postgresImage = myUtils.mkImage v.postgres;
 
   serverPort = config.infra.services.ports.windmill;
   extraPort = config.infra.services.ports.windmill_extra;

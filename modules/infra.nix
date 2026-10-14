@@ -209,4 +209,53 @@
       ${config.nix.package}/bin/nix-collect-garbage
     '';
   };
+
+  options.infra.versions = lib.mkOption {
+    type =
+      let
+        t = lib.types;
+        serviceVersionSubmodule = t.submodule {
+          freeformType = t.attrsOf (t.either serviceVersionSubmodule t.anything);
+          options = {
+            version = lib.mkOption {
+              type = t.nullOr t.str;
+              default = null;
+              description = "Application or suite version string.";
+            };
+            repository = lib.mkOption {
+              type = t.nullOr t.str;
+              default = null;
+              description = "Container image repository URI.";
+            };
+            tag = lib.mkOption {
+              type = t.nullOr t.str;
+              default = null;
+              description = "Container image tag.";
+            };
+            digest = lib.mkOption {
+              type = t.nullOr t.str;
+              default = null;
+              description = "Container image digest.";
+            };
+            hash = lib.mkOption {
+              type = t.nullOr t.str;
+              default = null;
+              description = "Source code or derivation hash.";
+            };
+            rev = lib.mkOption {
+              type = t.nullOr t.str;
+              default = null;
+              description = "Git commit revision.";
+            };
+          };
+        };
+      in
+      t.attrsOf serviceVersionSubmodule;
+    default = { };
+    description = "Application and container versions extracted from versions.toml";
+  };
+
+  config.infra.versions = lib.mapAttrs (_: v: lib.mkDefault v) (
+    builtins.fromTOML (builtins.readFile ../versions.toml)
+  );
 }

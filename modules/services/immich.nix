@@ -6,7 +6,7 @@
   ...
 }:
 let
-  immichVersion = "v3.3.1";
+  v = config.infra.versions.immich;
   envFile = config.vaultix.templates."immich.env".path;
 in
 {
@@ -60,7 +60,7 @@ in
   # Define the OCI Containers
   virtualisation.oci-containers.containers = {
     immich-postgres = {
-      image = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23";
+      image = myUtils.mkImage v.postgres;
       extraOptions = [
         "--network=immich"
         "--shm-size=128m"
@@ -75,12 +75,12 @@ in
     };
 
     immich-redis = {
-      image = "docker.io/valkey/valkey:9@sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9";
+      image = myUtils.mkImage v.valkey;
       extraOptions = [ "--network=immich" ];
     };
 
     immich-machine-learning = {
-      image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}";
+      image = myUtils.mkImageWithDefault v v.machine-learning;
       extraOptions = [ "--network=immich" ];
       environmentFiles = [ envFile ];
       environment = {
@@ -92,7 +92,7 @@ in
     };
 
     immich-server = {
-      image = "ghcr.io/immich-app/immich-server:${immichVersion}";
+      image = myUtils.mkImageWithDefault v v.server;
       extraOptions = [
         "--network=immich"
         # needed to get sso working

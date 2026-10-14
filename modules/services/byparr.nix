@@ -1,11 +1,12 @@
 {
   config,
+  myUtils,
   ...
 }:
 {
 
   virtualisation.oci-containers.containers.byparr = {
-    image = "ghcr.io/thephaseless/byparr:latest@sha256:874f719518f617d03a60e03411fc5d090647e1a877041e81f8dc965927c7deb6";
+    image = myUtils.mkImage config.infra.versions.byparr;
     ports = [ "${toString config.infra.services.ports.byparr}:8191" ];
 
     environment = {

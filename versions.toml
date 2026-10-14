@@ -1,0 +1,143 @@
+# Centralized versions for container images, custom packages, and pinned derivations.
+# Decomposed container fields: repository, tag, digest (optional).
+
+[account-center]
+repository = "ghcr.io/icikowski/account-center"
+tag = "dev"
+digest = "sha256:5696673b223025e7c496dd466eefe0097145ded1a62980406e5a89f70f78beba"
+
+[argus]
+repository = "ghcr.io/release-argus/argus"
+tag = "0.39.0"
+
+[byparr]
+repository = "ghcr.io/thephaseless/byparr"
+tag = "latest"
+digest = "sha256:874f719518f617d03a60e03411fc5d090647e1a877041e81f8dc965927c7deb6"
+
+[crowdsec-web-ui]
+repository = "ghcr.io/theduffman85/crowdsec-web-ui"
+tag = "latest"
+digest = "sha256:bfadbab9a72c21bf906eca0bb9bfb894c28ab31d1aed5bc25d9d9c153903ef89"
+
+[dawarich]
+version = "1.14.4"
+hash = "sha256-QwDb8iAuoVG+Er9vfN8aGqcqjtWV/qGyr01PWy7HgBM="
+npmHash = "sha256-WXwDi3K9s77+d/1lEOmUKeOZkcvUEsh8YnPztaqKHjk="
+
+[decypharr]
+repository = "docker.io/cy01/blackhole"
+tag = "v2.5"
+digest = "sha256:a65c62a18843ca3dfa73cdee5eecccd3732d98f3ff845ae8338a1caf7060dd1a"
+
+[homeassistant]
+repository = "ghcr.io/home-assistant/home-assistant"
+tag = "2026.9.3"
+digest = "sha256:d8922685169707fd91e8b9729902d975f06157d005e422874d201e0261dda196"
+
+[immich]
+tag = "v3.3.1"
+
+[immich.server]
+repository = "ghcr.io/immich-app/immich-server"
+
+[immich.machine-learning]
+repository = "ghcr.io/immich-app/immich-machine-learning"
+
+[immich.postgres]
+repository = "ghcr.io/immich-app/postgres"
+tag = "14-vectorchord0.4.3-pgvectors0.2.0"
+digest = "sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23"
+
+[immich.valkey]
+repository = "docker.io/valkey/valkey"
+tag = "9"
+digest = "sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9"
+
+[koalasync]
+repository = "ghcr.io/shik3i/koalasync"
+tag = "v3.2.0"
+digest = "sha256:b2222d391a56909a6696bddd9a31bd12140455e79675b1611fb9ef912d47c6e1"
+
+[mindwtr]
+version = "1.3.1"
+
+[mindwtr.cloud]
+repository = "ghcr.io/dongdongbh/mindwtr-cloud"
+
+[mindwtr.web]
+repository = "ghcr.io/dongdongbh/mindwtr-app"
+digest = "sha256:f6993a18e5f547a4df3ec941f94e10a74cf1287598ad7b21dca4a8478c950998"
+hash = "sha256-ANxGmUqu58E4zn/ecu+SIFSdr0+/zpWh0MFR/zsYT8A="
+
+[pot-provider]
+repository = "docker.io/brainicism/bgutil-ytdlp-pot-provider"
+tag = "latest"
+digest = "sha256:ed86b6fdd5e430ddd7c8ce1adb55e1ab54db7c7dbc1bcbf3a82454a85b971164"
+
+[profilarr]
+repository = "ghcr.io/dictionarry-hub/profilarr"
+tag = "2.2.0"
+digest = "sha256:ddcdd0f340043c2ec0a85ca74b9a6be9be42b1c0288c75fc36a26a43f695860b"
+
+[redlib]
+version = "0.36.0-unstable-2026-05-13"
+rev = "a4d36e954cf1bd64f209cd8868c5a29edc81b374"
+hash = "sha256-siyD6A12UALQIV7BMd7zu1TaojleTEYtpxPszuhx1/Y="
+cargoHash = "sha256-eO3c7rlFna3DuO31etJ6S4c7NmcvgvIWZ1KVkNIuUqQ="
+
+[revaulter]
+version = "2.5.0"
+repository = "ghcr.io/italypaleale/revaulter"
+
+[revaulter.cli]
+version = "2.5.0"
+hash = "sha256-uqgpA1l4ai98avadIvckl5NwSVvrQLVmgj1DFiFcqF0="
+
+[rsstt]
+repository = "docker.io/rongronggg9/rss-to-telegram"
+tag = "dev"
+digest = "sha256:75d000bdadf8f9934a4467e2e9a03f0d5671fa6d2e7f8299064ae82ecf64f90f"
+
+[shoko]
+repository = "ghcr.io/shokoanime/server"
+tag = "v5.3.3"
+digest = "sha256:b841f8249c9edfba102e4072e2b2a3eae4179e5dd553f29e11b9898a44f1e836"
+
+[waha]
+repository = "docker.io/devlikeapro/waha"
+tag = "gows"
+digest = "sha256:23f2d002d262b54c711af02b5fe79b1948bbf31e6b64cf7776cd6bd2f7477b47"
+
+[wallos]
+repository = "docker.io/bellamy/wallos"
+tag = "v5.8.1"
+digest = "sha256:0f049dbab45b9f8e8d43b84fd1b77ef9e55909bd1a384a0f4fe8597ab68a1d5d"
+
+[whoami]
+repository = "docker.io/containous/whoami"
+tag = "v1.5.0"
+digest = "sha256:7d6a3c8f91470a23ef380320609ee6e69ac68d20bc804f3a1c6065fb56cfa34e"
+
+[windmill]
+version = "1.818.0"
+
+[windmill.server]
+repository = "ghcr.io/windmill-labs/windmill"
+
+[windmill.extra]
+repository = "ghcr.io/windmill-labs/windmill-extra"
+
+[windmill.postgres]
+repository = "docker.io/library/postgres"
+tag = "18"
+
+[yopass.app]
+repository = "docker.io/jhaals/yopass"
+tag = "latest"
+digest = "sha256:f9505341f8c729805cbba0dfbb0473b77074640f27d51dd6e4bf863b014bac20"
+
+[yopass.memcached]
+repository = "docker.io/library/memcached"
+tag = "alpine"
+digest = "sha256:69ecd3c5701cebbe51f9fca15c1f9bd3b8773fd57cdb215adb6e1fa844bb0ea2"
