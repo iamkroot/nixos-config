@@ -1,5 +1,6 @@
 *.bak
 /result
 *.sublime-workspace
-.agents/
+.agents/*
+!.agents/skills
 *.vhd
