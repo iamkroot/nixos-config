@@ -1,24 +1,32 @@
 # Centralized versions for container images, custom packages, and pinned derivations.
-# Decomposed container fields: repository, tag, digest (optional).
+#
+# Conventions:
+# - Prefer to pin everything to exact versions/hashes/digests
+# - Container fields: repository, tag (or suite-level version), digest (optional but RECOMMENDED OCI manifest digest).
+# - Image derivations: when an OCI image specifies both `digest` and `hash`, it is pulled
+#   via `dockerTools.pullImage` (e.g. to extract static assets).
+#   - `digest`: OCI manifest/index hash (`sha256:...`) from the registry.
+#   - `hash`: Nix SRI NAR hash (`sha256-...=`) for the fixed-output derivation.
 
 [account-center]
 repository = "ghcr.io/icikowski/account-center"
-tag = "dev"
-digest = "sha256:5696673b223025e7c496dd466eefe0097145ded1a62980406e5a89f70f78beba"
+tag = "v1.9.0"
+digest = "sha256:2b8296b7c256b73dd0b50b75af2190bfc241a6eb88ea9338b90343a331d4bc57"
 
 [argus]
 repository = "ghcr.io/release-argus/argus"
 tag = "0.39.0"
+digest = "sha256:bcc346d402386bdeffc088a436b8a6c6393336bf688ab0f34c097218b0f5ba33"
 
 [byparr]
 repository = "ghcr.io/thephaseless/byparr"
-tag = "latest"
+tag = "3.0.4"
 digest = "sha256:874f719518f617d03a60e03411fc5d090647e1a877041e81f8dc965927c7deb6"
 
 [crowdsec-web-ui]
 repository = "ghcr.io/theduffman85/crowdsec-web-ui"
-tag = "latest"
-digest = "sha256:bfadbab9a72c21bf906eca0bb9bfb894c28ab31d1aed5bc25d9d9c153903ef89"
+tag = "2026.10.5"
+digest = "sha256:54d048dcab5082c0e394f0d00caacaf292f8f042ee449b974f9a28d1a192e3b7"
 
 [dawarich]
 version = "1.14.4"
@@ -27,22 +35,24 @@ npmHash = "sha256-WXwDi3K9s77+d/1lEOmUKeOZkcvUEsh8YnPztaqKHjk="
 
 [decypharr]
 repository = "docker.io/cy01/blackhole"
-tag = "v2.5"
-digest = "sha256:a65c62a18843ca3dfa73cdee5eecccd3732d98f3ff845ae8338a1caf7060dd1a"
+tag = "v2.7"
+digest = "sha256:92f70e53530e4686d1346cd8a42dd97a41dd359ce5e378ebcb0858cfa2abc2df"
 
 [homeassistant]
 repository = "ghcr.io/home-assistant/home-assistant"
-tag = "2026.9.3"
-digest = "sha256:d8922685169707fd91e8b9729902d975f06157d005e422874d201e0261dda196"
+tag = "2026.10.1"
+digest = "sha256:130241f28d01fa80dfa3b44f7d89781c188d8642ecab9024f079f19f9f82baa0"
 
 [immich]
-tag = "v3.3.1"
+tag = "v3.3.3"
 
 [immich.server]
 repository = "ghcr.io/immich-app/immich-server"
+digest = "sha256:bae7664ff3aa4c2c1fcbdcdd86b40b105643c5f861f3e6a770fc760089f25862"
 
 [immich.machine-learning]
 repository = "ghcr.io/immich-app/immich-machine-learning"
+digest = "sha256:73915f07e1f4289ba45b174c58443db74cef47ddf502613f475fc5e52458ea42"
 
 [immich.postgres]
 repository = "ghcr.io/immich-app/postgres"
@@ -52,7 +62,7 @@ digest = "sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c2
 [immich.valkey]
 repository = "docker.io/valkey/valkey"
 tag = "9"
-digest = "sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9"
+digest = "sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd"
 
 [koalasync]
 repository = "ghcr.io/shik3i/koalasync"
@@ -60,20 +70,21 @@ tag = "v3.2.0"
 digest = "sha256:b2222d391a56909a6696bddd9a31bd12140455e79675b1611fb9ef912d47c6e1"
 
 [mindwtr]
-version = "1.3.1"
+version = "1.3.6"
 
 [mindwtr.cloud]
 repository = "ghcr.io/dongdongbh/mindwtr-cloud"
+digest = "sha256:7a09c3c9277433d35073a6ae36e734fd979f6773e980bb6bb8c55274f0e98162"
 
 [mindwtr.web]
 repository = "ghcr.io/dongdongbh/mindwtr-app"
-digest = "sha256:f6993a18e5f547a4df3ec941f94e10a74cf1287598ad7b21dca4a8478c950998"
-hash = "sha256-ANxGmUqu58E4zn/ecu+SIFSdr0+/zpWh0MFR/zsYT8A="
+digest = "sha256:b757677d91a717e294c9febc0773525fced26ff33a331f3b68a2bc4caaf7660a"
+hash = "sha256-ecVlNk2yPSa46EszAhq2ytYkOJDyt3KdTr55asF5dQI="
 
 [pot-provider]
 repository = "docker.io/brainicism/bgutil-ytdlp-pot-provider"
-tag = "latest"
-digest = "sha256:ed86b6fdd5e430ddd7c8ce1adb55e1ab54db7c7dbc1bcbf3a82454a85b971164"
+tag = "2.0.2"
+digest = "sha256:d7d34108b76e52c7d3b575fe9e797e4bf41c1b2a08f80c5292eff6f851ce8472"
 
 [profilarr]
 repository = "ghcr.io/dictionarry-hub/profilarr"
@@ -87,17 +98,18 @@ hash = "sha256-siyD6A12UALQIV7BMd7zu1TaojleTEYtpxPszuhx1/Y="
 cargoHash = "sha256-eO3c7rlFna3DuO31etJ6S4c7NmcvgvIWZ1KVkNIuUqQ="
 
 [revaulter]
-version = "2.5.0"
+version = "2.7.1"
 repository = "ghcr.io/italypaleale/revaulter"
+digest = "sha256:4e957689c808a299bc37ad8c4c1596d4436a257846bebcae26cca112ae0b0e56"
 
 [revaulter.cli]
-version = "2.5.0"
-hash = "sha256-uqgpA1l4ai98avadIvckl5NwSVvrQLVmgj1DFiFcqF0="
+version = "2.7.1"
+hash = "sha256-9B2abKwuJJC3UgGMRhZJvLOMy/MkZAVHdckHCbvA++o="
 
 [rsstt]
 repository = "docker.io/rongronggg9/rss-to-telegram"
 tag = "dev"
-digest = "sha256:75d000bdadf8f9934a4467e2e9a03f0d5671fa6d2e7f8299064ae82ecf64f90f"
+digest = "sha256:f27fecd019bb7c545ad281a5a75c48782a9516bee22b31f8d0e21b3426784943"
 
 [shoko]
 repository = "ghcr.io/shokoanime/server"
@@ -107,12 +119,12 @@ digest = "sha256:b841f8249c9edfba102e4072e2b2a3eae4179e5dd553f29e11b9898a44f1e83
 [waha]
 repository = "docker.io/devlikeapro/waha"
 tag = "gows"
-digest = "sha256:23f2d002d262b54c711af02b5fe79b1948bbf31e6b64cf7776cd6bd2f7477b47"
+digest = "sha256:1ae3c6a994ee97e5039bf41103193d7bf9175f1a31db73ba89bdeed6277901bc"
 
 [wallos]
 repository = "docker.io/bellamy/wallos"
-tag = "v5.8.1"
-digest = "sha256:0f049dbab45b9f8e8d43b84fd1b77ef9e55909bd1a384a0f4fe8597ab68a1d5d"
+tag = "5.8.3"
+digest = "sha256:0006879778f31a962a3873f7682514b92a3c7665dcbc4764fcc241ad968eaccd"
 
 [whoami]
 repository = "docker.io/containous/whoami"
@@ -120,24 +132,27 @@ tag = "v1.5.0"
 digest = "sha256:7d6a3c8f91470a23ef380320609ee6e69ac68d20bc804f3a1c6065fb56cfa34e"
 
 [windmill]
-version = "1.818.0"
+version = "1.834.0"
 
 [windmill.server]
 repository = "ghcr.io/windmill-labs/windmill"
+digest = "sha256:0b4d9bddd961dbd3fef3a4d70f84f87279035c52a664f03a8acbdfed8c75a3fc"
 
 [windmill.extra]
 repository = "ghcr.io/windmill-labs/windmill-extra"
+digest = "sha256:f6734ce376a2e09ce17ef10f4ac5af6bf58816ef4922afc0c78b42891fc211d1"
 
 [windmill.postgres]
 repository = "docker.io/library/postgres"
 tag = "18"
+digest = "sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336"
 
 [yopass.app]
 repository = "docker.io/jhaals/yopass"
-tag = "latest"
-digest = "sha256:f9505341f8c729805cbba0dfbb0473b77074640f27d51dd6e4bf863b014bac20"
+tag = "15.1.0"
+digest = "sha256:e661c32f9fab98cf28634b254101567dd92a8a32ced76d5cb67c333d7e98d6b0"
 
 [yopass.memcached]
 repository = "docker.io/library/memcached"
 tag = "alpine"
-digest = "sha256:69ecd3c5701cebbe51f9fca15c1f9bd3b8773fd57cdb215adb6e1fa844bb0ea2"
+digest = "sha256:9e4de012dc607573052061c0bcb38abc775e1dd59b24e7ac38d1892842094aaf"
