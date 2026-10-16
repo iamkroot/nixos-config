@@ -105,12 +105,16 @@ in
   };
 
   # Use systemd tmpfiles to apply ACLs to the Downloads folder
-  # This ensures the 'media' group always has access to files created by the container
+  # This ensures the 'media' group and primaryUser always have access to files created by services
   systemd.tmpfiles.rules = [
     "d /var/lib/decypharr 0770 root media - -"
     "d /var/lib/profilarr 0770 root media - -"
-    "d ${downloadsDir} 2775 root media - -"
-    "a ${downloadsDir} - - - - default:group:media:rwx"
+    "d ${downloadsDir} 2775 ${pii.primaryUser} media - -"
+    "z ${downloadsDir} 2775 ${pii.primaryUser} media - -"
+    "a+ ${downloadsDir} - - - - user:${pii.primaryUser}:rwx"
+    "a+ ${downloadsDir} - - - - group:media:rwx"
+    "a+ ${downloadsDir} - - - - default:user:${pii.primaryUser}:rwx"
+    "a+ ${downloadsDir} - - - - default:group:media:rwx"
   ];
 
   virtualisation.oci-containers.containers.decypharr = {
