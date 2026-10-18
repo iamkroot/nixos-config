@@ -19,6 +19,7 @@ Analyze the target across these four distinct perspectives:
 2. Reliability & Failure Modes:
    - How does this handle service restarts, network partitions, or partial failures?
    - Are error paths swallowed? Are rollbacks viable?
+   - Don't focus too much on low hanging/obvious static errors that will be easily caught anyway
 3. Conventions & Standards:
    - Does this strictly respect repository rules (e.g., AGENTS.md, non-hardcoded ports, PII isolation)?
    - Are abstractions idiomatic to the project?
