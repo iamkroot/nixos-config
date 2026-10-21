@@ -92,10 +92,13 @@ tag = "2.3.0"
 digest = "sha256:11ed9f4c62311b956f1a89b44e19cf0908cd3e5169c3e43d59ab8144bbf7fe7d"
 
 [redlib]
-version = "0.36.0-unstable-2026-05-13"
-rev = "a4d36e954cf1bd64f209cd8868c5a29edc81b374"
-hash = "sha256-siyD6A12UALQIV7BMd7zu1TaojleTEYtpxPszuhx1/Y="
-cargoHash = "sha256-eO3c7rlFna3DuO31etJ6S4c7NmcvgvIWZ1KVkNIuUqQ="
+# FIXME: owner/repo should be forge-agnostic- use something like the repository field
+owner = "Nachtalb"
+repo = "redlib"
+version = "0.36.0-unstable-2026-10-21"
+rev = "fca8b45c186d51a74fd07e3159bc3bba435f7487"
+hash = "sha256-eNFDW4cqM1DKTI7k4U9rR+/7s1Qns4SCwwkRMSPkWo0="
+cargoHash = "sha256-c74QltRlz91xaclYj2V+ODLewbOg5ljlhRQGuqdZxbA="
 
 [revaulter]
 version = "2.7.2"

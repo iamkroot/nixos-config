@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   myUtils,
   ...
@@ -9,8 +8,8 @@
 let
   v = config.infra.versions.redlib;
   src = pkgs.fetchFromGitHub {
-    owner = "redlib-org";
-    repo = "redlib";
+    owner = v.owner or "redlib-org";
+    repo = v.repo or "redlib";
     inherit (v) rev hash;
   };
   redlib-latest = pkgs.redlib.overrideAttrs (oldAttrs: {
