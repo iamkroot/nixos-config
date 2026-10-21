@@ -43,6 +43,7 @@ in
   imports = [
     (myUtils.mkCaddyModule "mindwtr" {
       authelia = false;
+      meshOnly = true;
       extraHostConfig = {
         extraConfig = ''
           handle /v1/* {

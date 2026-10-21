@@ -6,7 +6,10 @@
 }:
 {
   imports = [
-    (myUtils.mkCaddyModule "wallos" { authelia = false; })
+    (myUtils.mkCaddyModule "wallos" {
+      authelia = false;
+      meshOnly = true;
+    })
   ];
 
   myAuthelia.oidcClients = [

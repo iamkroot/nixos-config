@@ -1,15 +1,10 @@
-{
-  config,
-  pkgs,
-  lib,
-  pii,
-  myUtils,
-  ...
-}:
-{
+{ pkgs, myUtils, ... }: {
   imports = [
     # TODO: Doesn't support OIDC yet https://github.com/seerr-team/seerr/pull/2715
-    (myUtils.mkCaddyModule "seerr" { authelia = false; })
+    (myUtils.mkCaddyModule "seerr" {
+      authelia = false;
+      meshOnly = true;
+    })
   ];
 
   services.seerr = {

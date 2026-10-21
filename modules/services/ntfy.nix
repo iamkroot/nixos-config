@@ -35,7 +35,10 @@ let
 in
 {
   imports = [
-    (myUtils.mkCaddyModule "ntfy" { authelia = false; })
+    (myUtils.mkCaddyModule "ntfy" {
+      authelia = false;
+      meshOnly = true;
+    })
   ];
 
   vaultix.secrets = {

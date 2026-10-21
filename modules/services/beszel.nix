@@ -11,7 +11,10 @@ let
 in
 {
   imports = [
-    (myUtils.mkCaddyModule "beszel" { authelia = true; })
+    (myUtils.mkCaddyModule "beszel" {
+      authelia = true;
+      meshOnly = true;
+    })
   ];
 
   vaultix.secrets."beszel/hub_private_key" = {

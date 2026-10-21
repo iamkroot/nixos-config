@@ -43,6 +43,33 @@ let
   domain = config.infra.services.hostnames.redlib;
 in
 {
+  imports = [
+    (myUtils.mkCaddyModule "redlib" {
+      authelia = false;
+      meshOnly = true;
+      extraHostConfig = {
+        extraConfig = ''
+          # Match ClaudeBot and other common AI scrapers
+          @aiBots {
+            header User-Agent *ClaudeBot*
+            header User-Agent *GPTBot*
+            header User-Agent *CCBot*
+            header User-Agent *anthropic-ai*
+            header User-Agent *OmgiliBot*
+          }
+
+          # Drop the connection or return a 403 Forbidden
+          respond @aiBots "AI Scraping Blocked" 403
+          respond /robots.txt "User-agent: ClaudeBot\nDisallow: /\n\nUser-agent: GPTBot\nDisallow: /" 200
+
+          reverse_proxy 127.0.0.1:${toString config.infra.services.ports.anubis_redlib} {
+            header_up X-Real-IP {client_ip}
+          }
+        '';
+      };
+    })
+  ];
+
   services.redlib = {
     enable = true;
     package = redlibPkg;
@@ -54,33 +81,6 @@ in
       REDLIB_DEFAULT_SHOW_NSFW = "on";
       REDLIB_DEFAULT_HIDE_HLS_NOTIFICATION = "on";
     };
-  };
-  services.caddy.virtualHosts."${domain}" = {
-    useACMEHost = config.infra.domain;
-    extraConfig = ''
-      # Match ClaudeBot and other common AI scrapers
-      @aiBots {
-        header User-Agent *ClaudeBot*
-        header User-Agent *GPTBot*
-        header User-Agent *CCBot*
-        header User-Agent *anthropic-ai*
-        header User-Agent *OmgiliBot*
-      }
-
-      # Drop the connection or return a 403 Forbidden
-      respond @aiBots "AI Scraping Blocked" 403
-      respond /robots.txt "User-agent: ClaudeBot\nDisallow: /\n\nUser-agent: GPTBot\nDisallow: /" 200
-
-      reverse_proxy 127.0.0.1:${toString config.infra.services.ports.anubis_redlib} {
-        header_up X-Real-IP {client_ip}
-      }
-    '';
-    logFormat = ''
-      output file /var/log/caddy/access-${domain}.log {
-        roll_size 50mb
-        roll_keep 5
-      }
-    '';
   };
 
   # Anubis Middleware

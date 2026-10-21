@@ -8,7 +8,10 @@ let
 in
 {
   imports = [
-    (myUtils.mkCaddyModule "uptime-kuma" { authelia = false; })
+    (myUtils.mkCaddyModule "uptime-kuma" {
+      authelia = false;
+      meshOnly = true;
+    })
   ];
 
   # Native Uptime Kuma System Service

@@ -9,7 +9,10 @@
 
 {
   imports = [
-    (myUtils.mkCaddyModule "atuin" { authelia = false; })
+    (myUtils.mkCaddyModule "atuin" {
+      authelia = false;
+      meshOnly = true;
+    })
   ];
 
   services.atuin = {

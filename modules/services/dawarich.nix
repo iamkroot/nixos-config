@@ -16,7 +16,10 @@ let
 in
 {
   imports = [
-    (myUtils.mkCaddyModule "dawarich" { authelia = false; })
+    (myUtils.mkCaddyModule "dawarich" {
+      authelia = false;
+      meshOnly = true;
+    })
   ];
 
   myAuthelia.accessRules = [

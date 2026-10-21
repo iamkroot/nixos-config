@@ -7,7 +7,10 @@
 }:
 {
   imports = [
-    (myUtils.mkCaddyModule "obsidian-live-sync" { authelia = false; })
+    (myUtils.mkCaddyModule "obsidian-live-sync" {
+      authelia = false;
+      meshOnly = true;
+    })
   ];
 
   vaultix.secrets.obsidian_livesync_pwd = {

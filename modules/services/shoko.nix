@@ -16,7 +16,10 @@ in
 {
   imports = [
     # didn't find a way to setup authelia
-    (myUtils.mkCaddyModule "shoko" { authelia = false; })
+    (myUtils.mkCaddyModule "shoko" {
+      authelia = false;
+      meshOnly = true;
+    })
   ];
   virtualisation.podman.enable = true;
 

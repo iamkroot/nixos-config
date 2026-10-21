@@ -11,7 +11,10 @@ let
 in
 {
   imports = [
-    (myUtils.mkCaddyModule "ldap" { portKey = "lldap_http"; })
+    (myUtils.mkCaddyModule "ldap" {
+      portKey = "lldap_http";
+      meshOnly = true;
+    })
   ];
 
   vaultix.secrets."lldap-admin-pass" = {
