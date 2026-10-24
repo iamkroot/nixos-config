@@ -4,3 +4,4 @@
 .agents/*
 !.agents/skills
 *.vhd
+__pycache__
