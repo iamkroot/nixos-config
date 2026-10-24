@@ -28,6 +28,7 @@ run = [
 dir = "{{ config_root }}"
 alias = "sedit"
 run = "mise -C secrets secret:edit"
+interactive = true
 
 [tasks."secret:decrypt"]
 alias = "decrypt"
