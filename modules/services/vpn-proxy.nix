@@ -25,8 +25,15 @@
 
       inbounds = [
         {
+          tag = "mixed-tailscale";
           type = "mixed";
           listen = pii.hosts.homelab1.tailscaleIp;
+          listen_port = config.infra.services.ports.vpn-proxy;
+        }
+        {
+          tag = "mixed-loopback";
+          type = "mixed";
+          listen = "127.0.0.1";
           listen_port = config.infra.services.ports.vpn-proxy;
         }
       ];

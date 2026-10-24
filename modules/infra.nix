@@ -214,6 +214,32 @@
     type =
       let
         t = lib.types;
+        sourceSpecSubmodule = t.submodule {
+          freeformType = t.attrsOf t.anything;
+          options = {
+            repository = lib.mkOption {
+              type = t.nullOr t.str;
+              default = null;
+              description = "Repository forge URI (e.g. github:owner/repo, gitea:domain/owner/repo).";
+            };
+            rev = lib.mkOption {
+              type = t.nullOr t.str;
+              default = null;
+              description = "Git commit revision or tag.";
+            };
+            hash = lib.mkOption {
+              type = t.nullOr t.str;
+              default = null;
+              description = "Fixed-output derivation SRI hash.";
+            };
+            forceFetchGit = lib.mkOption {
+              type = t.nullOr t.bool;
+              default = null;
+              description = "Whether to force git fetch instead of archive tarball.";
+            };
+          };
+        };
+
         serviceVersionSubmodule = t.submodule {
           freeformType = t.attrsOf (t.either serviceVersionSubmodule t.anything);
           options = {
@@ -221,6 +247,11 @@
               type = t.nullOr t.str;
               default = null;
               description = "Application or suite version string.";
+            };
+            src = lib.mkOption {
+              type = t.nullOr sourceSpecSubmodule;
+              default = null;
+              description = "Source repository fetch specification for build-from-source derivations.";
             };
             repository = lib.mkOption {
               type = t.nullOr t.str;

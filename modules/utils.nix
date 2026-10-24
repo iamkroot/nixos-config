@@ -168,4 +168,88 @@ rec {
   # with a component specification (providing `repository`). Only non-null attributes from imgSpec override defaultSpec.
   mkImageWithDefault =
     defaultSpec: imgSpec: mkImage (defaultSpec // (lib.filterAttrs (_: val: val != null) imgSpec));
+
+  # Fetch a source repository based on a forge URI scheme:
+  # - "github:owner/repo" -> pkgs.fetchFromGitHub
+  # - "gitea:domain/owner/repo" -> pkgs.fetchFromGitea
+  # - "codeberg:owner/repo" -> pkgs.fetchFromGitea { domain = "codeberg.org"; ... }
+  # - "gitlab:[domain/]owner/repo" -> pkgs.fetchFromGitLab
+  # - "git:https://..." -> pkgs.fetchgit
+  fetchRepo =
+    pkgs: spec:
+    let
+      repoStr =
+        if (spec.repository or null) != null && spec.repository != "" then
+          spec.repository
+        else
+          throw "myUtils.fetchRepo: missing required non-empty 'repository' attribute";
+      colonParts = lib.splitString ":" repoStr;
+      forge = lib.head colonParts;
+      rest = lib.concatStringsSep ":" (lib.tail colonParts);
+      parts = lib.splitString "/" rest;
+      numParts = builtins.length parts;
+      fetcherArgs = lib.filterAttrs (_: v: v != null) (removeAttrs spec [ "repository" ]);
+    in
+    if forge == "github" then
+      assert lib.assertMsg (
+        numParts == 2
+      ) "myUtils.fetchRepo: github repo '${repoStr}' must be 'github:owner/repo'";
+      pkgs.fetchFromGitHub (
+        fetcherArgs
+        // {
+          owner = lib.elemAt parts 0;
+          repo = lib.elemAt parts 1;
+        }
+      )
+    else if forge == "codeberg" then
+      assert lib.assertMsg (
+        numParts == 2
+      ) "myUtils.fetchRepo: codeberg repo '${repoStr}' must be 'codeberg:owner/repo'";
+      pkgs.fetchFromGitea (
+        fetcherArgs
+        // {
+          domain = "codeberg.org";
+          owner = lib.elemAt parts 0;
+          repo = lib.elemAt parts 1;
+        }
+      )
+    else if forge == "gitea" || forge == "forgejo" then
+      assert lib.assertMsg (
+        numParts == 3
+      ) "myUtils.fetchRepo: ${forge} repo '${repoStr}' must be '${forge}:domain/owner/repo'";
+      pkgs.fetchFromGitea (
+        fetcherArgs
+        // {
+          domain = lib.elemAt parts 0;
+          owner = lib.elemAt parts 1;
+          repo = lib.elemAt parts 2;
+        }
+      )
+    else if forge == "gitlab" then
+      assert lib.assertMsg (
+        numParts >= 2
+      ) "myUtils.fetchRepo: gitlab repo '${repoStr}' must be 'gitlab:[domain/]owner/repo'";
+      pkgs.fetchFromGitLab (
+        fetcherArgs
+        // (
+          if numParts == 2 then
+            {
+              owner = lib.elemAt parts 0;
+              repo = lib.elemAt parts 1;
+            }
+          else
+            {
+              domain = lib.elemAt parts 0;
+              owner = lib.elemAt parts 1;
+              repo = lib.elemAt parts 2;
+            }
+        )
+      )
+    else if forge == "git" then
+      assert lib.assertMsg (
+        rest != ""
+      ) "myUtils.fetchRepo: git repo '${repoStr}' must specify a valid URL ('git:https://...')";
+      pkgs.fetchgit ((removeAttrs fetcherArgs [ "forceFetchGit" ]) // { url = rest; })
+    else
+      throw "myUtils.fetchRepo: unsupported repository specification '${repoStr}'";
 }

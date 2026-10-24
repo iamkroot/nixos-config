@@ -7,11 +7,7 @@
 
 let
   v = config.infra.versions.redlib;
-  src = pkgs.fetchFromGitHub {
-    owner = v.owner or "redlib-org";
-    repo = v.repo or "redlib";
-    inherit (v) rev hash;
-  };
+  src = myUtils.fetchRepo pkgs v.src;
   redlib-latest = pkgs.redlib.overrideAttrs (oldAttrs: {
     inherit (v) version;
     inherit src;
@@ -70,17 +66,39 @@ in
     })
   ];
 
+  services.tor = {
+    enable = true;
+    client = {
+      enable = true;
+      socksListenAddress.port = config.infra.services.ports.tor_socks;
+    };
+    settings = {
+      Socks5Proxy = "127.0.0.1:${toString config.infra.services.ports.vpn-proxy}";
+    };
+  };
+
   services.redlib = {
     enable = true;
     package = redlibPkg;
     port = config.infra.services.ports.redlib;
-    # Expose to local network
-    openFirewall = true;
+    openFirewall = false;
     settings = {
       REDLIB_DEFAULT_USE_HLS = "on";
       REDLIB_DEFAULT_SHOW_NSFW = "on";
       REDLIB_DEFAULT_HIDE_HLS_NOTIFICATION = "on";
+      REDLIB_USE_REDDIT_ONION = "on";
+      ALL_PROXY = "socks5h://127.0.0.1:${toString config.infra.services.ports.tor_socks}";
     };
+  };
+
+  systemd.services.tor = {
+    after = [ "sing-box.service" ];
+    wants = [ "sing-box.service" ];
+  };
+
+  systemd.services.redlib = {
+    after = [ "tor.service" ];
+    wants = [ "tor.service" ];
   };
 
   # Anubis Middleware

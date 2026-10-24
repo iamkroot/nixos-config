@@ -7,6 +7,12 @@
 #   via `dockerTools.pullImage` (e.g. to extract static assets).
 #   - `digest`: OCI manifest/index hash (`sha256:...`) from the registry.
 #   - `hash`: Nix SRI NAR hash (`sha256-...=`) for the fixed-output derivation.
+# - Source fetchers: [<package>.src] dedicated sub-table for build-from-source derivations.
+#   - `repository`: forge URI scheme (e.g. 'github:owner/repo', 'gitea:domain/owner/repo',
+#     'codeberg:owner/repo', 'gitlab:[domain/]owner/repo', 'git:https://...').
+#   - `rev`: Git commit hash or tag.
+#   - `hash`: SRI hash for the fetched source repository.
+#   - `forceFetchGit`: boolean flag (optional) for forge fetchers to force full git fetch.
 
 [account-center]
 repository = "ghcr.io/icikowski/account-center"
@@ -92,13 +98,14 @@ tag = "2.3.0"
 digest = "sha256:11ed9f4c62311b956f1a89b44e19cf0908cd3e5169c3e43d59ab8144bbf7fe7d"
 
 [redlib]
-# FIXME: owner/repo should be forge-agnostic- use something like the repository field
-owner = "Nachtalb"
-repo = "redlib"
-version = "0.36.0-unstable-2026-10-21"
-rev = "fca8b45c186d51a74fd07e3159bc3bba435f7487"
-hash = "sha256-eNFDW4cqM1DKTI7k4U9rR+/7s1Qns4SCwwkRMSPkWo0="
-cargoHash = "sha256-c74QltRlz91xaclYj2V+ODLewbOg5ljlhRQGuqdZxbA="
+version = "0.40.0-unstable-2026-10-23"
+cargoHash = "sha256-mldbKN3gNNFkfaSBZGqo+haOL6B3nj+kiXy6ayd1h/I="
+
+[redlib.src]
+repository = "gitea:git.ptr.moe/baalajimaestro/redlib"
+rev = "a86b3e037059553d08311000d77bf5b4512ecb06"
+hash = "sha256-zVTDHvM5BbruvaPOajdjskSfb1Egm4KwWZ0Lp/yoIAI="
+forceFetchGit = true
 
 [revaulter]
 version = "2.7.2"
