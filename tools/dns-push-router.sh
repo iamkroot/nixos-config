@@ -18,9 +18,11 @@ NIX_BIN="${NIX_BIN:-nix}"
 PII=$($NIX_BIN eval -f secrets/pii.nix --json)
 SVCS=$($NIX_BIN eval --json --impure --expr 'let flake = builtins.getFlake (toString ./.); in (flake.inputs.nixpkgs.lib.evalModules { modules = [ ./modules/services-schema.nix ]; }).config.myServices')
 DATA=$(jq -n --argjson pii "$PII" --argjson svcs "$SVCS" -f tools/dns-data.jq)
-CLIENT_IDS=$(echo "$PII" | jq -c '["192.168.1.0/24", .networks.mesh.subnet, .networks.mesh.subnetV6]')
-ADGUARD_CLIENT_ADD_JSON=$(echo "$PII" | jq -c '{name: "LAN", ids: ["192.168.1.0/24", .networks.mesh.subnet, .networks.mesh.subnetV6], filtering_enabled: true, use_global_settings: true}')
-ADGUARD_CLIENT_UPDATE_JSON=$(echo "$PII" | jq -c '{name: "LAN", data: {name: "LAN", ids: ["192.168.1.0/24", .networks.mesh.subnet, .networks.mesh.subnetV6], filtering_enabled: true, use_global_settings: true}}')
+CLIENT_IDS=$(echo "$PII" | jq -c '["192.168.1.0/24"]')
+ADGUARD_LAN_CLIENT_ADD_JSON=$(echo "$PII" | jq -c '{name: "LAN", ids: ["192.168.1.0/24"], filtering_enabled: true, use_global_settings: true}')
+ADGUARD_LAN_CLIENT_UPDATE_JSON=$(echo "$PII" | jq -c '{name: "LAN", data: {name: "LAN", ids: ["192.168.1.0/24"], filtering_enabled: true, use_global_settings: true}}')
+ADGUARD_MESH_CLIENT_ADD_JSON=$(echo "$PII" | jq -c '{name: "MESH", ids: [.networks.mesh.subnet, .networks.mesh.subnetV6], filtering_enabled: true, use_global_settings: true}')
+ADGUARD_MESH_CLIENT_UPDATE_JSON=$(echo "$PII" | jq -c '{name: "MESH", data: {name: "MESH", ids: [.networks.mesh.subnet, .networks.mesh.subnetV6], filtering_enabled: true, use_global_settings: true}}')
 
 # Build hosts file entries: router.local + all homelab services
 HOSTS_ENTRIES=$(echo "$DATA" | jq -r '
@@ -31,11 +33,16 @@ HOSTS_ENTRIES=$(echo "$DATA" | jq -r '
 
 COUNT=$(echo "$HOSTS_ENTRIES" | wc -l)
 
-# Build AdGuard Home rewrite rules: rewrite homelab subdomains to local IP for LAN clients only
+# Build AdGuard Home rewrite rules:
+# 1. LAN clients get local IP (192.168.1.x)
+# 2. MESH clients get direct Tailscale IP (100.x.y.z) if available, falling back to local IP
 ADGUARD_JSON=$(echo "$DATA" | jq -c '
   .domain as $d |
   {
-    rules: [.homelab[] | "||\(.subdomain).\($d)^$dnsrewrite=\(.ip),client=LAN"]
+    rules: (
+      [.homelab[] | "||\(.subdomain).\($d)^$dnsrewrite=\(.ip),client=LAN"]
+      + [.homelab[] | "||\(.subdomain).\($d)^$dnsrewrite=\(.meshIp // .ip),client=MESH"]
+    )
   }
 ')
 
@@ -69,12 +76,18 @@ ssh "$ROUTER" "
 
   # Sync AdGuard Home client-conditional split rewrites if AdGuard is active
   if curl -sf http://127.0.0.1:3000/control/status >/dev/null 2>&1; then
-    echo 'Syncing AdGuard Home client=LAN split-DNS rewrite rules...'
+    echo 'Syncing AdGuard Home client=LAN and client=MESH split-DNS rewrite rules...'
     # Ensure persistent client 'LAN' exists for the local subnet
     curl -sf -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/control/clients/add \
-      -d '$ADGUARD_CLIENT_ADD_JSON' >/dev/null 2>&1 || \
+      -d '$ADGUARD_LAN_CLIENT_ADD_JSON' >/dev/null 2>&1 || \
     curl -sf -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/control/clients/update \
-      -d '$ADGUARD_CLIENT_UPDATE_JSON' >/dev/null 2>&1
+      -d '$ADGUARD_LAN_CLIENT_UPDATE_JSON' >/dev/null 2>&1
+
+    # Ensure persistent client 'MESH' exists for the Tailscale mesh subnets
+    curl -sf -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/control/clients/add \
+      -d '$ADGUARD_MESH_CLIENT_ADD_JSON' >/dev/null 2>&1 || \
+    curl -sf -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/control/clients/update \
+      -d '$ADGUARD_MESH_CLIENT_UPDATE_JSON' >/dev/null 2>&1
 
     # Remove [/kroot.dev/] from upstream_dns if present so WAN queries fall through to public DNS
     if grep -q '\[/kroot.dev/\]' /etc/adguardhome/adguardhome.yaml 2>/dev/null; then

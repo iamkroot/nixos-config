@@ -23,6 +23,7 @@ $svcs | to_entries
         | {
             subdomain: (.value.subdomain // .key),
             ip:    $pii.hosts[.value.host].localIp,
+            meshIp: ($pii.hosts[.value.host].tailscaleIp // null),
             cname: "\($pii.hosts[.value.host].name).\(domain)"
           }
       ] + [
@@ -30,12 +31,14 @@ $svcs | to_entries
         | select((has("publicIp") | not) and has("localIp"))
         | {
             subdomain: .name,
-            ip: .localIp
+            ip: .localIp,
+            meshIp: (.tailscaleIp // null)
           }
       ] + [
         {
           subdomain: "dns",
           ip: $pii.router2.localIp,
+          meshIp: null,
           cname: "\($pii.hosts.homelab1.name).\(domain)"
         }
       ]
