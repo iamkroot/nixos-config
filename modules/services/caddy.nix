@@ -39,6 +39,18 @@
           copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
         }
       }
+
+      # ----------------------------------------------------
+      # Anubis PoW Proxy with Local/Mesh IP Bypass
+      # Usage: import anubis_proxy <target_backend> <anubis_backend>
+      # ----------------------------------------------------
+      (anubis_proxy) {
+        @local remote_ip 127.0.0.1 ::1 private_ranges ${pii.networks.mesh.subnet} ${pii.networks.mesh.subnetV6}
+        reverse_proxy @local {args[0]}
+        reverse_proxy {args[1]} {
+          header_up X-Real-IP {client_ip}
+        }
+      }
     '';
   };
 

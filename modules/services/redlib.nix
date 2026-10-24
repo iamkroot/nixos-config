@@ -58,9 +58,7 @@ in
           respond @aiBots "AI Scraping Blocked" 403
           respond /robots.txt "User-agent: ClaudeBot\nDisallow: /\n\nUser-agent: GPTBot\nDisallow: /" 200
 
-          reverse_proxy 127.0.0.1:${toString config.infra.services.ports.anubis_redlib} {
-            header_up X-Real-IP {client_ip}
-          }
+          import anubis_proxy 127.0.0.1:${toString config.infra.services.ports.redlib} 127.0.0.1:${toString config.infra.services.ports.anubis_redlib}
         '';
       };
     })
