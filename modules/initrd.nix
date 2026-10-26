@@ -10,7 +10,6 @@
 {
   hardware.enableRedistributableFirmware = true;
   boot.initrd.availableKernelModules = [ "r8169" ];
-  boot.initrd.systemd.enable = true;
   boot.initrd.systemd.network = {
     enable = true;
 

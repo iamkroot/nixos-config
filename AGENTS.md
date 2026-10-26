@@ -31,7 +31,7 @@ The repository uses `mise` (`mise.toml`) for task execution and development work
 - **Dry-run / Check**:
   - Homelab: `mise run check-homelab`
   - Cloud: `mise run check-cloud`
-  - Avoid staging changes to existing files to git before the dry-run. Only stage new files (nix works just fine with dirty files.)
+  - Avoid staging changes to existing files to git before the dry-run. Only stage new files (nix works just fine with dirty files.) Also avoid _unstaging_ files that are already staged.
 - Prefer to create new mise tasks for repetitive actions, especially those that will extend beyond one session.
 - When directly evaluating nix exprs, remember to use `submodules` -- `nix eval ".?submodules=1#nixosConfigurations.foo.bar.baz"`.
 - Note: System rebuilds, deployments, and secret edits are performed manually by the user.

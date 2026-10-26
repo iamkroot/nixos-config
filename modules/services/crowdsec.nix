@@ -1,29 +1,15 @@
 {
-  inputs,
   pii,
   config,
   ...
 }:
 {
-  disabledModules = [
-    "services/security/crowdsec.nix"
-    "services/security/crowdsec-firewall-bouncer.nix"
-  ];
-
-  imports = [
-    "${inputs.crowdsec}/nixos/modules/services/security/crowdsec"
-    "${inputs.crowdsec}/nixos/modules/services/security/crowdsec-firewall-bouncer.nix"
-  ];
-
-  # Upstream PR 535319 includes a doc.md with missing heading IDs, which breaks
-  # nixos-render-docs when building the HTML NixOS manual.
-  documentation.nixos.enable = false;
-
   services.crowdsec = {
     enable = true;
     settings.config.api.server.listen_uri = "0.0.0.0:${toString config.infra.services.ports.crowdsec}";
 
     extraGroups = [ "caddy" ];
+    readOnlyPaths = [ "/var/log/caddy" ];
 
     hub.collections = [
       "crowdsecurity/caddy"
@@ -38,6 +24,19 @@
       "LePresidente/jellyfin"
       "gauth-fr/immich"
       "crowdsecurity/home-assistant"
+    ];
+
+    settings.parsers.s02Enrich = [
+      {
+        name = "custom/private-whitelist";
+        description = "Whitelist internal private network";
+        whitelist = {
+          reason = "Private network ${pii.hosts.homelab1.localIp}/24";
+          cidr = [
+            "${pii.hosts.homelab1.localIp}/24"
+          ];
+        };
+      }
     ];
 
     settings.acquisitions = [
@@ -82,16 +81,6 @@
       }
     ];
   };
-
-  # Whitelist local network addresses
-  environment.etc."crowdsec/parsers/s02-enrich/private-whitelist.yaml".text = ''
-    name: custom/private-whitelist
-    description: "Whitelist internal private network"
-    whitelist:
-      reason: "Private network ${pii.hosts.homelab1.localIp}/24"
-      cidr:
-        - "${pii.hosts.homelab1.localIp}/24"
-  '';
 
   # Drops the connections at the kernel/firewall level
   services.crowdsec-firewall-bouncer = {

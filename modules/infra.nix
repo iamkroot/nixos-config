@@ -92,14 +92,6 @@
 
   config.nixpkgs.overlays = [
     (final: prev: {
-      # Workaround for nixpkgs #568705: eternal-terminal fails to build with abseil-cpp/protobuf in C++17 mode
-      eternal-terminal = prev.eternal-terminal.overrideAttrs (old: {
-        postPatch = (old.postPatch or "") + ''
-          substituteInPlace CMakeLists.txt \
-            --replace-fail "set(CMAKE_CXX_STANDARD 17)" "set(CMAKE_CXX_STANDARD 20)"
-        '';
-      });
-
       # Workaround for nixpkgs: authelia-web 4.39.28 has pnpmDepsHash mismatch on Linux
       authelia = myUtils.selfExpiringOverride {
         pkgs = prev;

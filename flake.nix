@@ -34,10 +34,6 @@
       url = "github:iamkroot/chatlume";
       flake = false;
     };
-
-    crowdsec = {
-      url = "github:NixOS/nixpkgs/pull/535319/head";
-    };
   };
 
   outputs =
