@@ -179,6 +179,7 @@ in
       "--add-host=${config.infra.services.hostnames.sonarr}:host-gateway"
     ];
   };
+
   vaultix.secrets = vaultixSecrets // {
     "sonarr-key" = {
       file = pii.secrets.sonarr-key;

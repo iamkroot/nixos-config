@@ -97,6 +97,12 @@ repository = "ghcr.io/dictionarry-hub/profilarr"
 tag = "2.3.1"
 digest = "sha256:352e42dec74ecfd68d13bb198fbc6d9346e3a8c55003026e1814e59319a2176d"
 
+[prowlarr-orionoid]
+repository = "docker.io/jamtur01/prowlarr-orionoid"
+tag = "1.2.0"
+digest = "sha256:a82627dc2682d8d910e2e750405b6dd564a6012b8559f664effaea922e60762d"
+
+
 [redlib]
 version = "0.40.0-unstable-2026-10-23"
 cargoHash = "sha256-mldbKN3gNNFkfaSBZGqo+haOL6B3nj+kiXy6ayd1h/I="
