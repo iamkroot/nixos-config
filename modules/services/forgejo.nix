@@ -13,7 +13,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "forgejo" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

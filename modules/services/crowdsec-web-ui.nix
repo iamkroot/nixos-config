@@ -13,7 +13,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "crowdsec-web-ui" {
       authelia = true;
-      meshOnly = true;
     })
   ];
 

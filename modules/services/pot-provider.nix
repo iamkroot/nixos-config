@@ -11,7 +11,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "pot-provider" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

@@ -14,6 +14,11 @@ in
               default = true;
               description = "If true, service is included in the host's configuration and DNS generation.";
             };
+            meshOnly = lib.mkOption {
+              type = t.bool;
+              default = false;
+              description = "If true, service is restricted to LAN and Tailscale mesh, and rewrites are generated for mesh clients.";
+            };
             port = lib.mkOption {
               type = t.port;
               default = 0;

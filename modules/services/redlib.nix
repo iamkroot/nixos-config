@@ -42,7 +42,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "redlib" {
       authelia = false;
-      meshOnly = true;
       extraHostConfig = {
         extraConfig = ''
           # Match ClaudeBot and other common AI scrapers

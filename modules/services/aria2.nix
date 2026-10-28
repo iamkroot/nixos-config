@@ -8,7 +8,7 @@
 }:
 {
   imports = [
-    (myUtils.mkCaddyModule "aria2" { meshOnly = true; })
+    (myUtils.mkCaddyModule "aria2" { })
     (myUtils.mkCaddyModule "ariang" {
       # authelia = true; not needed
       extraHostConfig.extraConfig = ''

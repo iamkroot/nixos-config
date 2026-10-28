@@ -43,23 +43,18 @@ in
   imports = [
     (myUtils.mkCaddyModule "radarr" {
       authelia = true;
-      meshOnly = true;
     })
     (myUtils.mkCaddyModule "sonarr" {
       authelia = true;
-      meshOnly = true;
     })
     (myUtils.mkCaddyModule "decypharr" {
       authelia = true;
-      meshOnly = true;
     })
     (myUtils.mkCaddyModule "profilarr" {
       authelia = true;
-      meshOnly = true;
     })
     (myUtils.mkCaddyModule "prowlarr" {
       authelia = true;
-      meshOnly = true;
     })
     ../../modules/services/byparr.nix
   ];

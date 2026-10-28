@@ -9,7 +9,6 @@
   imports = [
     (myUtils.mkCaddyModule "obsidian-live-sync" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

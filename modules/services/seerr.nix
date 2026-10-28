@@ -3,7 +3,6 @@
     # TODO: Doesn't support OIDC yet https://github.com/seerr-team/seerr/pull/2715
     (myUtils.mkCaddyModule "seerr" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

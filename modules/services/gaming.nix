@@ -45,7 +45,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "sunshine" {
       authelia = false;
-      meshOnly = true;
       extraHostConfig.extraConfig = ''
         reverse_proxy https://127.0.0.1:${toString config.infra.services.ports.sunshine} {
           transport http {

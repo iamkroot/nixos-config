@@ -13,7 +13,6 @@ in
     (myUtils.mkCaddyModule "homeassistant" {
       authelia = false;
       # FIXME: Need to ensure api is still available
-      meshOnly = true;
     })
   ];
 

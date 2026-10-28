@@ -13,7 +13,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "beszel" {
       authelia = true;
-      meshOnly = true;
     })
   ];
 

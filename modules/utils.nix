@@ -16,7 +16,6 @@ rec {
     name:
     {
       authelia ? false,
-      meshOnly ? false,
       # can be used to override all the fields. In particular,
       # extraHostConfig.extraConfig will override the standard "reverse_proxy" directive
       # and will render other options like "authelia=true" useless.
@@ -26,12 +25,18 @@ rec {
       targetHost ? "127.0.0.1",
       bypassAuthPaths ? [ ],
     }:
-    { config, pii, ... }:
+    {
+      config,
+      pii,
+      services ? config.myServices or { },
+      ...
+    }:
     let
       hostname = config.infra.services.hostnames."${name}";
       port = config.infra.services.ports."${portKey}";
       userExtraConfig = extraHostConfig.extraConfig or null;
       meshNet = pii.networks.mesh;
+      meshOnly = services.${name}.meshOnly or false;
       meshSnippet = ''
         @denied not remote_ip ${meshNet.subnet} ${meshNet.subnetV6} 127.0.0.1 ::1 private_ranges
         abort @denied

@@ -58,7 +58,6 @@ in
     })
     (myUtils.mkCaddyModule "windmill" {
       authelia = false;
-      meshOnly = true; # Restrict to LAN and Tailscale mesh
       extraHostConfig = {
         extraConfig = ''
           # Extra services: LSP, Multiplayer, Debugger (WebSocket gateway)

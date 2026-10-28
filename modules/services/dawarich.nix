@@ -18,7 +18,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "dawarich" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

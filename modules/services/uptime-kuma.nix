@@ -10,7 +10,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "uptime-kuma" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

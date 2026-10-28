@@ -11,7 +11,6 @@
   imports = [
     (myUtils.mkCaddyModule "atuin" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

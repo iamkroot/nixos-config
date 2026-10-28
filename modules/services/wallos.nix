@@ -8,7 +8,6 @@
   imports = [
     (myUtils.mkCaddyModule "wallos" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

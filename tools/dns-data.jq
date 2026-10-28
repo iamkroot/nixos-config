@@ -59,5 +59,15 @@ $svcs | to_entries
             ip: .publicIp
           }
       ]
+    ),
+    mesh: (
+      [
+        .[]
+        | select((.value.meshOnly // false) == true and ($pii.hosts[.value.host].tailscaleIp != null))
+        | {
+            subdomain: (.value.subdomain // .key),
+            ip: $pii.hosts[.value.host].tailscaleIp
+          }
+      ]
     )
   }

@@ -28,7 +28,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "argus" {
       authelia = true;
-      meshOnly = true;
     })
   ];
 

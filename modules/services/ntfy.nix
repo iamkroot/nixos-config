@@ -37,7 +37,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "ntfy" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

@@ -13,7 +13,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "ldap" {
       portKey = "lldap_http";
-      meshOnly = true;
     })
   ];
 

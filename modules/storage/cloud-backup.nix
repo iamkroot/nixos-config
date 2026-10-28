@@ -108,7 +108,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "kopia" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 

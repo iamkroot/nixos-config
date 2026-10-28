@@ -10,7 +10,6 @@ in
   imports = [
     (myUtils.mkCaddyModule "waha" {
       authelia = false;
-      meshOnly = true;
     })
   ];
 
