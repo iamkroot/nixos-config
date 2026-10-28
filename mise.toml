@@ -23,6 +23,7 @@ run = [
 	"nix run $'.?submodules=1#vaultix.app.x86_64-linux.renc'",
 	"git -C secrets add cache",
 ]
+interactive = true
 
 [tasks."secret:edit"]
 dir = "{{ config_root }}"
