@@ -66,7 +66,8 @@ $svcs | to_entries
         | select((.value.meshOnly // false) == true and ($pii.hosts[.value.host].tailscaleIp != null))
         | {
             subdomain: (.value.subdomain // .key),
-            ip: $pii.hosts[.value.host].tailscaleIp
+            ip: $pii.hosts[.value.host].tailscaleIp,
+            isCloud: is_cloud(.value.host)
           }
       ]
     )

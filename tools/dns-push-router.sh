@@ -18,9 +18,9 @@ NIX_BIN="${NIX_BIN:-nix}"
 PII=$($NIX_BIN eval -f secrets/pii.nix --json)
 SVCS=$($NIX_BIN eval --json --impure --expr 'let flake = builtins.getFlake (toString ./.); in (flake.inputs.nixpkgs.lib.evalModules { modules = [ ./modules/services-schema.nix ]; }).config.myServices')
 DATA=$(jq -n --argjson pii "$PII" --argjson svcs "$SVCS" -f tools/dns-data.jq)
-CLIENT_IDS=$(echo "$PII" | jq -c '["192.168.1.0/24"]')
-ADGUARD_LAN_CLIENT_ADD_JSON=$(echo "$PII" | jq -c '{name: "LAN", ids: ["192.168.1.0/24"], filtering_enabled: true, use_global_settings: true}')
-ADGUARD_LAN_CLIENT_UPDATE_JSON=$(echo "$PII" | jq -c '{name: "LAN", data: {name: "LAN", ids: ["192.168.1.0/24"], filtering_enabled: true, use_global_settings: true}}')
+CLIENT_IDS=$(echo "$PII" | jq -c '["192.168.1.0/24", "127.0.0.1", "::1"]')
+ADGUARD_LAN_CLIENT_ADD_JSON=$(echo "$PII" | jq -c '{name: "LAN", ids: ["192.168.1.0/24", "127.0.0.1", "::1"], filtering_enabled: true, use_global_settings: true}')
+ADGUARD_LAN_CLIENT_UPDATE_JSON=$(echo "$PII" | jq -c '{name: "LAN", data: {name: "LAN", ids: ["192.168.1.0/24", "127.0.0.1", "::1"], filtering_enabled: true, use_global_settings: true}}')
 ADGUARD_MESH_CLIENT_ADD_JSON=$(echo "$PII" | jq -c '{name: "MESH", ids: [.networks.mesh.subnet, .networks.mesh.subnetV6], filtering_enabled: true, use_global_settings: true}')
 ADGUARD_MESH_CLIENT_UPDATE_JSON=$(echo "$PII" | jq -c '{name: "MESH", data: {name: "MESH", ids: [.networks.mesh.subnet, .networks.mesh.subnetV6], filtering_enabled: true, use_global_settings: true}}')
 
@@ -35,13 +35,15 @@ COUNT=$(echo "$HOSTS_ENTRIES" | wc -l)
 
 # Build AdGuard Home rewrite rules:
 # 1. LAN clients get local IP (192.168.1.x)
-# 2. MESH clients get direct Tailscale IP (100.x.y.z) for mesh-only services
+# 2. MESH clients get direct Tailscale IP (100.x.y.z) for mesh-only homelab services
+# 3. Cloud mesh-only services get unconditional rewrites (since they have no LAN IP)
 ADGUARD_JSON=$(echo "$DATA" | jq -c '
   .domain as $d |
   {
     rules: (
       [.homelab[] | "||\(.subdomain).\($d)^$dnsrewrite=\(.ip),client=LAN"]
-      + [.mesh[] | "||\(.subdomain).\($d)^$dnsrewrite=\(.ip),client=MESH"]
+      + [.mesh[] | select(.isCloud | not) | "||\(.subdomain).\($d)^$dnsrewrite=\(.ip),client=MESH"]
+      + [.mesh[] | select(.isCloud) | "||\(.subdomain).\($d)^$dnsrewrite=\(.ip)"]
     )
   }
 ')
