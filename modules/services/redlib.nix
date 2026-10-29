@@ -63,16 +63,17 @@ in
     })
   ];
 
-  services.tor = {
-    enable = true;
-    client = {
-      enable = true;
-      socksListenAddress.port = config.infra.services.ports.tor_socks;
-    };
-    settings = {
-      Socks5Proxy = "127.0.0.1:${toString config.infra.services.ports.vpn-proxy}";
-    };
-  };
+  # Tor proxy (disabled for now)
+  # services.tor = {
+  #   enable = true;
+  #   client = {
+  #     enable = true;
+  #     socksListenAddress.port = config.infra.services.ports.tor_socks;
+  #   };
+  #   settings = {
+  #     Socks5Proxy = "127.0.0.1:${toString config.infra.services.ports.vpn-proxy}";
+  #   };
+  # };
 
   services.redlib = {
     enable = true;
@@ -83,20 +84,20 @@ in
       REDLIB_DEFAULT_USE_HLS = "on";
       REDLIB_DEFAULT_SHOW_NSFW = "on";
       REDLIB_DEFAULT_HIDE_HLS_NOTIFICATION = "on";
-      REDLIB_USE_REDDIT_ONION = "on";
-      ALL_PROXY = "socks5h://127.0.0.1:${toString config.infra.services.ports.tor_socks}";
+      # REDLIB_USE_REDDIT_ONION = "on";
+      # ALL_PROXY = "socks5h://127.0.0.1:${toString config.infra.services.ports.tor_socks}";
     };
   };
 
-  systemd.services.tor = {
-    after = [ "sing-box.service" ];
-    wants = [ "sing-box.service" ];
-  };
+  # systemd.services.tor = {
+  #   after = [ "sing-box.service" ];
+  #   wants = [ "sing-box.service" ];
+  # };
 
-  systemd.services.redlib = {
-    after = [ "tor.service" ];
-    wants = [ "tor.service" ];
-  };
+  # systemd.services.redlib = {
+  #   after = [ "tor.service" ];
+  #   wants = [ "tor.service" ];
+  # };
 
   # Anubis Middleware
   services.anubis.instances."redlib" = {

@@ -104,14 +104,13 @@ digest = "sha256:a82627dc2682d8d910e2e750405b6dd564a6012b8559f664effaea922e60762
 
 
 [redlib]
-version = "0.40.0-unstable-2026-10-23"
-cargoHash = "sha256-mldbKN3gNNFkfaSBZGqo+haOL6B3nj+kiXy6ayd1h/I="
+version = "0.36.0-unstable-2026-10-28"
+cargoHash = "sha256-HxOGzNKytC5EHA5Ox6Dor/qQZafEnWYjzKS6HH9fYW8="
 
 [redlib.src]
-repository = "gitea:git.ptr.moe/baalajimaestro/redlib"
-rev = "a86b3e037059553d08311000d77bf5b4512ecb06"
-hash = "sha256-zVTDHvM5BbruvaPOajdjskSfb1Egm4KwWZ0Lp/yoIAI="
-forceFetchGit = true
+repository = "github:polak14/redlib"
+rev = "29f18352cf54be4ffe579f773552acd0c45cdd08"
+hash = "sha256-ShLaYBcSZmW2gQuwJdtE3nhpuzWL+ITkyuCgQ0rNM1o="
 
 [revaulter]
 version = "2.8.0"
