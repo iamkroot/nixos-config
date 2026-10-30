@@ -124,7 +124,7 @@ hash = "sha256-zW+iwajbt3bSNeiq634bNeb1N6CekZXXGaZghVd7mTE="
 [rsstt]
 repository = "docker.io/rongronggg9/rss-to-telegram"
 tag = "dev"
-digest = "sha256:f27fecd019bb7c545ad281a5a75c48782a9516bee22b31f8d0e21b3426784943"
+digest = "sha256:48b06e90e00fc08de2f90f83c674ee1c42c53b6b29f28a120bf0c2ba6804b482"
 
 [shoko]
 repository = "ghcr.io/shokoanime/server"
@@ -143,8 +143,8 @@ digest = "sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9df
 
 [waha]
 repository = "docker.io/devlikeapro/waha"
-tag = "gows"
-digest = "sha256:1ae3c6a994ee97e5039bf41103193d7bf9175f1a31db73ba89bdeed6277901bc"
+tag = "gows-2026.10.1"
+digest = "sha256:1f7faeb0227ad5edb5711f7058bfce807ea65e5f92234af0778e4db140f6eb46"
 
 [wallos]
 repository = "docker.io/bellamy/wallos"
@@ -157,15 +157,15 @@ tag = "v1.5.0"
 digest = "sha256:7d6a3c8f91470a23ef380320609ee6e69ac68d20bc804f3a1c6065fb56cfa34e"
 
 [windmill]
-version = "1.848.2"
+version = "1.854.2"
 
 [windmill.server]
 repository = "ghcr.io/windmill-labs/windmill"
-digest = "sha256:f160972c473f2909a27f1520f6f7b27d01fbf97ec4b2d52db00279a19076a826"
+digest = "sha256:b765d13a92e22b6ef1fef1b93cfa072696194b0c5198d087639c7ca6f2126fc6"
 
 [windmill.extra]
 repository = "ghcr.io/windmill-labs/windmill-extra"
-digest = "sha256:384ef22072cd92c83a468690a49eae233981ceaba626467f6841d534c8a8aca7"
+digest = "sha256:c7c8676928b3152e968b4717ef9f1a0929c25dd0bac351120bdd903401e4bfec"
 
 [windmill.postgres]
 repository = "docker.io/library/postgres"
