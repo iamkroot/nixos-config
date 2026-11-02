@@ -92,6 +92,11 @@ repository = "ghcr.io/dongdongbh/mindwtr-app"
 digest = "sha256:972a101e16452009fc721dd31a4ec80139b74768d8107271745ee7083223004f"
 hash = "sha256-Eo5Dzle6c3O3wY8NmBuaqMe7/9Z/71NkdxvuQTbR1CI="
 
+[onstar2mqtt]
+repository = "ghcr.io/bigthundersr/onstar2mqtt"
+tag = "2.11.0"
+digest = "sha256:d37121037380ba4b9c33f240c656ef0cc83d18b5bb798bc4b80cf32494701747"
+
 [pot-provider]
 repository = "docker.io/brainicism/bgutil-ytdlp-pot-provider"
 tag = "2.0.2"
