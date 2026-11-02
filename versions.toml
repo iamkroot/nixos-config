@@ -31,8 +31,8 @@ digest = "sha256:874f719518f617d03a60e03411fc5d090647e1a877041e81f8dc965927c7deb
 
 [crowdsec-web-ui]
 repository = "ghcr.io/theduffman85/crowdsec-web-ui"
-tag = "2026.10.10"
-digest = "sha256:f57568d27b2c7798155a638b9cb76302777a9dcf43d8026f344c17767589d694"
+tag = "2026.10.13"
+digest = "sha256:3b7d608ea3fb1d8ecf12079c188f9a8c705c89cf03685db4a1b89303d8e17477"
 
 [dawarich]
 version = "1.14.4"
@@ -68,12 +68,12 @@ digest = "sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c2
 [immich.valkey]
 repository = "docker.io/valkey/valkey"
 tag = "9"
-digest = "sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd"
+digest = "sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7"
 
 [koalasync]
 repository = "ghcr.io/shik3i/koalasync"
-tag = "v3.3.1"
-digest = "sha256:a82b121a3a35a44249f909df9149b739533687559b072e274fe19b93eb24283a"
+tag = "v3.3.3"
+digest = "sha256:5532b6ecc986525179444a0604a35511b7e1b95ffc4d01d0dfed74a428b56a50"
 
 [mindwtr]
 version = "1.3.7"
@@ -139,7 +139,7 @@ digest = "sha256:ba3990c25fdc7d24f43731d3919b0c9f4021cc4e9ea5d4d3823ad216358198f
 [shitter.valkey]
 repository = "docker.io/valkey/valkey"
 tag = "9"
-digest = "sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd"
+digest = "sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7"
 
 [waha]
 repository = "docker.io/devlikeapro/waha"
@@ -148,8 +148,8 @@ digest = "sha256:1f7faeb0227ad5edb5711f7058bfce807ea65e5f92234af0778e4db140f6eb4
 
 [wallos]
 repository = "docker.io/bellamy/wallos"
-tag = "5.10.2"
-digest = "sha256:8873c2328e745c7ca8ff0e0f5508215219ec5c02a3469c0d8049602be2a2bca3"
+tag = "5.10.3"
+digest = "sha256:082f85de7367cdbe9c3005a3e4133b33135d204b1e0f47d760e29613a74a04d4"
 
 [whoami]
 repository = "docker.io/containous/whoami"
@@ -157,20 +157,20 @@ tag = "v1.5.0"
 digest = "sha256:7d6a3c8f91470a23ef380320609ee6e69ac68d20bc804f3a1c6065fb56cfa34e"
 
 [windmill]
-version = "1.854.2"
+version = "1.855.1"
 
 [windmill.server]
 repository = "ghcr.io/windmill-labs/windmill"
-digest = "sha256:b765d13a92e22b6ef1fef1b93cfa072696194b0c5198d087639c7ca6f2126fc6"
+digest = "sha256:474fceb2b81445ab9dac9383cb3884133c1ddd0a68e85dcab24a784f7d110bb5"
 
 [windmill.extra]
 repository = "ghcr.io/windmill-labs/windmill-extra"
-digest = "sha256:c7c8676928b3152e968b4717ef9f1a0929c25dd0bac351120bdd903401e4bfec"
+digest = "sha256:80fb9e7ac474ab2850b2b23b6010e3ca6d47ea2449f9774e6951ef25651450f1"
 
 [windmill.postgres]
 repository = "docker.io/library/postgres"
 tag = "18"
-digest = "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+digest = "sha256:3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81"
 
 [yopass.app]
 repository = "docker.io/jhaals/yopass"
