@@ -14,14 +14,38 @@
   services.sing-box = {
     enable = true;
     settings = {
-      dns.servers = [
-        {
-          tag = "vpn-dns";
-          type = "udp";
-          server = pii.vpn.dns;
-          detour = "vpn-out";
-        }
-      ];
+      dns = {
+        servers = [
+          {
+            tag = "vpn-dns";
+            type = "udp";
+            server = pii.vpn.dns;
+            detour = "vpn-out";
+          }
+          {
+            tag = "local-dns";
+            type = "udp";
+            server = pii.router2.localIp;
+            detour = "direct";
+          }
+        ];
+        rules = [
+          {
+            domain_suffix = [
+              pii.primaryDomain
+              "local"
+              "lan"
+              "ts.net"
+              "arpa"
+              "localhost"
+            ];
+            server = "local-dns";
+            strategy = "prefer_ipv4";
+          }
+        ];
+        final = "vpn-dns";
+        strategy = "ipv4_only";
+      };
 
       inbounds = [
         {
@@ -58,11 +82,41 @@
           type = "urltest";
           tag = "vpn-out";
           outbounds = map (s: s.tag) pii.vpn.servers;
-          # Uses built-in defaults: https://www.gstatic.com/generate_204, 3m interval, 50ms tolerance
+          url = "http://1.1.1.1/generate_204";
+          interval = "3m";
+          tolerance = 50;
+        }
+        {
+          type = "direct";
+          tag = "direct";
+          domain_resolver = "local-dns";
         }
       ];
 
       route = {
+        rules = [
+          {
+            ip_is_private = true;
+            outbound = "direct";
+          }
+          {
+            ip_cidr = [
+              pii.networks.mesh.subnet
+              pii.networks.mesh.subnetV6
+            ];
+            outbound = "direct";
+          }
+          {
+            domain_suffix = [
+              pii.primaryDomain
+              "local"
+              "lan"
+              "ts.net"
+              "localhost"
+            ];
+            outbound = "direct";
+          }
+        ];
         final = "vpn-out";
         default_domain_resolver = "vpn-dns";
       };
