@@ -69,6 +69,14 @@ $svcs | to_entries
             ip: $pii.hosts[.value.host].tailscaleIp,
             isCloud: is_cloud(.value.host)
           }
+      ] + [
+        $pii.hosts[]
+        | select(has("tailscaleIp"))
+        | {
+            subdomain: .name,
+            ip: .tailscaleIp,
+            isCloud: has("publicIp")
+          }
       ]
     )
   }
