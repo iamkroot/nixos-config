@@ -1,12 +1,14 @@
 {
   config,
   lib,
+  pkgs,
   services,
   myUtils,
   ...
 }:
 let
   port = config.infra.services.ports.homeassistant;
+  smartrentSrc = myUtils.fetchRepo pkgs config.infra.versions.homeassistant-smartrent.src;
 in
 {
   imports = [
@@ -28,6 +30,7 @@ in
     volumes = [
       "/var/lib/homeassistant:/config"
       "/etc/localtime:/etc/localtime:ro"
+      "${smartrentSrc}/custom_components/smartrent:/config/custom_components/smartrent:ro"
     ];
     environment = {
       TZ = "America/Los_Angeles";

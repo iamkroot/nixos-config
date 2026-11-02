@@ -95,6 +95,7 @@ description = "Deploy Cloud VM from generated VHD"
 run = '''DISK_SIZE_GB=64 ./tools/deploy-{{vars.cloud1_variant}}-vm.sh {{vars.cloud1_rg}} {{vars.cloud1_name}} ./{{vars.cloud1_name}}.vhd {{vars.cloud1_storage_account}} vhds'''
 
 [tasks.rebuild-homelab]
+alias = "rh"
 vars._.file = "secrets/mise_vars.txt"
 description = "Invoke nixos-rebuild remotely to homelab"
 interactive = true

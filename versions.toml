@@ -49,6 +49,11 @@ repository = "ghcr.io/home-assistant/home-assistant"
 tag = "2026.10.4"
 digest = "sha256:23f4dfbb69ce76315dbc4de7915504f1c2dcecd7ca2648113a493a385972e133"
 
+[homeassistant-smartrent.src]
+repository = "github:vincent861223/homeassistant-smartrent"
+rev = "e53d9d41c875f5a5ff266e62f2026bd560950eb9"
+hash = "sha256-E7hUKAftpLU9YkyyPYPX3t256xBQ7KCbsQrddDp+u14="
+
 [immich]
 tag = "v3.3.5"
 
