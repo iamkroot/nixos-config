@@ -35,7 +35,24 @@
   systemd.targets.hibernate.enable = false;
   systemd.targets.hybrid-sleep.enable = false;
   # for RDP
-  networking.firewall.allowedTCPPorts = [ 3389 ];
+  networking.firewall.allowedTCPPorts = [ config.infra.services.ports.krdp ];
+
+  systemd.user.services."app-org.kde.krdpserver" = {
+    description = "KRDP Server";
+    after = [
+      "plasma-xdg-desktop-portal-kde.service"
+      "plasma-core.target"
+    ];
+    partOf = [ "plasma-workspace.target" ];
+    wantedBy = [ "plasma-workspace.target" ];
+    aliases = [ "plasma-krdp_server.service" ];
+    serviceConfig = {
+      Type = "exec";
+      ExecStart = "${pkgs.kdePackages.krdp}/bin/krdpserver --port ${toString config.infra.services.ports.krdp}";
+      Restart = "on-abnormal";
+      RestartSec = "3s";
+    };
+  };
 
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
     elisa

@@ -1,15 +1,10 @@
 {
-  inputs,
   pkgs,
   pii,
   ...
 }:
 
 {
-  imports = [
-    inputs.plasma-manager.homeModules.plasma-manager
-  ];
-
   programs.plasma = {
     enable = true;
 
