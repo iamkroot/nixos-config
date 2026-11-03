@@ -60,6 +60,34 @@ $svcs | to_entries
           }
       ]
     ),
+    public: {
+      homelab: [
+        .[]
+        | select((is_cloud(.value.host) | not) and (.value.meshOnly // false) == false)
+        | {
+            subdomain: (.value.subdomain // .key),
+            cname: "\($pii.hosts[.value.host].name).\(domain)"
+          }
+      ],
+      cloud: (
+        [
+          .[]
+          | select(is_cloud(.value.host) and (.value.meshOnly // false) == false)
+          | {
+              subdomain: (.value.subdomain // .key),
+              ip: $pii.hosts[.value.host].publicIp,
+              cname: "\($pii.hosts[.value.host].name).\(domain)"
+            }
+        ] + [
+          $pii.hosts[]
+          | select(has("publicIp"))
+          | {
+              subdomain: .name,
+              ip: .publicIp
+            }
+        ]
+      )
+    },
     mesh: (
       [
         .[]
