@@ -29,6 +29,13 @@
     enable = true;
     email = pii.primaryEmail;
 
+    virtualHosts."*.${config.infra.domain}" = {
+      useACMEHost = config.infra.domain;
+      extraConfig = ''
+        respond "Not Found" 404
+      '';
+    };
+
     extraConfig = ''
       # ----------------------------------------------------
       # Authelia Forward Auth Snippet
