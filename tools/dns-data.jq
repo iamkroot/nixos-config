@@ -38,7 +38,7 @@ $svcs | to_entries
         {
           subdomain: "dns",
           ip: $pii.router2.localIp,
-          meshIp: null,
+          meshIp: ($pii.router2.tailscaleIp // null),
           cname: "\($pii.hosts.homelab1.name).\(domain)"
         }
       ]
@@ -77,6 +77,14 @@ $svcs | to_entries
             ip: .tailscaleIp,
             isCloud: has("publicIp")
           }
-      ]
+      ] + (
+        if ($pii.router2.tailscaleIp // null) != null then [
+          {
+            subdomain: "dns",
+            ip: $pii.router2.tailscaleIp,
+            isCloud: false
+          }
+        ] else [] end
+      )
     )
   }
