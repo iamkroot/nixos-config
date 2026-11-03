@@ -1,6 +1,6 @@
 [tasks.fmt]
 description = "Run nixfmt"
-run = "nix-shell -p nixfmt-tree --run \"treefmt ${@:-.}\""
+run = "nix shell --no-substitute nixpkgs#nixfmt-tree --command treefmt \"${@:-.}\""
 
 [tasks."dns:push-router"]
 vars._.file = "secrets/mise_vars.txt"
