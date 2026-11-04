@@ -35,14 +35,14 @@ COUNT=$(echo "$HOSTS_ENTRIES" | wc -l)
 
 # Build AdGuard Home rewrite rules:
 # 1. LAN clients get local IP (192.168.1.x)
-# 2. MESH clients get direct Tailscale IP (100.x.y.z) for mesh-only homelab services
+# 2. MESH clients get direct Tailscale IP (100.x.y.z) for all homelab services
 # 3. Cloud mesh-only services get unconditional rewrites (since they have no LAN IP)
 ADGUARD_JSON=$(echo "$DATA" | jq -c '
   .domain as $d |
   {
     rules: (
       [.homelab[] | "||\(.subdomain).\($d)^$dnsrewrite=\(.ip),client=LAN"]
-      + [.mesh[] | select(.isCloud | not) | "||\(.subdomain).\($d)^$dnsrewrite=\(.ip),client=MESH"]
+      + [.homelab[] | select(.meshIp != null) | "||\(.subdomain).\($d)^$dnsrewrite=\(.meshIp),client=MESH"]
       + [.mesh[] | select(.isCloud) | "||\(.subdomain).\($d)^$dnsrewrite=\(.ip)"]
     )
   }
