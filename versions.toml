@@ -31,8 +31,8 @@ digest = "sha256:874f719518f617d03a60e03411fc5d090647e1a877041e81f8dc965927c7deb
 
 [crowdsec-web-ui]
 repository = "ghcr.io/theduffman85/crowdsec-web-ui"
-tag = "2026.10.13"
-digest = "sha256:3b7d608ea3fb1d8ecf12079c188f9a8c705c89cf03685db4a1b89303d8e17477"
+tag = "2026.11.3"
+digest = "sha256:54fabf0c6ac7895bd3b85971128145e54b4d84d9ec3276480d5abc4381a15afc"
 
 [dawarich]
 version = "1.14.4"
@@ -41,13 +41,13 @@ npmHash = "sha256-WXwDi3K9s77+d/1lEOmUKeOZkcvUEsh8YnPztaqKHjk="
 
 [decypharr]
 repository = "docker.io/cy01/blackhole"
-tag = "v2.7.1"
-digest = "sha256:777ae890807218353c06db091c218636a049170450c620db1c38bc533cee9403"
+tag = "v2.7.2"
+digest = "sha256:1fb75ea43e4f47b3f8c387178e880d79b1d73c7aab4ba6f7e1f4fa484711e450"
 
 [homeassistant]
 repository = "ghcr.io/home-assistant/home-assistant"
-tag = "2026.10.4"
-digest = "sha256:23f4dfbb69ce76315dbc4de7915504f1c2dcecd7ca2648113a493a385972e133"
+tag = "2026.11.0"
+digest = "sha256:c6c1ca9931036bf3a2c4cc088d8db25dfea3b33935a5ecc83c40349462e2f69e"
 
 [homeassistant-smartrent.src]
 repository = "github:vincent861223/homeassistant-smartrent"
@@ -55,15 +55,15 @@ rev = "e53d9d41c875f5a5ff266e62f2026bd560950eb9"
 hash = "sha256-E7hUKAftpLU9YkyyPYPX3t256xBQ7KCbsQrddDp+u14="
 
 [immich]
-tag = "v3.3.5"
+tag = "v3.3.6"
 
 [immich.server]
 repository = "ghcr.io/immich-app/immich-server"
-digest = "sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6"
+digest = "sha256:e1981983b1c13f6024b57d72e7ecae3342eed1581201ab09fb248932d86c593a"
 
 [immich.machine-learning]
 repository = "ghcr.io/immich-app/immich-machine-learning"
-digest = "sha256:5b28c9352c8374b8a1ed96fbdd8d6755fea6e43510ec43fdf6538aa02ea40f56"
+digest = "sha256:14367bfb374b8576ddf49abd67c5ca0190a4c7fcf6303cdad65d7f7bf1a50bc2"
 
 [immich.postgres]
 repository = "ghcr.io/immich-app/postgres"
@@ -158,8 +158,8 @@ digest = "sha256:1f7faeb0227ad5edb5711f7058bfce807ea65e5f92234af0778e4db140f6eb4
 
 [wallos]
 repository = "docker.io/bellamy/wallos"
-tag = "5.10.3"
-digest = "sha256:082f85de7367cdbe9c3005a3e4133b33135d204b1e0f47d760e29613a74a04d4"
+tag = "5.10.4"
+digest = "sha256:78b73a32ae24bcca67d6f4b96ca76fe29ee8da5e8df1769df1e612a4e776c904"
 
 [whoami]
 repository = "docker.io/containous/whoami"
@@ -167,15 +167,15 @@ tag = "v1.5.0"
 digest = "sha256:7d6a3c8f91470a23ef380320609ee6e69ac68d20bc804f3a1c6065fb56cfa34e"
 
 [windmill]
-version = "1.855.1"
+version = "1.860.0"
 
 [windmill.server]
 repository = "ghcr.io/windmill-labs/windmill"
-digest = "sha256:474fceb2b81445ab9dac9383cb3884133c1ddd0a68e85dcab24a784f7d110bb5"
+digest = "sha256:d09a7eb5e2c34d6a70cf35bb45b079fdd91b1aed945e90d2cc9bf76ed11729c1"
 
 [windmill.extra]
 repository = "ghcr.io/windmill-labs/windmill-extra"
-digest = "sha256:80fb9e7ac474ab2850b2b23b6010e3ca6d47ea2449f9774e6951ef25651450f1"
+digest = "sha256:f3b087aeaf298451e0bb75ead44377032e9796fa1fd236de5dea5ac8e3641f4e"
 
 [windmill.postgres]
 repository = "docker.io/library/postgres"
