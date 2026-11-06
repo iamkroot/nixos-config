@@ -57,6 +57,14 @@ in
       IdentityFile = osConfig.vaultix.secrets."github-ssh-key".path;
     };
   };
+  programs.firefox = lib.mkIf (osConfig.services.desktopManager.plasma6.enable or false) {
+    enable = true;
+    profiles.default = {
+      id = 0;
+      isDefault = true;
+    };
+  };
+
   programs.home-manager.enable = true;
   home.stateVersion = "26.05";
 }
