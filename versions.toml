@@ -26,13 +26,13 @@ digest = "sha256:bcc346d402386bdeffc088a436b8a6c6393336bf688ab0f34c097218b0f5ba3
 
 [byparr]
 repository = "ghcr.io/thephaseless/byparr"
-tag = "3.0.4"
-digest = "sha256:874f719518f617d03a60e03411fc5d090647e1a877041e81f8dc965927c7deb6"
+tag = "3.1.1"
+digest = "sha256:c66fa161187b8fa527bfad7eefa2647ea1c553f77df68cbffd6fe83366d1787b"
 
 [crowdsec-web-ui]
 repository = "ghcr.io/theduffman85/crowdsec-web-ui"
-tag = "2026.11.3"
-digest = "sha256:54fabf0c6ac7895bd3b85971128145e54b4d84d9ec3276480d5abc4381a15afc"
+tag = "2026.11.5"
+digest = "sha256:8bb448c5c9d9991750dd9e967f3c079782a0bfe8ad1737b87a981ecc1f944a5b"
 
 [dawarich]
 version = "1.14.4"
@@ -81,16 +81,16 @@ tag = "v3.3.3"
 digest = "sha256:5532b6ecc986525179444a0604a35511b7e1b95ffc4d01d0dfed74a428b56a50"
 
 [mindwtr]
-version = "1.3.7"
+version = "1.3.8"
 
 [mindwtr.cloud]
 repository = "ghcr.io/dongdongbh/mindwtr-cloud"
-digest = "sha256:502a3c945faa06a3810484c28b4fda4350e36924c8782923b3ad74539a87509e"
+digest = "sha256:e6065cb8f11aa8843ea566810b9d07d0f87d499fa6703d1e030a7fed2f64b028"
 
 [mindwtr.web]
 repository = "ghcr.io/dongdongbh/mindwtr-app"
-digest = "sha256:972a101e16452009fc721dd31a4ec80139b74768d8107271745ee7083223004f"
-hash = "sha256-Eo5Dzle6c3O3wY8NmBuaqMe7/9Z/71NkdxvuQTbR1CI="
+digest = "sha256:44aa7a31c403baa5ff70fa1f70593d994064af62527a68e4c94664dd33bde1ef"
+hash = "sha256-SPRyOYVkP392KGIBcq316l9AZ5cCg16yqOIHTbdustM="
 
 [onstar2mqtt]
 repository = "ghcr.io/bigthundersr/onstar2mqtt"
@@ -167,20 +167,20 @@ tag = "v1.5.0"
 digest = "sha256:7d6a3c8f91470a23ef380320609ee6e69ac68d20bc804f3a1c6065fb56cfa34e"
 
 [windmill]
-version = "1.860.0"
+version = "1.863.0"
 
 [windmill.server]
 repository = "ghcr.io/windmill-labs/windmill"
-digest = "sha256:d09a7eb5e2c34d6a70cf35bb45b079fdd91b1aed945e90d2cc9bf76ed11729c1"
+digest = "sha256:1e0437156f28393749d7713011eaf5cdf2da782ef68741c5e4278557dbf15ab8"
 
 [windmill.extra]
 repository = "ghcr.io/windmill-labs/windmill-extra"
-digest = "sha256:f3b087aeaf298451e0bb75ead44377032e9796fa1fd236de5dea5ac8e3641f4e"
+digest = "sha256:da67282a8cd659c74216b4e3df28db68efa9c967ada71fa67ea3f317130ca6c7"
 
 [windmill.postgres]
 repository = "docker.io/library/postgres"
 tag = "18"
-digest = "sha256:3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81"
+digest = "sha256:bd5dfa494a5a259704365813dbfa5fa6b3e69be7348d43b547f540c730478583"
 
 [yopass.app]
 repository = "docker.io/jhaals/yopass"
@@ -190,4 +190,4 @@ digest = "sha256:6e45ce6c6c694a094643e433c45e36d66d516a3a70235321186e4c061942d6d
 [yopass.memcached]
 repository = "docker.io/library/memcached"
 tag = "alpine"
-digest = "sha256:6a089e37cbb8acd75c80c6c0667fe57ec54db68782fb1b3afb1d0eb265e50070"
+digest = "sha256:bfc2ee42c4edb65f436dafc6a61cbc6938c30118e11ddea2f968e1a2c90bb12a"
