@@ -15,6 +15,7 @@
     # 1. Create the directory if it doesn't exist
     "d /media 0775 ${pii.primaryUser} media - -"
     "d /media/photos 0775 ${pii.primaryUser} media - -"
+    "d /home/${pii.primaryUser}/.cache 0700 ${pii.primaryUser} users - -"
 
     # 2. Apply ACLs to the directory itself (Access ACL)
     "a /media - - - - group:media:rwx"

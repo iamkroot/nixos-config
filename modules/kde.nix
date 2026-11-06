@@ -21,6 +21,7 @@
   services.displayManager.defaultSession = "plasma";
 
   programs.xwayland.enable = true;
+  programs.firefox.enable = true;
 
   fonts.packages = with pkgs; [
     noto-fonts
