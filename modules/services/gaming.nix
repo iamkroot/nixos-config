@@ -75,7 +75,6 @@ in
     applications = {
       env = {
         DISPLAY = ":0";
-        WAYLAND_DISPLAY = "wayland-0";
         XDG_CURRENT_DESKTOP = "KDE";
         XDG_SESSION_TYPE = "wayland";
         PATH = "$(PATH):${
