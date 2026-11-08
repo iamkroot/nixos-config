@@ -1,14 +1,24 @@
 {
   config,
+  pkgs,
   myUtils,
   pii,
   ...
 }:
+let
+  arrImportExtras = import ./import-extras-pkg.nix { inherit pkgs; };
+in
 {
   imports = [
     (myUtils.mkCaddyModule "sonarr" {
       authelia = true;
     })
+  ];
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/sonarr/custom-scripts 0755 sonarr media - -"
+    "L+ /var/lib/sonarr/custom-scripts/sonarr-import-extras - - - - ${arrImportExtras}/bin/arr-import-extras"
+    "L+ /var/lib/sonarr/custom-scripts/arr-import-extras - - - - ${arrImportExtras}/bin/arr-import-extras"
   ];
 
   services.sonarr = {

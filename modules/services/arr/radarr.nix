@@ -1,14 +1,24 @@
 {
   config,
+  pkgs,
   myUtils,
   pii,
   ...
 }:
+let
+  arrImportExtras = import ./import-extras-pkg.nix { inherit pkgs; };
+in
 {
   imports = [
     (myUtils.mkCaddyModule "radarr" {
       authelia = true;
     })
+  ];
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/radarr/custom-scripts 0755 radarr media - -"
+    "L+ /var/lib/radarr/custom-scripts/radarr-import-featurettes - - - - ${arrImportExtras}/bin/arr-import-extras"
+    "L+ /var/lib/radarr/custom-scripts/arr-import-extras - - - - ${arrImportExtras}/bin/arr-import-extras"
   ];
 
   services.radarr = {
