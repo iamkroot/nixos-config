@@ -58,4 +58,8 @@
   };
 
   environment.systemPackages = [ pkgs.ariang ];
+
+  networking.firewall.interfaces."podman0".allowedTCPPorts = [
+    config.infra.services.ports.aria2
+  ];
 }

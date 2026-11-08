@@ -41,84 +41,15 @@ let
 in
 {
   imports = [
-    (myUtils.mkCaddyModule "radarr" {
-      authelia = true;
-    })
-    (myUtils.mkCaddyModule "sonarr" {
-      authelia = true;
-    })
     (myUtils.mkCaddyModule "decypharr" {
       authelia = true;
     })
-    (myUtils.mkCaddyModule "profilarr" {
-      authelia = true;
-    })
-    (myUtils.mkCaddyModule "prowlarr" {
-      authelia = true;
-    })
-    ../../modules/services/byparr.nix
   ];
-
-  myAuthelia.accessRules = [
-    # Bypass API so *arr apps and external tools can talk to each other
-    {
-      domain = [
-        config.infra.services.hostnames.seerr
-        config.infra.services.hostnames.radarr
-        config.infra.services.hostnames.sonarr
-      ];
-      resources = [ "^/api.*" ];
-      policy = "bypass";
-    }
-    # Require auth for the human-facing web UI
-    {
-      domain = [ config.infra.services.hostnames.seerr ];
-      policy = "one_factor";
-    }
-    # Require jellyfin_admins for Profilarr
-    {
-      domain = config.infra.services.hostnames.profilarr;
-      policy = "one_factor";
-      subject = [
-        "group:jellyfin_admins"
-      ];
-    }
-  ];
-
-  services.sonarr = {
-    enable = true;
-    group = "media";
-    environmentFiles = [ "/var/lib/sonarr/sonarr.env" ];
-    settings = {
-      server.port = config.infra.services.ports.sonarr;
-      auth.method = "External";
-    };
-  };
-
-  services.radarr = {
-    enable = true;
-    group = "media";
-    environmentFiles = [ "/var/lib/radarr/radarr.env" ];
-    settings = {
-      server.port = config.infra.services.ports.radarr;
-      auth.method = "External";
-    };
-  };
-
-  # TODO: Is there a way to declare sonarr/radarr App configs here?
-  services.prowlarr = {
-    enable = true;
-    settings = {
-      server.port = config.infra.services.ports.prowlarr;
-      auth.method = "External";
-    };
-  };
 
   # Use systemd tmpfiles to apply ACLs to the Downloads folder
   # This ensures the 'media' group and primaryUser always have access to files created by services
   systemd.tmpfiles.rules = [
     "d /var/lib/decypharr 0770 root media - -"
-    "d /var/lib/profilarr 0770 root media - -"
     "d ${downloadsDir} 2775 ${pii.primaryUser} media - -"
     "z ${downloadsDir} 2775 ${pii.primaryUser} media - -"
     "a+ ${downloadsDir} - - - - user:${pii.primaryUser}:rwx"
@@ -150,66 +81,7 @@ in
     ];
   };
 
-  virtualisation.oci-containers.containers.profilarr = {
-    image = myUtils.mkImage config.infra.versions.profilarr;
-    ports = [ "${toString config.infra.services.ports.profilarr}:6868" ];
-
-    environment = {
-      PUID = "1000";
-      PGID = toString config.users.groups.media.gid;
-      # handled by authelia
-      AUTH = "off";
-      ORIGIN = "https://${config.infra.services.hostnames.profilarr}";
-    };
-
-    volumes = [
-      "/var/lib/profilarr:/config:rw"
-    ];
-
-    extraOptions = [
-      "--health-interval=5m"
-      "--health-retries=3"
-      # Bypass Hairpin NAT bugs, map the public domain to host
-      "--add-host=${config.infra.services.hostnames.radarr}:host-gateway"
-      "--add-host=${config.infra.services.hostnames.sonarr}:host-gateway"
-    ];
-  };
-
-  vaultix.secrets = vaultixSecrets // {
-    "sonarr-key" = {
-      file = pii.secrets.sonarr-key;
-    };
-    "radarr-key" = {
-      file = pii.secrets.radarr-key;
-    };
-  };
-
-  vaultix.templates."sonarr.env" = {
-    content = ''
-      SONARR_AUTH_APIKEY=${config.vaultix.placeholder.sonarr-key}
-    '';
-    mode = "640";
-    group = "media";
-    path = "/var/lib/sonarr/sonarr.env";
-  };
-  vaultix.templates."radarr.env" = {
-    content = ''
-      RADARR_AUTH_APIKEY=${config.vaultix.placeholder.radarr-key}
-    '';
-    group = "media";
-    mode = "640";
-    path = "/var/lib/radarr/radarr.env";
-  };
-
-  networking.firewall.interfaces."podman0".allowedTCPPorts =
-    map (name: config.infra.services.ports.${name})
-      [
-        "radarr"
-        "sonarr"
-        "prowlarr"
-        "profilarr"
-        "aria2" # FIXME: Move this closer to aria2 module
-      ];
+  vaultix.secrets = vaultixSecrets;
 
   vaultix.templates."decypharr-config.json" = {
     group = "media";
