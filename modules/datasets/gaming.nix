@@ -149,7 +149,9 @@ in
     options = {
       mountpoint = "legacy";
       recordsize = "1M";
-      "sanoid:autosnap" = "true";
+      "sanoid:autosnap" = "false";
+      "syncoid:sync" = "no";
+      "kopia:backup" = "false";
     };
   };
 }
