@@ -114,6 +114,17 @@
           });
         };
       };
+
+      # Workaround for nixpkgs: cargoUseSystemLibs in cargo-setup-hook breaks dufs build (aws-lc-sys requires system AWS-LC)
+      dufs = myUtils.selfExpiringOverride {
+        pkgs = prev;
+        name = "dufs";
+        strictlyNewer = true;
+        minVersion = "0.47.0";
+        localPkg = prev.dufs.overrideAttrs (_old: {
+          dontCargoUseSystemLibs = true;
+        });
+      };
     })
   ];
 

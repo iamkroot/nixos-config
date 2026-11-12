@@ -11,6 +11,7 @@ let
   redlib-latest = pkgs.redlib.overrideAttrs (oldAttrs: {
     inherit (v) version;
     inherit src;
+    dontCargoUseSystemLibs = true;
     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
       inherit src;
       name = "redlib-${v.version}-vendor";
