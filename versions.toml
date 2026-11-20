@@ -16,13 +16,13 @@
 
 [account-center]
 repository = "ghcr.io/icikowski/account-center"
-tag = "v1.11.1"
-digest = "sha256:eb18702accbe57192a4a2b9910a41eb2ab37a636191e663bd3784ed5cb5233fc"
+tag = "v1.11.2"
+digest = "sha256:417db8f35e52cde94a4939ebaed050e8ebd8f105e77da758264f334e12fad601"
 
 [argus]
 repository = "ghcr.io/release-argus/argus"
-tag = "0.39.0"
-digest = "sha256:bcc346d402386bdeffc088a436b8a6c6393336bf688ab0f34c097218b0f5ba33"
+tag = "0.39.1"
+digest = "sha256:a5700f759e209af46480e313b383aa7c69fca5d7a7e2b6936e596380798a5c0d"
 
 [byparr]
 repository = "ghcr.io/thephaseless/byparr"
@@ -31,8 +31,8 @@ digest = "sha256:c66fa161187b8fa527bfad7eefa2647ea1c553f77df68cbffd6fe83366d1787
 
 [crowdsec-web-ui]
 repository = "ghcr.io/theduffman85/crowdsec-web-ui"
-tag = "2026.11.8"
-digest = "sha256:c531d36780cfb072023aa273849ea081e2a6dc18df15326dde6af7dcc6cda160"
+tag = "2026.11.12"
+digest = "sha256:5bc8a0bdb6350101bce07f1db55df9784b27f6f2ff49cc1316bd67988628558e"
 
 [dawarich]
 version = "1.14.4"
@@ -46,8 +46,8 @@ digest = "sha256:1fb75ea43e4f47b3f8c387178e880d79b1d73c7aab4ba6f7e1f4fa484711e45
 
 [homeassistant]
 repository = "ghcr.io/home-assistant/home-assistant"
-tag = "2026.11.1"
-digest = "sha256:6785d1eca68747a524c156faae1b139ed415c07357386ae6fe17291986e59e82"
+tag = "2026.11.2"
+digest = "sha256:493a07e8f6530fc640223f4a0a5248f20a61ca2f718bb1d31efbf08a2c5ea28f"
 
 [homeassistant-smartrent.src]
 repository = "github:vincent861223/homeassistant-smartrent"
@@ -55,15 +55,15 @@ rev = "e53d9d41c875f5a5ff266e62f2026bd560950eb9"
 hash = "sha256-E7hUKAftpLU9YkyyPYPX3t256xBQ7KCbsQrddDp+u14="
 
 [immich]
-tag = "v3.4.1"
+tag = "v3.4.2"
 
 [immich.server]
 repository = "ghcr.io/immich-app/immich-server"
-digest = "sha256:7c489add298fc2f92cda4c777de6462aa206877e04087b815f62c7664af0b53b"
+digest = "sha256:fc880c1bf665b4aab1e74c15e56ab871225989cd546536e6b77e771869af06bd"
 
 [immich.machine-learning]
 repository = "ghcr.io/immich-app/immich-machine-learning"
-digest = "sha256:8adebf414256f6e4f837bfbb66fa94f14f4da7260e3a1d65cbba49e4e35d8764"
+digest = "sha256:739405742a79bd7447227c553bb62ed5491aa36acf00bc667af7f9c93b6fae91"
 
 [immich.postgres]
 repository = "ghcr.io/immich-app/postgres"
@@ -73,29 +73,29 @@ digest = "sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c2
 [immich.valkey]
 repository = "docker.io/valkey/valkey"
 tag = "9"
-digest = "sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7"
+digest = "sha256:1c2b25b09f354c66fe994733acdf12fcfd4bdf6f3bd92b88a93a70378d884056"
 
 [koalasync]
 repository = "ghcr.io/shik3i/koalasync"
-tag = "v3.4.0"
-digest = "sha256:e94eeaefc5332cb4d39866ecd698bb1fbc17d4d723ac3bef017e95ff2a7154b6"
+tag = "v3.5.0"
+digest = "sha256:451412201abab467a48bc566357906741bd433527fee6e1eea7c1391446218e3"
 
 [mindwtr]
-version = "1.3.8"
+version = "1.3.9"
 
 [mindwtr.cloud]
 repository = "ghcr.io/dongdongbh/mindwtr-cloud"
-digest = "sha256:e6065cb8f11aa8843ea566810b9d07d0f87d499fa6703d1e030a7fed2f64b028"
+digest = "sha256:9bd240a1da46f18e38ca93fe105faad7d79667d1bf12a156250a92700a28aede"
 
 [mindwtr.web]
 repository = "ghcr.io/dongdongbh/mindwtr-app"
-digest = "sha256:44aa7a31c403baa5ff70fa1f70593d994064af62527a68e4c94664dd33bde1ef"
-hash = "sha256-SPRyOYVkP392KGIBcq316l9AZ5cCg16yqOIHTbdustM="
+digest = "sha256:91eb0e968593e898bbeae02e86879b76bc56b93f1bb03a5fa7a27e18c2db54cf"
+hash = "sha256-JPZKq2XUUNjKOcSs03iaZvp41eutxt2X6lJsrm/zQnc="
 
 [onstar2mqtt]
 repository = "ghcr.io/bigthundersr/onstar2mqtt"
-tag = "2.11.0"
-digest = "sha256:d37121037380ba4b9c33f240c656ef0cc83d18b5bb798bc4b80cf32494701747"
+tag = "2.11.1"
+digest = "sha256:c1b85ff07c611b9f619ea3976180e50ff08c9ea567ddc70c4e951a290eea8441"
 
 [pot-provider]
 repository = "docker.io/brainicism/bgutil-ytdlp-pot-provider"
@@ -123,18 +123,18 @@ rev = "29f18352cf54be4ffe579f773552acd0c45cdd08"
 hash = "sha256-ShLaYBcSZmW2gQuwJdtE3nhpuzWL+ITkyuCgQ0rNM1o="
 
 [revaulter]
-version = "2.8.1"
+version = "2.9.0"
 repository = "ghcr.io/italypaleale/revaulter"
-digest = "sha256:dd74bc86ffa30be3165d8775f9c23f3dcfecba33a08bc0ba5c3233b668ab77b4"
+digest = "sha256:51fecdda76fab39df213e1370eddcabf74ca9d0c3c1167f3d27a07913dc5e25b"
 
 [revaulter.cli]
-version = "2.8.1"
-hash = "sha256-jWAidOouxHPK2K6OKSuzidpwzPxFuf6QblEHKNHM08o="
+version = "2.9.0"
+hash = "sha256-edW7R/bs/rHLjGAmYPgN0tNiU64PqBJq/2K7ABnE/nw="
 
 [rsstt]
 repository = "docker.io/rongronggg9/rss-to-telegram"
 tag = "dev"
-digest = "sha256:48b06e90e00fc08de2f90f83c674ee1c42c53b6b29f28a120bf0c2ba6804b482"
+digest = "sha256:747ced40030c52bb19ee4cfd878c0141f0734a6947c14b0968d57c35e951147e"
 
 [shoko]
 repository = "ghcr.io/shokoanime/server"
@@ -144,12 +144,12 @@ digest = "sha256:b841f8249c9edfba102e4072e2b2a3eae4179e5dd553f29e11b9898a44f1e83
 [shitter.app]
 repository = "docker.io/mv12star/shitter"
 tag = "latest"
-digest = "sha256:6b1c6b26d63ef72d9a9a1d0d6f0db7f57c00054d256395444b53aeabef99f8b0"
+digest = "sha256:bc3f6f32a13672c18054e52471c6b4854aa015febae081146cb9cd39ad5c26e7"
 
 [shitter.valkey]
 repository = "docker.io/valkey/valkey"
 tag = "9"
-digest = "sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7"
+digest = "sha256:1c2b25b09f354c66fe994733acdf12fcfd4bdf6f3bd92b88a93a70378d884056"
 
 [waha]
 repository = "docker.io/devlikeapro/waha"
@@ -158,8 +158,8 @@ digest = "sha256:1f7faeb0227ad5edb5711f7058bfce807ea65e5f92234af0778e4db140f6eb4
 
 [wallos]
 repository = "docker.io/bellamy/wallos"
-tag = "5.11.1"
-digest = "sha256:182d4be4dae26834cc5cec3686bb142e78b0a139a0eb1059355d061d8c0de3e5"
+tag = "5.11.2"
+digest = "sha256:de82c41215a761d33a38a3672526b3ce47d0fe7acb84f5c2a4cb2342c710cf4c"
 
 [whoami]
 repository = "docker.io/containous/whoami"
@@ -167,25 +167,25 @@ tag = "v1.5.0"
 digest = "sha256:7d6a3c8f91470a23ef380320609ee6e69ac68d20bc804f3a1c6065fb56cfa34e"
 
 [windmill]
-version = "1.868.0"
+version = "1.880.1"
 
 [windmill.server]
 repository = "ghcr.io/windmill-labs/windmill"
-digest = "sha256:8547f16ad3c54ac8a14ef651eee4ec4b7b90e8a75b5a4f5518a407ab30623cf4"
+digest = "sha256:7ac21ebf0f098f76549d1bb9004fb08591f3dd0ae4eeb11130d355191dfbb716"
 
 [windmill.extra]
 repository = "ghcr.io/windmill-labs/windmill-extra"
-digest = "sha256:9af687854a1de17b8db319b5ab74e2ac7f5c715ec6e10fb05534b4fc010be6c3"
+digest = "sha256:6b7cd9e08a5205aa4da65e9bc8333e589a9880746bbe4dd0639a4123521ec1f4"
 
 [windmill.postgres]
 repository = "docker.io/library/postgres"
 tag = "18"
-digest = "sha256:e3d24f6906d0760bf4da0dae872415391ededefad23fd471c47dc53b0ddf3c42"
+digest = "sha256:e754b839f447639b7004895f4d8a4bfcb4e9dbe3a1bc035f27f646562a16fd61"
 
 [yopass.app]
 repository = "docker.io/jhaals/yopass"
-tag = "16.1.0"
-digest = "sha256:39e63883a5392e5a8445cfd89651bf2df86546efaa4d2842ae15daa9ccb57a17"
+tag = "16.2.0"
+digest = "sha256:6e245cd019198164117a77a01b8c5e0437b639e261fa6cacd0c54d5ea732cd53"
 
 [yopass.memcached]
 repository = "docker.io/library/memcached"
