@@ -12,6 +12,8 @@ let
     inherit (v) version;
     inherit src;
     dontCargoUseSystemLibs = true;
+    enableParallelBuilding = true;
+    requiredSystemFeatures = [ "big-parallel" ];
     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
       inherit src;
       name = "redlib-${v.version}-vendor";
@@ -27,9 +29,15 @@ let
         git
         rustPlatform.bindgenHook
       ]);
+    postPatch = (oldAttrs.postPatch or "") + ''
+      substituteInPlace src/client.rs \
+        --replace-fail '.redirect(Policy::none())' '.redirect(Policy::none())
+        .http1_only()'
+    '';
     checkFlags = (oldAttrs.checkFlags or [ ]) ++ [
       "--skip=oauth::tests::test_generic_web_backend"
       "--skip=oauth::tests::test_mobile_spoof_backend"
+      "--skip=backends::live_tests"
     ];
   });
   redlibPkg = myUtils.selfExpiringOverride {
@@ -84,10 +92,19 @@ in
     settings = {
       REDLIB_DEFAULT_USE_HLS = "on";
       REDLIB_DEFAULT_SHOW_NSFW = "on";
+      REDLIB_ENABLE_RSS = "on";
       REDLIB_DEFAULT_HIDE_HLS_NOTIFICATION = "on";
       # REDLIB_USE_REDDIT_ONION = "on";
       # ALL_PROXY = "socks5h://127.0.0.1:${toString config.infra.services.ports.tor_socks}";
     };
+  };
+
+  vaultix.secrets."redlib/sess_cookie" = { };
+
+  vaultix.templates."redlib.env" = {
+    content = ''
+      REDLIB_REDDIT_COOKIE=${config.vaultix.placeholder."redlib/sess_cookie"}
+    '';
   };
 
   # systemd.services.tor = {
@@ -95,10 +112,15 @@ in
   #   wants = [ "sing-box.service" ];
   # };
 
-  # systemd.services.redlib = {
-  #   after = [ "tor.service" ];
-  #   wants = [ "tor.service" ];
-  # };
+  systemd.services.redlib = {
+    # after = [ "tor.service" ];
+    # wants = [ "tor.service" ];
+    wants = [ "vaultix-activate.service" ];
+    after = [ "vaultix-activate.service" ];
+    serviceConfig.EnvironmentFile = [
+      config.vaultix.templates."redlib.env".path
+    ];
+  };
 
   # Anubis Middleware
   services.anubis.instances."redlib" = {
