@@ -78,4 +78,11 @@
     "d /var/lib/jellyfin/data/subtitles 0770 jellyfin media - -"
     "d /var/lib/jellyfin/metadata 0770 jellyfin media - -"
   ];
+
+  # Reduce real-time library monitor delay from default 60s to 10s
+  systemd.services.jellyfin.preStart = ''
+    if [ -f /var/lib/jellyfin/config/system.xml ]; then
+      ${pkgs.gnused}/bin/sed -i 's|<LibraryMonitorDelay>[0-9]*</LibraryMonitorDelay>|<LibraryMonitorDelay>10</LibraryMonitorDelay>|' /var/lib/jellyfin/config/system.xml
+    fi
+  '';
 }
