@@ -27,6 +27,7 @@ let
         download_links_refresh_interval = "5m";
         workers = 600;
         auto_expire_links_after = "3d";
+        unpack_rar = true;
       };
       vaultix = lib.nameValuePair secretName {
         file = path;
@@ -81,6 +82,10 @@ in
     ];
   };
 
+  systemd.services.podman-decypharr.restartTriggers = [
+    config.vaultix.templates."decypharr-config.json".content
+  ];
+
   vaultix.secrets = vaultixSecrets;
 
   vaultix.templates."decypharr-config.json" = {
@@ -98,9 +103,14 @@ in
           "sonarr",
           "radarr"
         ],
-        "folder_naming": "original_no_ext",
+        "folder_naming": "original",
         "default_download_action": "download",
         "retries": 3,
+        "hearsay": {
+          "enabled": false,
+          "participate": false,
+          "publish": false
+        },
         "repair": {
           "source": "arr",
           "workers": 5,
