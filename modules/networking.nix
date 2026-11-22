@@ -31,8 +31,9 @@ lib.mkMerge [
             dhcp-client-id = "mac";
           };
           ipv6 = {
-            method = "auto";
+            method = "disabled";
             route-metric = 3000;
+            ignore-auto-dns = true;
           };
         };
       };
@@ -69,7 +70,9 @@ lib.mkMerge [
           dns = "${pii.router2.localIp};";
         };
         ipv6 = {
-          method = "auto";
+          # causes issues with byparr cloudflare tokens issued for ipv4...
+          # didn't wanna give byparr `--network=host`
+          method = "disabled";
           ignore-auto-dns = true;
         };
       };
