@@ -161,6 +161,11 @@ repository = "docker.io/valkey/valkey"
 tag = "9"
 digest = "sha256:1c2b25b09f354c66fe994733acdf12fcfd4bdf6f3bd92b88a93a70378d884056"
 
+[tweakio]
+repository = "docker.io/varthe/tweakio"
+tag = "latest"
+digest = "sha256:bfce2305e9377ccd963c5b85800383587a0b7a2b842f1106abe551dcde43fcb6"
+
 [waha]
 repository = "docker.io/devlikeapro/waha"
 tag = "gows-2026.10.1"
