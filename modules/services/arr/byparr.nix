@@ -1,13 +1,23 @@
 {
   config,
+  lib,
+  pkgs,
   myUtils,
   ...
 }:
+let
+  v = config.infra.versions.byparr;
+  hasSrc = (v.src or null) != null;
+  byparrSrc = if hasSrc then myUtils.fetchRepo pkgs v.src else null;
+in
 {
 
   virtualisation.oci-containers.containers.byparr = {
     image = myUtils.mkImage config.infra.versions.byparr;
     ports = [ "${toString config.infra.services.ports.byparr}:8191" ];
+    volumes = lib.optionals hasSrc [
+      "${byparrSrc}/src:/app/src:ro"
+    ];
 
     environment = {
       PORT = "8191";

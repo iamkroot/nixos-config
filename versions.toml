@@ -29,6 +29,11 @@ repository = "ghcr.io/thephaseless/byparr"
 tag = "3.1.1"
 digest = "sha256:c66fa161187b8fa527bfad7eefa2647ea1c553f77df68cbffd6fe83366d1787b"
 
+[byparr.src]
+repository = "github:luca-bortoletto/Byparr"
+rev = "9c1bb8feabc7de7b2279c209c151d0cbc7e381fe"
+hash = "sha256-fZIqRAytV6RMEduOcN3ILuIJAVpJob2DAb7LuaVVerI="
+
 [crowdsec-web-ui]
 repository = "ghcr.io/theduffman85/crowdsec-web-ui"
 tag = "2026.11.12"
