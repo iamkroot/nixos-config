@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  pii,
   myUtils,
   ...
 }:
@@ -9,8 +8,6 @@ let
   v = config.infra.versions.shitter;
   port = config.infra.services.ports.nitter;
   domain = config.infra.services.hostnames.nitter;
-  vpnProxyPort = config.infra.services.ports.vpn-proxy;
-  vpnProxyHost = pii.hosts.homelab1.tailscaleIp;
 in
 {
   imports = [
@@ -20,6 +17,9 @@ in
   ];
 
   vaultix.secrets."nitter/hmac_key" = { };
+  vaultix.secrets."nitter/sessions" = {
+    mode = "0644";
+  };
 
   vaultix.templates."nitter.conf" = {
     mode = "0644";
@@ -53,7 +53,7 @@ in
       enableRSSSearch = true
       enableRSSList = true
       enableDebug = false
-      proxy = "http://${vpnProxyHost}:${toString vpnProxyPort}"
+      proxy = ""
       proxyAuth = ""
       apiProxy = ""
       disableTid = false
@@ -74,7 +74,6 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/nitter 0755 root root -"
     "d /var/lib/nitter/redis 0755 root root -"
-    "f /var/lib/nitter/sessions.jsonl 0644 root root -"
   ];
 
   systemd.services.create-nitter-network = {
@@ -113,7 +112,7 @@ in
         dependsOn = [ "nitter-redis" ];
         volumes = [
           "${config.vaultix.templates."nitter.conf".path}:/src/nitter.conf:ro"
-          "/var/lib/nitter/sessions.jsonl:/src/sessions.jsonl:ro"
+          "${config.vaultix.secrets."nitter/sessions".path}:/src/sessions.jsonl:ro"
         ];
       };
     };
@@ -141,11 +140,9 @@ in
       "var-lib-nitter.mount"
       "vaultix-activate.service"
       "create-nitter-network.service"
-      "sing-box.service"
     ];
     wants = [
       "vaultix-activate.service"
-      "sing-box.service"
     ];
     requires = [
       "var-lib-nitter.mount"
@@ -153,11 +150,6 @@ in
     ];
     preStart = ''
       mkdir -p /var/lib/nitter
-      # Ensure sessions.jsonl exists with read permissions (0644) for container user
-      if [ ! -f /var/lib/nitter/sessions.jsonl ]; then
-        touch /var/lib/nitter/sessions.jsonl
-        chmod 0644 /var/lib/nitter/sessions.jsonl
-      fi
     '';
   };
 }
